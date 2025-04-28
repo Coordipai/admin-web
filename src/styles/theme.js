@@ -24,7 +24,7 @@ const color = {
     brand600: "#7F56D9",
     brand700: "#6941C6",
     brand800: "#53389E",
-    brand900: "42307D",
+    brand900: "#42307D",
   
     error25: "#FFFBFA",
     error50: "#FEF3F2",
