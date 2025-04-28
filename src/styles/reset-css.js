@@ -21,7 +21,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   input {
-    background-color: ${({ theme }) => theme.colors.white}
+    background-color: ${({ theme }) => theme.colors.white};
   }
   input::-webkit-inner-spin-button {
     appearance: none;
