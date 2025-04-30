@@ -22,8 +22,18 @@ export const GlobalStyle = createGlobalStyle`
 
   input {
     background-color: ${({ theme }) => theme.colors.white};
+    font-family: Poppins, Inter, sans-serif;
   }
   input::-webkit-inner-spin-button {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+  }
+  textarea {
+    background-color: ${({ theme }) => theme.colors.white};
+    font-family: Poppins, Inter, sans-serif;
+  }
+  textarea::-webkit-inner-spin-button {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
