@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import FormInput from '@components/FormInput';
 import FormTextarea from '@components/FormTextArea';
+import FormDropdown from '../components/FormDropdown';
+import { Form } from 'react-router-dom';
 
 const FormInputTest = () => {
     const [value, setValue] = useState('');
@@ -39,6 +41,32 @@ const FormTextAreaTest = () => {
     )
 }
 
+const FormDropdownTest = () => {
+    const memus = [
+            { title: 'Option 1' },
+            { title: 'Option 2' },
+            { title: 'Option 3' },
+    ];
+
+    const [index, setIndex] = useState(0);
+    const handleChange = (index) => {
+        setIndex(index);
+    }
+
+    return (
+        <div>
+            <FormDropdown 
+                placeholder="Select an option"
+                menus={memus}
+                selectedMenu={index}
+                handleChange={(i) => handleChange(i)}
+            />
+            <div> selected index: {index}</div>
+            <div> selected value: {memus[index].title}</div>
+        </div>
+    )
+}
+
 
 const ComponentTest = () => {
     return (
@@ -46,6 +74,7 @@ const ComponentTest = () => {
             <div> Component Test </div>
             <FormInputTest />
             <FormTextAreaTest />
+            <FormDropdownTest />
         </div>
     );
 }
