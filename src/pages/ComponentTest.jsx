@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import FormInput from '@components/FormInput';
 import FormTextarea from '@components/FormTextArea';
-import FormDropdown from '../components/FormDropdown';
-import { Form } from 'react-router-dom';
+import FormDropdown from '@components/FormDropdown';
+import Header from '@components/Header';
 
 const FormInputTest = () => {
     const [value, setValue] = useState('');
@@ -67,6 +67,28 @@ const FormDropdownTest = () => {
     )
 }
 
+const HeaderTest = () => {
+    return (
+        <div>
+            <Header
+                text="Header Title"
+                isTab={true}
+                buttonsData={[
+                    {
+                        value: 'Button 1',
+                        isHighlighted: false,
+                        onClick: () => console.log('Button 1 clicked'),
+                    },
+                    {
+                        value: 'Button 2',
+                        isHighlighted: true,
+                        onClick: () => console.log('Button 2 clicked'),
+                    },
+                ]}
+            />
+        </div>
+    );
+}
 
 const ComponentTest = () => {
     return (
@@ -75,6 +97,7 @@ const ComponentTest = () => {
             <FormInputTest />
             <FormTextAreaTest />
             <FormDropdownTest />
+            <HeaderTest />
         </div>
     );
 }
