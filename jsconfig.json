@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+	  "module": "es6",
+	  "target": "es6",
+	  "jsx": "react",
+	  "allowJs": true,
+	  "checkJs": false, // JSDoc 타입 검사 활성화
+	  "moduleResolution": "node"
+	},
+	"exclude": [
+	  "node_modules",
+	  "**/node_modules/*"
+	]
+  }
