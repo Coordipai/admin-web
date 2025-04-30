@@ -1,6 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 
-const GlobalStyle = createGlobalStyle`
+export const GlobalStyle = createGlobalStyle`
   :root {
     font-family: Poppins, Inter, sans-serif;
     color-scheme: light only;
@@ -159,5 +159,3 @@ const GlobalStyle = createGlobalStyle`
     border-spacing: 0;
   }  
 `;
-
-export { GlobalStyle };
