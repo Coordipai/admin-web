@@ -108,6 +108,41 @@ const Placeholder = styled.span`
   font-weight: ${({ theme }) => theme.weights.medium};
   color: ${({ theme }) => theme.colors.gray500};
 `;
+/**
+ * @param {object} props - 컴포넌트의 props
+ * @param {string} [props.label] - 드롭다운 위에 표시될 레이블 텍스트
+ * @param {string|string[]} props.value - 선택된 값. multi가 true일 경우 배열
+ * @param {function} props.onChange - 값 변경 시 호출될 콜백 함수
+ * @param {Array<{value: string, label: string, disabled?: boolean}>} [props.options=[]] - 드롭다운 옵션 배열
+ * @param {string} [props.helperText] - 드롭다운 아래에 표시될 도움말 텍스트
+ * @param {boolean} [props.error=false] - 오류 상태를 표시. true일 경우 오류 스타일 적용
+ * @param {boolean} [props.disabled=false] - 드롭다운 비활성화 여부
+ * @param {boolean} [props.multi=false] - 다중 선택 가능 여부
+ * @param {string} [props.placeholder='선택하세요'] - 기본 표시 텍스트
+ * @returns {JSX.Element} 스타일이 적용된 드롭다운 컴포넌트
+ * 
+ * @example
+ * // 기본 사용법
+ * <DropDown
+ *   label="카테고리"
+ *   value={category}
+ *   onChange={setCategory}
+ *   options={[
+ *     { value: 'food', label: '음식' },
+ *     { value: 'drink', label: '음료' }
+ *   ]}
+ * />
+ * 
+ * // 다중 선택 사용
+ * <DropDown
+ *   label="태그"
+ *   value={tags}
+ *   onChange={setTags}
+ *   options={tagOptions}
+ *   multi={true}
+ *   placeholder="태그를 선택하세요"
+ * />
+ */
 
 const DropDown = ({
   label,
