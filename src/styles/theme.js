@@ -225,9 +225,38 @@ const text = {
     `,
 };
 
+const padding = {
+  xs: '0.25rem',   // 4px
+  sm: '0.5rem',    // 8px
+  md: '0.75rem',   // 12px
+  lg: '1rem',      // 16px
+  xl: '2rem',      // 32px
+};
+
+const radius = {
+  sm: '0.25rem',   // 4px
+  md: '0.375rem',  // 6px
+  lg: '0.5rem',    // 8px
+  xl: '0.75rem',   // 12px
+};
+
+const margin = {
+  xs: '0.25rem',   // 4px
+  sm: '0.5rem',    // 8px
+  md: '0.75rem',   // 12px
+  lg: '1rem',      // 16px
+  xl: '2rem',      // 32px
+  label: '0.375rem', // 6px
+};
+
 export const theme = {
   colors: color,
   weights: weight,
   texts: text,
+  padding: padding,
+  radius: radius,
+  margin: margin,
 };
+
+export { color, weight, text, padding, radius, margin };
   
