@@ -233,6 +233,14 @@ const padding = {
   xl: '2rem',      // 32px
 };
 
+const gap = {
+  xs: '0.25rem',   // 4px
+  sm: '0.5rem',    // 8px
+  md: '0.75rem',   // 12px
+  lg: '1rem',      // 16px
+  xl: '2rem',      // 32px
+};
+
 const radius = {
   sm: '0.25rem',   // 4px
   md: '0.375rem',  // 6px
@@ -256,7 +264,8 @@ export const theme = {
   padding: padding,
   radius: radius,
   margin: margin,
+  gap: gap,
 };
 
-export { color, weight, text, padding, radius, margin };
+export { color, weight, text, padding, radius, margin, gap };
   
