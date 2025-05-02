@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import Typography from './Typography';
 
 const FieldWrapper = styled.div`
   display: flex;
@@ -27,6 +28,7 @@ const DropDownBase = styled.button`
   justify-content: space-between;
   padding: ${({ theme }) => `${theme.padding.sm} ${theme.padding.md}`};
   ${({ theme }) => theme.texts.textMD}
+  font-weight: ${({ theme }) => theme.weights.medium};
   color: ${({ theme, $hasValue }) => $hasValue ? theme.colors.gray900 : theme.colors.gray500};
   background: ${({ theme, disabled }) => (disabled ? theme.colors.gray50 : theme.colors.white)};
   border: 1px solid ${({ theme, $error }) => $error ? theme.colors.error500 : theme.colors.gray300};
@@ -103,11 +105,6 @@ const HelperText = styled.span`
   margin-top: ${({ theme }) => theme.margin.label};
 `;
 
-const Placeholder = styled.span`
-  ${({ theme }) => theme.texts.textSM}
-  font-weight: ${({ theme }) => theme.weights.medium};
-  color: ${({ theme }) => theme.colors.gray500};
-`;
 /**
  * @param {object} props - 컴포넌트의 props
  * @param {string} [props.label] - 드롭다운 위에 표시될 레이블 텍스트
@@ -214,7 +211,7 @@ const DropDown = ({
         {hasValue ? (
           <span>{getLabel(value)}</span>
         ) : (
-          <Placeholder>{placeholder}</Placeholder>
+          <Typography variant="textSM" weight="medium" color="gray500" value={placeholder} />
         )}
       </DropDownBase>
       {open && (
