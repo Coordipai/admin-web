@@ -7,7 +7,7 @@ import DropDown from '../../components/Edit/DropDown'
 const Layout = styled.div`
 	display: flex;
 	width: 100vw;
-	min-height: 100vh;
+	height: 100vh;
 	background: ${({ theme }) => theme.colors.white};
 `;
 
@@ -32,6 +32,7 @@ const MainContainer = styled.div`
 	padding: 32px;
 	width: 100%;
 	background: ${({ theme }) => theme.colors.white};
+	max-height: 100vh;
 `;
 
 
