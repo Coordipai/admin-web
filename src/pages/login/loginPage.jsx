@@ -4,6 +4,12 @@ import githubLogo from '../../assets/gitHubLogo.png'
 import CheckLineGraphic from './CheckLineGraphic'
 import GitHubLoginButton from './loginButton'
 
+const Title = styled.h2`
+  ${({ theme }) => theme.texts.displayMD};
+  font-weight: ${({ theme }) => theme.weights.semiBold};
+  //font-family: 'Poppins', sans-serif;
+`
+
 // 화면 정중앙 위치하게하는 wrapper
 const LoginWrapper = styled.div`
   height: 100vh;
@@ -36,7 +42,7 @@ export default function LoginPage() {
           <img src={githubLogo} alt="GitHub Logo" width="100" height="100" />
         </LogoRow>
 
-        <h2 style={{ fontSize: '36px', fontWeight: 'bold' }}>
+        <h2 style={{ fontSize: '36px'}} >
           Authorize GitHub
         </h2>
 
