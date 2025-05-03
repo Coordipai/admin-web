@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import Typography from '../Edit/Typography';
+import Typography from '@components/Edit/Typography';
 
 const StyledButton = styled.button`
   display: inline-flex;

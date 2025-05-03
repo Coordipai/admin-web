@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import InputField from './InputField';
+import InputField from '@components/Edit/InputField';
 import { createPortal } from 'react-dom';
-import searchIcon from '../../assets/icons/search-icon.svg';
+import searchIcon from '@assets/icons/search-icon.svg';
 
 // DropDownMenu, DropDownItem 스타일 재사용
-import { DropDownMenu, DropDownItem } from './DropDown.jsx';
+import { DropDownMenu, DropDownItem } from '@components/Edit/DropDown.jsx';
 
 /**
  * @param {object} props

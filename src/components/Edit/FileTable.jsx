@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Typography from './Typography';
-import Button from '../Common/Button';
-import IconButton from '../Common/IconButton';
-import FileModal from '../Common/FileModal';
+import Typography from '@components/Edit/Typography';
+import Button from '@components/Common/Button';
+import IconButton from '@components/Common/IconButton';
+import FileModal from '@components/Common/FileModal';
 
 const TableWrapper = styled.div`
   box-sizing: border-box;

@@ -1,13 +1,13 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import Typography from './Typography';
-import Button from '../Common/Button';
-import IconButton from '../Common/IconButton';
-import TrashIcon from '../../assets/icons/trash-icon.svg';
-import EditIcon from '../../assets/icons/edit-icon.svg';
-import Badge from './Badge';
-import ArrowLeftIcon from '../../assets/icons/arrow-left-icon.svg';
-import ArrowRightIcon from '../../assets/icons/arrow-right-icon.svg';
+import Typography from '@components/Edit/Typography';
+import Button from '@components/Common/Button';
+import IconButton from '@components/Common/IconButton';
+import TrashIcon from '@assets/icons/trash-icon.svg';
+import EditIcon from '@assets/icons/edit-icon.svg';
+import Badge from '@components/Edit/Badge';
+import ArrowLeftIcon from '@assets/icons/arrow-left-icon.svg';
+import ArrowRightIcon from '@assets/icons/arrow-right-icon.svg';
 
 const TableWrapper = styled.div`
   box-sizing: border-box;

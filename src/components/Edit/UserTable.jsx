@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Typography from './Typography';
-import DropDown from './DropDown';
-import IconButton from '../Common/IconButton';
+import Typography from '@components/Edit/Typography';
+import DropDown from '@components/Edit/DropDown';
+import IconButton from '@components/Common/IconButton';
 
 const TableWrapper = styled.div`
   box-sizing: border-box;
