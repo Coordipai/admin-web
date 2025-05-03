@@ -3,6 +3,10 @@ import InputField from '../../components/Edit/InputField'
 import styled from "styled-components";
 import Typography from '../../components/Edit/Typography'
 import DropDown from '../../components/Edit/DropDown'
+import { HorizontalDivider } from '../../styles/globalStyle';
+import Button from '../../components/Common/Button';
+import { useNavigate } from 'react-router-dom';
+import { DatePicker } from '../../components/Edit/DatePicker';
 
 const Layout = styled.div`
 	display: flex;
@@ -43,19 +47,6 @@ const HeaderSection = styled.div`
 	width: 100%;
 `;
 
-const Title = styled.div`
-	font-family: Poppins, sans-serif;
-	font-weight: ${({ theme }) => theme.weights.bold};
-	font-size: 1.5rem;
-	color: ${({ theme }) => theme.colors.gray900};
-`;
-
-const Divider = styled.div`
-	width: 100%;
-	height: 1px;
-	background: ${({ theme }) => theme.colors.gray200};
-`;
-
 const Fieldset = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -78,27 +69,6 @@ const ButtonGroup = styled.div`
 	width: 100%;
 `;
 
-const Button = styled.button`
-	padding: 0.625rem 1.125rem;
-	border-radius: ${({ theme }) => theme.radius.lg};
-	border: 1px solid ${({ theme }) => theme.colors.brand500};
-	background: ${({ theme }) => theme.colors.brand500};
-	color: ${({ theme }) => theme.colors.white};
-	font-family: Poppins, sans-serif;
-	font-weight: ${({ theme }) => theme.weights.semiBold};
-	font-size: 1rem;
-	cursor: pointer;
-	transition: background 0.2s;
-	&:hover {
-		background: ${({ theme }) => theme.colors.brand600};
-	}
-`;
-
-const CancelButton = styled(Button)`
-	background: ${({ theme }) => theme.colors.white};
-	color: ${({ theme }) => theme.colors.brand500};
-`;
-
 const Section = styled.section`
 width: 100%;
 	display: flex;
@@ -114,14 +84,29 @@ export const BuildProject = () => {
 	const [sprint, setSprint] = useState('');
 	const [github, setGithub] = useState('');
 	const [discord, setDiscord] = useState('');
+	const [error, setError] = useState({});
+	const navigate = useNavigate();
+
+	const handleNext = () => {
+		const newError = {};
+		if (!projectName) newError.projectName = true;
+		if (!deadline) newError.deadline = true;
+		if (!sprint) newError.sprint = true;
+		if (!github) newError.github = true;
+		if (!discord) newError.discord = true;
+		setError(newError);
+		if (Object.keys(newError).length === 0) {
+			navigate('/buildproject2');
+		}
+	};
 
 	return (
 		<Layout>
 			<Sidebar>sidebar</Sidebar>
 			<MainContainer>
-				<HeaderSection>
-					<Title>프로젝트 생성</Title>
-					<Divider />
+			<HeaderSection>
+					<Typography variant="textXL" weight="bold" value="프로젝트 생성" />
+					<HorizontalDivider />
 				</HeaderSection>
 			
 					<Section>
@@ -130,52 +115,73 @@ export const BuildProject = () => {
 								label="프로젝트 명 입력"
 								placeholder="입력하세요"
 								value={projectName}
-								onChange={e => setProjectName(e.target.value)}
+								onChange={e => {
+									setProjectName(e.target.value);
+									if (error.projectName && e.target.value) setError(prev => ({ ...prev, projectName: false }));
+								}}
+								require
+								error={error.projectName}
 							/>
 							<DropDownWrapper>
-								<DropDown
-									label="프로젝트 기한"
-									placeholder="Select team member"
-									value={deadline}
-									onChange={setDeadline}
-									options={[
-										{ value: '', label: 'Select team member' },
-										{ value: '1주', label: '1주' },
-										{ value: '2주', label: '2주' },
-										{ value: '1개월', label: '1개월' },
-										{ value: '3개월', label: '3개월' },
-									]}
-								/>
+								<div style={{ width: '100%' }}>
+									<DatePicker
+										label="마감기한 설정"
+										require
+										paramYear={deadline ? Number(deadline.split('-')[0]) : undefined}
+										paramMonth={deadline ? Number(deadline.split('-')[1]) : undefined}
+										paramDate={deadline ? Number(deadline.split('-')[2]) : undefined}
+										setPickedDate={date => {
+											setDeadline(date);
+											if (error.deadline && date) setError(prev => ({ ...prev, deadline: false }));
+										}}
+										error={error.deadline}
+									/>
+								</div>
 								<DropDown
 									label="스프린트 단위"
 									placeholder="Select team member"
 									value={sprint}
-									onChange={setSprint}
+									onChange={v => {
+										setSprint(v);
+										if (error.sprint && v !== '') setError(prev => ({ ...prev, sprint: false }));
+									}}
 									options={[
 										{ value: '', label: 'Select team member' },
 										{ value: '1주', label: '1주' },
 										{ value: '2주', label: '2주' },
 										{ value: '1개월', label: '1개월' },
 									]}
+									require
+									error={error.sprint}
 								/>
 							</DropDownWrapper>
 							<InputField
 								label="Github Repo 주소 입력"
 								placeholder="입력하세요"
 								value={github}
-								onChange={e => setGithub(e.target.value)}
+								onChange={e => {
+									setGithub(e.target.value);
+									if (error.github && e.target.value) setError(prev => ({ ...prev, github: false }));
+								}}
+								require
+								error={error.github}
 							/>
 							<InputField
 								label="Discord 서버 ID 입력"
 								placeholder="입력하세요"
 								value={discord}
-								onChange={e => setDiscord(e.target.value)}
+								onChange={e => {
+									setDiscord(e.target.value);
+									if (error.discord && e.target.value) setError(prev => ({ ...prev, discord: false }));
+								}}
+								require
+								error={error.discord}
 							/>
 						</Fieldset>
 					
 					<ButtonGroup>
-						<Button type="button">취소</Button>
-						<Button type="submit">다음</Button>
+						<Button text="취소" type="button" onClick={() => navigate('/')} />
+						<Button text="다음" type="button" onClick={handleNext} />
 					</ButtonGroup>
 					</Section>
 				
