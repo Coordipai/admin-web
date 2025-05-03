@@ -48,7 +48,7 @@ export const InputFieldBase = styled.div`
   width: 100%;
   display: flex;
   flex: 1;
-  padding: 0.625rem 0.875rem;
+  padding: ${({ theme }) => `${theme.padding.sm} ${theme.padding.md}`};
   align-items: center;
   ${({ theme }) => theme.texts.textMD}
   font-weight: ${({ theme }) => theme.weights.regular};
