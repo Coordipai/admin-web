@@ -23,7 +23,7 @@ const Dot = styled.span`
   background: ${({ $dot }) => $dot};
 `;
 
-const Bage = ({ priority }) => {
+const Badge = ({ priority }) => {
   const theme = useTheme();
   // 타입별 색상 매핑
   const styleMap = {
@@ -67,8 +67,8 @@ const Bage = ({ priority }) => {
   );
 };
 
-Bage.propTypes = {
+Badge.propTypes = {
   priority: PropTypes.string
 };
 
-export default Bage;
+export default Badge;
