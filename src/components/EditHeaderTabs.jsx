@@ -1,15 +1,15 @@
-import styled from "styled-components";
-import PropTypes from "prop-types";
+import styled from 'styled-components'
+import PropTypes from 'prop-types'
 
 const EditHeaderTabsLayout = styled.div`
   display: flex;
   flex-direction: column;
-`;
+`
 
 const HeaderTabsBox = styled.div`
   display: flex;
   gap: 1rem;
-`;
+`
 
 const HeaderTabBase = styled.div`
   display: flex;
@@ -17,7 +17,7 @@ const HeaderTabBase = styled.div`
   justify-content: center;
   align-content: space-between;
   cursor: pointer;
-`;
+`
 
 const HeaderTabText = styled.span`
   padding: 0 0.25rem 1rem 0.25rem;
@@ -25,19 +25,19 @@ const HeaderTabText = styled.span`
   font-weight: ${({ theme }) => theme.weights.semiBold};
   color: ${({ theme, $selected }) =>
     $selected ? theme.colors.brand700 : theme.colors.gray500};
-`;
+`
 
 const HeaderTabBottomBorder = styled.div`
   width: 100%;
-  height: ${({ $selected }) => ($selected ? `${2 / 16}rem` : "0")};
+  height: ${({ $selected }) => ($selected ? `${2 / 16}rem` : '0')};
   background-color: ${({ theme }) => theme.colors.brand700};
-`;
+`
 
 const EditHeaderTabsDivider = styled.div`
   width: 100%;
   height: 0.0625rem;
   background-color: ${({ theme }) => theme.colors.gray200};
-`;
+`
 
 const EditHeaderTabs = ({ selectedTab, setSelectedTab }) => {
   return (
@@ -54,12 +54,12 @@ const EditHeaderTabs = ({ selectedTab, setSelectedTab }) => {
       </HeaderTabsBox>
       <EditHeaderTabsDivider />
     </EditHeaderTabsLayout>
-  );
-};
+  )
+}
 
 EditHeaderTabs.propTypes = {
   selectedTab: PropTypes.number.isRequired,
-  setSelectedTab: PropTypes.func.isRequired,
-};
+  setSelectedTab: PropTypes.func.isRequired
+}
 
-export default EditHeaderTabs;
+export default EditHeaderTabs

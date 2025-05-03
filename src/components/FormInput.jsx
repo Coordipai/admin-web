@@ -1,20 +1,20 @@
-import { useState } from "react";
-import styled from "styled-components";
-import PropTypes from "prop-types";
-import { InputFieldBase } from "@styles/globalStyle";
+import { useState } from 'react'
+import styled from 'styled-components'
+import PropTypes from 'prop-types'
+import { InputFieldBase } from '@styles/globalStyle'
 
 const FormInputLayout = styled.div`
   width: 100%;
   display: flex;
-`;
+`
 
 const FormInputBox = styled.input`
   width: 100%;
   display: flex;
   border: 0;
   outline: none;
-  caret-color: ${({ $hideCursor }) => ($hideCursor ? "transparent" : "auto")};
-`;
+  caret-color: ${({ $hideCursor }) => ($hideCursor ? 'transparent' : 'auto')};
+`
 
 const FormInput = ({
   placeholder,
@@ -25,9 +25,9 @@ const FormInput = ({
   type,
   hideCursor = false,
   disabled = false,
-  onClick = () => {},
+  onClick = () => {}
 }) => {
-  const [focused, setFocused] = useState(false);
+  const [focused, setFocused] = useState(false)
 
   return (
     <FormInputLayout>
@@ -49,8 +49,8 @@ const FormInput = ({
         />
       </InputFieldBase>
     </FormInputLayout>
-  );
-};
+  )
+}
 
 FormInput.propTypes = {
   placeholder: PropTypes.string,
@@ -61,7 +61,7 @@ FormInput.propTypes = {
   type: PropTypes.string,
   hideCursor: PropTypes.bool,
   disabled: PropTypes.bool,
-  onClick: PropTypes.func,
-};
+  onClick: PropTypes.func
+}
 
-export default FormInput;
+export default FormInput
