@@ -32,6 +32,13 @@ const LogoRow = styled.div`
   gap: 32px;
 `
 
+// 로그인 handler
+const handleGithubLogin = () => {
+  // TODO: 백엔드 OAuth 로그인 URL 배포용으로 교체 예정
+  window.location.href = 'http://localhost:8080/auth/github/login';
+};
+
+
 export default function LoginPage() {
   return (
     <LoginWrapper>
@@ -46,7 +53,7 @@ export default function LoginPage() {
           Authorize GitHub
         </h2>
 
-        <GitHubLoginButton onClick={() => console.log('로그인 시도')} />
+        <GitHubLoginButton onClick={handleGithubLogin} />
       </ContentBox>
     </LoginWrapper>
   )
