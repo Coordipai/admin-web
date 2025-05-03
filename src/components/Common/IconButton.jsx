@@ -5,9 +5,6 @@ const StyledIconButton = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: ${({ theme }) => theme.padding.sm};
   border: none;
   background: none;
   color: ${({ theme }) => theme.colors.gray700};
