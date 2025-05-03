@@ -10,9 +10,15 @@ const StyledButton = styled.button`
   padding: ${({ theme, $variant }) =>
     $variant === 'icon' ? `${theme.padding.sm}` : `${theme.padding.sm} ${theme.padding.lg}`};
   border-radius: ${({ theme }) => theme.radius.lg};
-  border: 1px solid ${({ theme }) => theme.colors.brand500};
-  background: ${({ theme }) => theme.colors.brand500};
-  color: ${({ theme }) => theme.colors.white};
+  border: 1px solid
+    ${({ theme, $color }) =>
+      $color === 'white'
+        ? theme.colors.gray300
+        : $color
+        ? theme.colors[$color]
+        : theme.colors.brand500};
+  background: ${({ theme, $color }) => $color ? theme.colors[$color] : theme.colors.brand500};
+  color: ${({ theme, $color }) => $color === 'white' ? theme.colors.gray700 : theme.colors.white};
   font-family: Poppins, sans-serif;
   font-weight: ${({ theme }) => theme.weights.semiBold};
   font-size: 1rem;
@@ -28,8 +34,12 @@ const StyledButton = styled.button`
       cursor: not-allowed;
     `}
   &:hover {
-    background: ${({ theme, disabled }) =>
-      disabled ? theme.colors.gray200 : theme.colors.brand600};
+    background: ${({ theme, $color, disabled }) =>
+      disabled
+        ? theme.colors.gray200
+        : $color === 'white'
+        ? theme.colors.gray200
+        : theme.colors.brand600};
   }
   ${({ $variant, theme }) =>
     $variant === 'text' &&
@@ -94,19 +104,27 @@ const Button = ({
   text,
   icon,
   variant = 'default',
+  color,
   onClick,
   type = 'button',
   disabled = false,
   ...props
 }) => {
   return (
-    <StyledButton type={type} onClick={onClick} disabled={disabled} $variant={variant} {...props}>
+    <StyledButton
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      $variant={variant}
+      $color={color}
+      {...props}
+    >
       {icon && <IconWrapper>{icon}</IconWrapper>}
       {text && (
         <Typography
           variant="textMD"
           weight={variant === 'text' ? 'medium' : 'semibold'}
-          color={variant === 'text' ? 'brand500' : 'white'}
+          color={color === 'white' ? 'gray700' : 'white'}
           value={text}
         />
       )}
