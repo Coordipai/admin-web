@@ -1,27 +1,31 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 const FieldWrapper = styled.div`
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.margin.label};
   width: 100%;
   max-width: 100%;
-  padding: ${({ theme }) => theme.padding.sm};
 `;
 
 const Label = styled.label`
   ${({ theme }) => theme.texts.textSM}
   font-weight: ${({ theme }) => theme.weights.medium};
   color: ${({ theme }) => theme.colors.gray700};
-  margin-bottom: ${({ theme }) => theme.margin.label};
+`;
+
+const InputWrapper = styled.div`
+  position: relative;
+  width: 100%;
 `;
 
 const StyledInput = styled.input`
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  padding: ${({ theme }) => `${theme.padding.sm} ${theme.padding.md}`};
+  padding: ${({ theme, $hasIcon }) => $hasIcon ? `${theme.padding.sm} ${theme.padding.md} ${theme.padding.sm} 36px` : `${theme.padding.sm} ${theme.padding.md}`};
   ${({ theme }) => theme.texts.textMD}
   color: ${({ theme }) => theme.colors.gray900};
   background: ${({ theme, disabled }) => (disabled ? theme.colors.gray50 : theme.colors.white)};
@@ -44,7 +48,7 @@ const StyledInput = styled.input`
   ${({ theme, $error }) =>
     $error &&
     css`
-      border-color: ${theme.colors.error500};
+      border-color: ${theme.colors.error500} !important;
     `}
 
   ${({ theme, disabled }) =>
@@ -57,9 +61,20 @@ const StyledInput = styled.input`
 
 const HelperText = styled.span`
   ${({ theme }) => theme.texts.textSM}
-  color: ${({ theme, $error }) => ($error ? theme.colors.error500 : theme.colors.gray500)};
-  margin-top: ${({ theme }) => theme.margin.label};
+  color: ${({ theme, $error }) => ($error ? theme.colors.error500 : theme.colors.gray500)} !important;
 `;
+
+const IconImg = styled.img`
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  filter: brightness(0) saturate(100%) invert(62%) sepia(6%) saturate(0%) hue-rotate(175deg) brightness(97%) contrast(88%);
+`;
+
 /**
  * @param {object} props - 컴포넌트의 props
  * @param {string} [props.label] - 입력 필드 위에 표시될 레이블 텍스트
@@ -69,6 +84,7 @@ const HelperText = styled.span`
  * @param {string} [props.helperText] - 입력 필드 아래에 표시될 도움말 텍스트
  * @param {boolean} [props.error=false] - 오류 상태를 표시. true일 경우 빨간색 테두리와 오류 메시지 스타일 적용
  * @param {boolean} [props.disabled=false] - 입력 필드 비활성화 여부
+ * @param {boolean} [props.require=false] - 필수 입력 항목 여부
  * @returns {JSX.Element} 스타일이 적용된 입력 필드 컴포넌트
  *
  * @example
@@ -98,20 +114,34 @@ const InputField = ({
   helperText,
   error = false,
   disabled = false,
+  icon,
+  require = false,
   ...props
 }) => {
+  const theme = useTheme();
+  // error가 true일 때만 helperText 노출, error가 false면 helperText도 무조건 숨김
+  let showHelper = undefined;
+  if (error) {
+    showHelper = helperText || (require ? '필수 입력 항목입니다.' : undefined);
+  }
   return (
     <FieldWrapper>
-      {label && <Label>{label}</Label>}
-      <StyledInput
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        $error={error}
-        disabled={disabled}
-        {...props}
-      />
-      {helperText && <HelperText $error={error}>{helperText}</HelperText>}
+      {label && <Label>{label}{require && <span style={{color:theme.colors.error500,marginLeft:4}}>*</span>}</Label>}
+      <InputWrapper>
+        {icon && (
+          <IconImg src={icon} alt="icon" />
+        )}
+        <StyledInput
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          $error={error}
+          disabled={disabled}
+          $hasIcon={!!icon}
+          {...props}
+        />
+      </InputWrapper>
+      {showHelper && <HelperText $error={error}>{showHelper}</HelperText>}
     </FieldWrapper>
   );
 };

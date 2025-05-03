@@ -5,12 +5,13 @@ import Button from '../Common/Button';
 import IconButton from '../Common/IconButton';
 import FileModal from '../Common/FileModal';
 
-const TableContainer = styled.div`
+const TableWrapper = styled.div`
   box-sizing: border-box;
   width: 100%;
-  height: 100%;
+  max-height: 100%;
   border: 1px solid ${({ theme }) => theme.colors.gray200};
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radius.lg};
+  background: ${({ theme }) => theme.colors.white};
   overflow: hidden;
   box-shadow: 0px 1px 2px rgba(16, 24, 40, 0.06), 0px 1px 3px rgba(16, 24, 40, 0.1);
   display: flex;
@@ -22,30 +23,16 @@ const TableHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray200};
-`;
-
-const UploadButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: ${({ theme }) => theme.colors.brand500};
-  border: 1px solid ${({ theme }) => theme.colors.brand500};
-  border-radius: 8px;
-  color: ${({ theme }) => theme.colors.white};
-  font-family: Poppins, sans-serif;
-  font-weight: ${({ theme }) => theme.weights.semiBold};
-  font-size: 0.875rem;
-  cursor: pointer;
-  &:hover {
-    background: ${({ theme }) => theme.colors.brand600};
-  }
+  height: fit-content;
+  flex-shrink: 0;
 `;
 
 const Table = styled.div`
   width: 100%;
   height: 100%;
+  max-height: 100%;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 `;
@@ -67,9 +54,11 @@ const TableHeaderCell = styled.div`
 const TableRowContainer = styled.div`
   width: 100%;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  max-height: 100%;
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -89,12 +78,11 @@ const TableRowContainer = styled.div`
 const TableRow = styled.div`
   display: flex;
   align-items: center;
-  padding: 16px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray200};
-  background: ${({ isEven, theme }) => isEven ? theme.colors.gray50 : theme.colors.white};
-  &:last-child {
-    border-bottom: none;
-  }
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray100};
+  padding: ${({ theme }) => theme.padding.md};
+  height: fit-content;
+  background: ${({ $isEven, theme }) => $isEven ? theme.colors.gray25 : theme.colors.white};
+  &:last-child { border-bottom: none; }
 `;
 
 const FileIcon = styled.div`
@@ -123,6 +111,27 @@ const DeleteButton = styled.button`
   &:hover {
     opacity: 0.7;
   }
+`;
+
+const FileIconCell = styled.div`
+  flex: 0.3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+const FileInfoCell = styled.div`
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const ActionCell = styled.div`
+  flex: 0.2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
 
 const FileTable = ({ files, setFiles }) => {
@@ -158,7 +167,7 @@ const FileTable = ({ files, setFiles }) => {
         onClose={() => setModalOpen(false)}
         onAttach={handleAttach}
       />
-      <TableContainer>
+      <TableWrapper>
         <TableHeader>
           <Typography variant="displayMD" weight="medium" value="프로젝트 자료" />
           <Button
@@ -177,29 +186,31 @@ const FileTable = ({ files, setFiles }) => {
           </TableHeaderRow>
           <TableRowContainer>
             {files.map((file, index) => (
-              <TableRow key={file.name + index} isEven={index % 2 === 0}>
-                <FileIcon>
-                  <img
-                    src={`/src/assets/icons/${file.icon}-icon.svg`}
-                    alt={file.icon}
-                  />
-                </FileIcon>
-                <FileInfo>
+              <TableRow key={file.name + index} $isEven={index % 2 === 0}>
+                <FileIconCell>
+                  <FileIcon>
+                    <img
+                      src={`/src/assets/icons/${file.icon}-icon.svg`}
+                      alt={file.icon}
+                    />
+                  </FileIcon>
+                </FileIconCell>
+                <FileInfoCell>
                   <Typography variant="textSM" weight="medium" value={file.name} />
                   <Typography variant="textSM" weight="regular" color="gray500" value={typeof file.size === 'number' ? formatFileSize(file.size) : file.size} />
-                </FileInfo>
-                <DeleteButton>
+                </FileInfoCell>
+                <ActionCell>
                   <IconButton
                     icon={<img src="/src/assets/icons/trash-icon.svg" alt="Delete" />}
                     type="button"
                     onClick={() => handleDelete(file.name)}
                   />
-                </DeleteButton>
+                </ActionCell>
               </TableRow>
             ))}
           </TableRowContainer>
         </Table>
-      </TableContainer>
+      </TableWrapper>
     </>
   );
 };

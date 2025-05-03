@@ -274,7 +274,7 @@ const FileModal = ({ open, onClose, onAttach }) => {
                       variant="textSM"
                       weight="regular"
                       color="gray500"
-                      value={f.size}
+                      value={formatFileSize(f.size)}
                     />
                   </FileItemInfo>
                   <IconButton
@@ -295,5 +295,14 @@ const FileModal = ({ open, onClose, onAttach }) => {
     </Overlay>
   );
 };
+// 파일 크기 변환 함수 (FileModal에서 사용한 것과 동일하게 복사)
+function formatFileSize(bytes) {
+  const n = Number(bytes);
+  if (isNaN(n) || n < 0) return '0 B';
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  if (n < 1024 * 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`;
+  return `${(n / 1024 / 1024 / 1024).toFixed(1)} GB`;
+}
 
 export default FileModal; 

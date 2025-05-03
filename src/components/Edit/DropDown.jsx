@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import Typography from './Typography';
+import { createPortal } from 'react-dom';
 
 const FieldWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.margin.sm};
+  gap: ${({ theme }) => theme.margin.label};
   width: 100%;
   max-width: 100%;
   
@@ -16,7 +17,6 @@ const Label = styled.label`
   ${({ theme }) => theme.texts.textSM}
   font-weight: ${({ theme }) => theme.weights.medium};
   color: ${({ theme }) => theme.colors.gray700};
-  margin-bottom: ${({ theme }) => theme.margin.label};
 `;
 
 const DropDownBase = styled.button`
@@ -64,28 +64,30 @@ const DropDownMenu = styled.ul`
   box-shadow: 0px 8px 24px 0px rgba(16, 24, 40, 0.08);
   margin: 0;
   padding: ${({ theme }) => `${theme.padding.xs} 0`};
-  z-index: 10;
+  z-index: 9999;
   list-style: none;
   max-height: 16rem;
   overflow-y: auto;
   overflow-x: hidden;
   white-space: nowrap;
+  pointer-events: auto;
 `;
 
 const DropDownItem = styled.li`
+  box-sizing: border-box;
   width: 100%;
   padding: ${({ theme }) => `${theme.padding.sm} ${theme.padding.md}`};
   ${({ theme }) => theme.texts.textMD}
-  color: ${({ theme, selected, disabled, isplaceholder }) =>
+  color: ${({ theme, selected, disabled, $isplaceholder }) =>
     disabled
       ? theme.colors.gray300
-      : isplaceholder
+      : $isplaceholder
       ? theme.colors.gray500
       : selected
       ? theme.colors.brand600
       : theme.colors.gray700};
-  background: ${({ selected, theme, isplaceholder }) =>
-    isplaceholder
+  background: ${({ selected, theme, $isplaceholder }) =>
+    $isplaceholder
       ? theme.colors.white
       : selected
       ? theme.colors.brand50
@@ -94,15 +96,14 @@ const DropDownItem = styled.li`
   transition: background 0.15s, color 0.15s;
 
   &:hover {
-    background: ${({ theme, disabled, isplaceholder }) =>
-      disabled || isplaceholder ? theme.colors.white : theme.colors.brand50};
+    background: ${({ theme, disabled, $isplaceholder }) =>
+      disabled || $isplaceholder ? theme.colors.white : theme.colors.brand50};
   }
 `;
 
 const HelperText = styled.span`
   ${({ theme }) => theme.texts.textSM}
-  color: ${({ theme, $error }) => ($error ? theme.colors.error500 : theme.colors.gray500)};
-  margin-top: ${({ theme }) => theme.margin.label};
+  color: ${({ theme, $error }) => ($error ? theme.colors.error500 : theme.colors.gray500)} !important;
 `;
 
 /**
@@ -116,6 +117,7 @@ const HelperText = styled.span`
  * @param {boolean} [props.disabled=false] - 드롭다운 비활성화 여부
  * @param {boolean} [props.multi=false] - 다중 선택 가능 여부
  * @param {string} [props.placeholder='선택하세요'] - 기본 표시 텍스트
+ * @param {boolean} [props.require=false] - 필수 선택 여부
  * @returns {JSX.Element} 스타일이 적용된 드롭다운 컴포넌트
  * 
  * @example
@@ -149,16 +151,26 @@ const DropDown = ({
   helperText,
   error = false,
   disabled = false,
-  multi = false,
   placeholder = '선택하세요',
+  multi = false,
+  require = false,
   ...props
 }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef();
+  const baseRef = useRef();
+  const menuRef = useRef();
+  const [menuStyle, setMenuStyle] = useState({});
+  const theme = useTheme();
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
+      if (
+        ref.current &&
+        !ref.current.contains(e.target) &&
+        menuRef.current &&
+        !menuRef.current.contains(e.target)
+      ) {
         setOpen(false);
       }
     };
@@ -166,37 +178,49 @@ const DropDown = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open]);
 
-  const handleSelect = (option) => {
-    if (disabled || option.disabled) return;
-    if (multi) {
-      if (Array.isArray(value)) {
-        if (value.includes(option.value)) {
-          onChange(value.filter((v) => v !== option.value));
-        } else {
-          onChange([...value, option.value]);
-        }
-      } else {
-        onChange([option.value]);
-      }
-    } else {
-      onChange(option.value);
-      setOpen(false);
+  useEffect(() => {
+    if (open && baseRef.current) {
+      const rect = baseRef.current.getBoundingClientRect();
+      setMenuStyle({
+        position: 'absolute',
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+        zIndex: 9999,
+      });
     }
-  };
+  }, [open]);
 
   const getLabel = (val) => {
-    if (multi && Array.isArray(val)) {
-      return options.filter(opt => val.includes(opt.value)).map(opt => opt.label).join(', ');
+    if (multi) {
+      if (!Array.isArray(val) || val.length === 0) return '';
+      return options
+        .filter(opt => val.map(String).includes(String(opt.value)))
+        .map(opt => opt.label)
+        .join(', ');
+    } else {
+      if (val === undefined || val === null || val === '') return '';
+      const found = options.find(opt => String(opt.value) === String(val));
+      return found ? found.label : '';
     }
-    const found = options.find(opt => opt.value === val);
-    return found ? found.label : '';
   };
+  const hasValue = (() => {
+    if (multi) {
+      return Array.isArray(value) && value.length > 0 && value.some(v => options.some(opt => String(opt.value) === String(v)));
+    } else {
+      if (value === undefined || value === null || value === '') return false;
+      return options.some(opt => String(opt.value) === String(value));
+    }
+  })();
 
-  const hasValue = multi ? Array.isArray(value) && value.length > 0 : !!value;
+  let showHelper = undefined;
+  if (error) {
+    showHelper = helperText || (require ? '필수 선택 항목입니다.' : undefined);
+  }
 
   return (
     <FieldWrapper ref={ref}>
-      {label && <Label>{label}</Label>}
+      {label && <Label>{label}{require && <span style={{color:theme.colors.error500,marginLeft:4}}>*</span>}</Label>}
       <DropDownBase
         type="button"
         onClick={() => !disabled && setOpen((prev) => !prev)}
@@ -207,36 +231,56 @@ const DropDown = ({
         aria-haspopup="listbox"
         aria-expanded={open}
         {...props}
+        ref={baseRef}
       >
         {hasValue ? (
-          <span>{getLabel(value)}</span>
+          <Typography variant="textSM" weight="medium" color="gray700" value={getLabel(value)} />
         ) : (
           <Typography variant="textSM" weight="medium" color="gray500" value={placeholder} />
         )}
       </DropDownBase>
-      {open && (
-        <DropDownMenu role="listbox">
-          {options.map((opt) => (
-            <DropDownItem
-              key={opt.value}
-              selected={multi ? Array.isArray(value) && value.includes(opt.value) : value === opt.value}
-              disabled={opt.disabled || opt.value === ''}
-              isplaceholder={opt.value === ''}
-              onClick={() => {
-                if (opt.disabled || opt.value === '') return;
-                handleSelect(opt);
-              }}
-              role="option"
-              aria-selected={multi ? Array.isArray(value) && value.includes(opt.value) : value === opt.value}
-            >
-              {opt.label}
-            </DropDownItem>
-          ))}
-        </DropDownMenu>
+      {open && createPortal(
+        <DropDownMenu ref={menuRef} role="listbox" style={menuStyle}>
+          {options.map((opt) => {
+            const isSelected = multi
+              ? Array.isArray(value) && value.map(String).includes(String(opt.value))
+              : String(value) === String(opt.value);
+            return (
+              <DropDownItem
+                key={opt.value}
+                selected={isSelected}
+                disabled={opt.disabled || opt.value === ''}
+                $isplaceholder={opt.value === '' ? 'true' : undefined}
+                onClick={() => {
+                  if (opt.disabled || opt.value === '') return;
+                  if (multi) {
+                    let newValue = Array.isArray(value) ? [...value] : [];
+                    if (newValue.map(String).includes(String(opt.value))) {
+                      newValue = newValue.filter(v => String(v) !== String(opt.value));
+                    } else {
+                      newValue.push(opt.value);
+                    }
+                    onChange(newValue);
+                  } else {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }
+                  if (!multi) setOpen(false);
+                }}
+                role="option"
+                aria-selected={isSelected}
+              >
+                {opt.label}
+              </DropDownItem>
+            );
+          })}
+        </DropDownMenu>,
+        document.body
       )}
-      {helperText && <HelperText $error={error}>{helperText}</HelperText>}
+      {showHelper && <HelperText $error={error}>{showHelper}</HelperText>}
     </FieldWrapper>
   );
 };
 
-export default DropDown; 
+export default DropDown;
+export { DropDownMenu, DropDownItem }; 
