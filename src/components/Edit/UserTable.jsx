@@ -54,6 +54,18 @@ const NameCell = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.gap.md};
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+  &:hover, &:focus-within {
+    overflow-x: auto;
+    text-overflow: unset;
+  }
 `;
 const ProfileImg = styled.img`
   width: 40px;
@@ -71,12 +83,36 @@ const FieldCell = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+  &:hover, &:focus-within {
+    overflow-x: auto;
+    text-overflow: unset;
+  }
 `;
 const ActionCell = styled.div`
   flex: 0.3;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  max-width: 60px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+  &:hover, &:focus-within {
+    overflow-x: auto;
+    text-overflow: unset;
+  }
 `;
 
 const TableRowContainer = styled.div`
