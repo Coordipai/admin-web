@@ -8,7 +8,7 @@ import { ButtonBase } from '@styles/globalStyle'
 
 
 const FormWrapper = styled.div`
-  max-width: 640px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
   display: flex;

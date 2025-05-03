@@ -35,7 +35,7 @@ const LogoRow = styled.div`
 // 로그인 handler
 const handleGithubLogin = () => {
   // TODO: 백엔드 OAuth 로그인 URL 배포용으로 교체 예정
-  window.location.href = 'http://localhost:8080/auth/github/login';
+  window.location.href = 'https://coordipai-web-server.knuassignx.site/auth/github/login';
 };
 
 
