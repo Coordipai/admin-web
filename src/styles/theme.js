@@ -164,8 +164,8 @@ const weight = {
   medium: 500,
   semiBold: 600,
   bold: 700,
-  extraBold: 800,
-};
+  extraBold: 800
+}
 
 const text = {
   display2XL: `
@@ -222,8 +222,8 @@ const text = {
     font-size: 0.75rem;  // 12px
     line-height: 1.125rem;
     letter-spacing: -0.02em;
-    `,
-};
+    `
+}
 
 const padding = {
   xs: '4px',   // 4px
@@ -258,7 +258,6 @@ const radius = {
 };
 
 
-
 export const theme = {
   colors: color,
   weights: weight,
@@ -270,4 +269,3 @@ export const theme = {
 };
 
 export { color, weight, text, padding, radius, margin, gap };
-  
