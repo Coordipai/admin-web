@@ -51,13 +51,13 @@ const SearchInputField = ({
   }, [open]);
 
   useEffect(() => {
-    if (open) {
-      setFiltered(
-        value
-          ? options.filter(opt => opt.label.includes(value) || opt.value.includes(value))
-          : options
-      );
-    }
+    if (!open) return;
+    if (!options || options.length === 0) return;
+    setFiltered(
+      value
+        ? options.filter(opt => opt.label.includes(value) || opt.value.includes(value))
+        : options
+    );
   }, [value, options, open]);
 
   useEffect(() => {
