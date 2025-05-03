@@ -225,9 +225,49 @@ const text = {
     `,
 };
 
+const padding = {
+  xs: '4px',   // 4px
+  sm: '8px',   // 8px
+  md: '16px',  // 16px
+  lg: '24px',  // 24px
+  xl: '32px',  // 32px
+};
+
+const gap = {
+  xs: '4px',   // 4px
+  sm: '8px',   // 8px
+  md: '16px',  // 16px
+  lg: '24px',  // 24px
+  xl: '32px',  // 32px
+};
+
+const margin = {
+  xs: '4px',   // 4px
+  sm: '8px',   // 8px
+  md: '16px',  // 16px
+  lg: '24px',  // 24px
+  xl: '32px',  // 32px
+  label: '6px', // 6px (label만 예외)
+};
+
+const radius = {
+  sm: '0.25rem',   // 4px
+  md: '0.375rem',  // 6px
+  lg: '0.5rem',    // 8px
+  xl: '0.75rem',   // 12px
+};
+
+
+
 export const theme = {
   colors: color,
   weights: weight,
   texts: text,
+  padding: padding,
+  radius: radius,
+  margin: margin,
+  gap: gap,
 };
+
+export { color, weight, text, padding, radius, margin, gap };
   
