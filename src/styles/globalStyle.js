@@ -1,10 +1,10 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const PageBox = styled.div`
   display: flex;
   height: 100vh;
   overflow-y: hidden;
-`;
+`
 
 export const MainBox = styled.div`
   width: 100%;
@@ -16,14 +16,14 @@ export const MainBox = styled.div`
   background-color: ${({ theme, $isEditMode }) =>
     !$isEditMode ? theme.colors.white : theme.colors.gray25};
   overflow-y: auto;
-`;
+`
 
 export const ContainerBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   padding: 0 2rem;
-`;
+`
 
 export const ButtonBase = styled.div`
   display: flex;
@@ -42,7 +42,7 @@ export const ButtonBase = styled.div`
       $isHighlighted ? theme.colors.brand600 : theme.colors.gray300};
   cursor: pointer;
   white-space: nowrap;
-`;
+`
 
 export const InputFieldBase = styled.div`
   width: 100%;
@@ -61,8 +61,8 @@ export const InputFieldBase = styled.div`
   box-shadow: ${({ theme, $focused }) =>
     $focused
       ? `0 0 0.25rem ${theme.colors.brand100}, 0 0.0625rem 0.125rem rgba(16, 24, 40, 0.05)`
-      : "none"};
-`;
+      : 'none'};
+`
 
 export const BadgeBase = styled.div`
   display: inline-flex;
@@ -74,29 +74,29 @@ export const BadgeBase = styled.div`
   background-color: ${({ theme, $backgroundColor }) =>
     theme.colors[$backgroundColor]};
   border-radius: 1rem;
-`;
+`
 
 export const VerticalDivider = styled.div`
   height: 100%;
   width: 0.0625rem;
   background-color: ${({ theme }) => theme.colors.gray200};
-`;
+`
 
 export const HorizontalDivider = styled.div`
   width: 100%;
   height: 0.0625rem;
   background-color: ${({ theme }) => theme.colors.gray200};
-`;
+`
 
 export const styledIcon = ({
   icon,
-  iconWidth = "1.25rem",
-  iconHeight = "1.25rem",
-  strokeColor = "#344054",
+  iconWidth = '1.25rem',
+  iconHeight = '1.25rem',
+  strokeColor = '#344054'
 }) => styled(icon)`
   width: ${iconWidth};
   height: ${iconHeight};
   path {
     stroke: ${strokeColor};
   }
-`;
+`
