@@ -25,7 +25,6 @@ const FieldWrapper = styled.div`
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
-  margin-top: 2rem;
 `
 
 const LabelText = styled.span`
@@ -33,28 +32,9 @@ const LabelText = styled.span`
   font-weight: {({ theme }) => theme.weights.medium};
   color: {({ theme }) => theme.colors.gray700};
 `
-
-const CheckboxList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  max-height: 200px;              // 높이 제한
-  overflow-y: auto;               // 세로 스크롤 가능
-  padding-right: 0.25rem;         // 스크롤바 안 가리도록 여유
-`
-
-const RepositoryBox = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  border: 1px solid ${({ theme }) => theme.colors.gray300};
-  background-color: ${({ theme, $checked }) =>
-    $checked ? theme.colors.brand200 : theme.colors.white};
-
-  transition: background-color 0.2s ease;
+const Textarea = styled(FormTextarea)`
+  height: 600px !important;               // 원하는 높이
+  overflow-y: auto;           // 세로 스크롤 가능
 `
 const Button = styled(ButtonBase)`
   width: 110px;                  // 원하는 너비
@@ -70,15 +50,6 @@ export default function AccountSetupPage() {
   const [discordId, setDiscordId] = useState('')
   const [career, setCareer] = useState('')
   const [selectedField, setSelectedField] = useState(-1)
-  const [selectedRepos, setSelectedRepos] = useState([])
-
-  const toggleRepo = (repo) => {
-    setSelectedRepos((prev) =>
-      prev.includes(repo)
-        ? prev.filter((r) => r !== repo)
-        : [...prev, repo]
-    )
-  }
 
   const fieldOptions = [
     { title: '프론트엔드' },
@@ -87,19 +58,7 @@ export default function AccountSetupPage() {
     { title: '디자인' },
     { title: '기타' },
   ]
-
-  const repoList = [
-    'coordipai/admin-web',
-    'coordipai/admin-api',
-    'coordipai/landing-page',
-    '레포1111',
-    '레포22',
-    '레포3333333',
-    '레포14231423342432',
-    '레포1234125253125',
-  ]
   
-
   return (
     <>
       <FormWrapper>
@@ -136,33 +95,12 @@ export default function AccountSetupPage() {
 
         <FieldWrapper>
           <LabelText>간단한 경력을 입력해주세요.</LabelText>
-          <FormTextarea placeholder="ex. 사이드 프로젝트 2회 경험" value={career} handleChange={setCareer} />
-        </FieldWrapper>
-
-        <FieldWrapper>
-          <LabelText>적용할 레포지토리</LabelText>
-
-          <CheckboxList>
-            {repoList.map((repo) => {
-              const isChecked = selectedRepos.includes(repo)
-
-              return (
-                <RepositoryBox key={repo} $checked={isChecked} onClick={() => toggleRepo(repo)}>
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => toggleRepo(repo)} 
-                  />
-                  {repo}
-                </RepositoryBox>
-              )
-            })}
-          </CheckboxList>
+          <Textarea placeholder="ex. 사이드 프로젝트 2회 경험" value={career} handleChange={setCareer} />
         </FieldWrapper>
 
         <ButtonWrapper>
           <Button $isHighlighted>
-            계정 생성하기
+            다음
           </Button>
         </ButtonWrapper>
 

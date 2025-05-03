@@ -3,6 +3,7 @@ import LoginPage from './pages/login/loginPage'
 import FirstAccountPage from './pages/AccountSetupPage/AccountSetupPage'
 import IssueModalTest from './pages/IssuePage/IssueModalTest'
 import UserForm from './pages/UserPage/UserPage'
+import RepositoryCheckPage from './pages/AccountSetupPage/RepositoryCheckPage'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/firstaccount" element={<FirstAccountPage />} />
         <Route path="/issueModalTest" element={<IssueModalTest />} />
         <Route path="/userform" element={<UserForm />} />
+        <Route path="/repositorycheckpage" element={<RepositoryCheckPage />} />
       </Routes>
     </BrowserRouter>
   )
