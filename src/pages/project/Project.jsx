@@ -261,6 +261,7 @@ export const Project = () => {
 								rows={filteredRows.length > 0 ? filteredRows : []}
 								page={page}
 								onPageChange={setPage}
+								variant="issue"
 							/>
 						</Fieldset>
 					)}
@@ -279,6 +280,7 @@ export const Project = () => {
 								rows={filteredRequestRows.length > 0 ? filteredRequestRows : []}
 								page={page}
 								onPageChange={setPage}
+								variant="request"
 							/>
 						</Fieldset>
 					)}

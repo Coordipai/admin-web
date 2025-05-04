@@ -6,6 +6,7 @@ import IconButton from '@components/Common/IconButton';
 import Badge from '@components/Edit/Badge';
 import ArrowLeftIcon from '@assets/icons/arrow-left-icon.svg';
 import ArrowRightIcon from '@assets/icons/arrow-right-icon.svg';
+import { useNavigate } from 'react-router-dom';
 
 const TableWrapper = styled.div`
   box-sizing: border-box;
@@ -74,6 +75,16 @@ const Tr = styled.tr`
   &:last-child ${Td} {
     border-bottom: none;
   }
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.gray200};
+  }
+`;
+
+const TrHeader = styled.tr`
+  &:last-child ${Td} {
+    border-bottom: none;
+  }
 `;
 
 const LabelBadge = styled.span`
@@ -99,12 +110,13 @@ const PaginationWrapper = styled.div`
   max-width: 100%;
 `;
 
-const IssueTable = ({ rows = [], page = 1, onPageChange }) => {
+const IssueTable = ({ rows = [], page = 1, onPageChange, variant='issue' }) => {
   const wrapperRef = useRef(null);
   const [pageSize, setPageSize] = useState(99);
   const HEADER_HEIGHT = 47; // px
   const PAGINATION_HEIGHT = 57; // px
   const ROW_HEIGHT = 52.5; // px
+  const navigate = useNavigate();
 
   // pageSize 계산 함수
   const calculatePageSize = () => {
@@ -127,6 +139,11 @@ const IssueTable = ({ rows = [], page = 1, onPageChange }) => {
     };
   }, []);
 
+  const handleNext = () => {
+		if (variant === 'issue') navigate('/buildproject2');
+		else if (variant === 'request') navigate('/buildproject3');
+	};
+
   const total = Math.ceil(rows.length / pageSize) || 1;
   const pagedRows = rows.slice((page - 1) * pageSize, page * pageSize);
 
@@ -135,7 +152,7 @@ const IssueTable = ({ rows = [], page = 1, onPageChange }) => {
       <TableScrollArea>
         <Table>
           <Thead>
-            <Tr>
+            <TrHeader>
               <Th># 이슈번호</Th>
               <Th>레포이름</Th>
               <Th>제목</Th>
@@ -143,7 +160,7 @@ const IssueTable = ({ rows = [], page = 1, onPageChange }) => {
               <Th>어사이니</Th>
               <Th>우선순위</Th>
               <Th>이터레이션</Th>
-            </Tr>
+            </TrHeader>
           </Thead>
           <tbody>
             {pagedRows.length === 0 ? (
@@ -154,7 +171,7 @@ const IssueTable = ({ rows = [], page = 1, onPageChange }) => {
               </Tr>
             ) : (
               pagedRows.map((row, idx) => (
-                <Tr key={row.issue_number + row.title + idx}>
+                <Tr key={row.issue_number + row.title + idx} onClick={handleNext}>
                   <Td># {row.issue_number}</Td>
                   <Td>{row.repo_fullname}</Td>
                   <Td>{row.title}</Td>
