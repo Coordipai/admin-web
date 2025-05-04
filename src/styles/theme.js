@@ -226,28 +226,28 @@ const text = {
 }
 
 const padding = {
-  xs: '4px',   // 4px
-  sm: '8px',   // 8px
-  md: '16px',  // 16px
-  lg: '24px',  // 24px
-  xl: '32px',  // 32px
+  xs: '0.25rem',   // 4px
+  sm: '0.5rem',   // 8px
+  md: '1rem',     // 16px
+  lg: '1.5rem',   // 24px
+  xl: '2rem',     // 32px
 };
 
 const gap = {
-  xs: '4px',   // 4px
-  sm: '8px',   // 8px
-  md: '16px',  // 16px
-  lg: '24px',  // 24px
-  xl: '32px',  // 32px
+  xs: '0.25rem',   // 4px
+  sm: '0.5rem',   // 8px
+  md: '1rem',     // 16px
+  lg: '1.5rem',   // 24px
+  xl: '2rem',     // 32px
 };
 
 const margin = {
-  xs: '4px',   // 4px
-  sm: '8px',   // 8px
-  md: '16px',  // 16px
-  lg: '24px',  // 24px
-  xl: '32px',  // 32px
-  label: '6px', // 6px (label만 예외)
+  xs: '0.25rem',   // 4px
+  sm: '0.5rem',   // 8px
+  md: '1rem',     // 16px
+  lg: '1.5rem',   // 24px
+  xl: '2rem',     // 32px
+  label: '0.375rem', // 6px (label만 예외)
 };
 
 const radius = {

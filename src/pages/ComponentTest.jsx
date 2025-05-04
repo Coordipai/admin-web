@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import FormInput from '@components/FormInput'
 import FormTextarea from '@components/FormTextArea'
-import FormDropdown from '@components/FormDropdown'
 import Header from '@components/Header'
 import SideBar from '@components/SideBar'
 

@@ -1,12 +1,12 @@
 import {useState} from 'react'
-import InputField from '../../components/Edit/InputField'
+import InputField from '@components/Edit/InputField'
 import styled from "styled-components";
-import Typography from '../../components/Edit/Typography'
-import DropDown from '../../components/Edit/DropDown'
-import { HorizontalDivider } from '../../styles/globalStyle';
-import Button from '../../components/Common/Button';
+import Typography from '@components/Edit/Typography'
+import DropDown from '@components/Edit/DropDown'
+import { HorizontalDivider } from '@styles/globalStyle';
+import Button from '@components/Common/Button';
 import { useNavigate } from 'react-router-dom';
-import { DatePicker } from '../../components/Edit/DatePicker';
+import { DatePicker } from '@components/Edit/DatePicker';
 
 const Layout = styled.div`
 	display: flex;

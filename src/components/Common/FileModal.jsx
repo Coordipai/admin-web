@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import Typography from '../Edit/Typography';
+import Typography from '@components/Edit/Typography';
 import Button from './Button';
 import IconButton from './IconButton';
 
