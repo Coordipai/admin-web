@@ -3,28 +3,38 @@ import styled from 'styled-components';
 import Typography from '@components/Edit/Typography';
 import Button from '@components/Common/Button';
 import IconButton from '@components/Common/IconButton';
-import TrashIcon from '@assets/icons/trash-icon.svg';
-import EditIcon from '@assets/icons/edit-icon.svg';
 import Badge from '@components/Edit/Badge';
 import ArrowLeftIcon from '@assets/icons/arrow-left-icon.svg';
 import ArrowRightIcon from '@assets/icons/arrow-right-icon.svg';
+import { useNavigate } from 'react-router-dom';
 
 const TableWrapper = styled.div`
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-height: 100%;
   background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.gray200};
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radius.lg};
   box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.06), 0px 1px 3px 0px rgba(16, 24, 40, 0.1);
+  overflow: hidden;
+`;
+
+const TableScrollArea = styled.div`
+  width: 100%;
   overflow-x: auto;
-  overflow-y: hidden;
+  flex: 1 1 auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
 `;
 
 const Table = styled.table`
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  background: ${({ theme }) => theme.colors.white};
 `;
 
 const Thead = styled.thead`
@@ -32,36 +42,46 @@ const Thead = styled.thead`
 `;
 
 const Th = styled.th`
-  padding: 16px 12px;
+  padding: ${({ theme }) => `${theme.padding.md} ${theme.padding.sm}`};
   text-align: left;
-  font-weight: 600;
-  font-size: 14px;
+  ${({ theme }) => theme.texts.textSM};
+  font-weight: ${({ theme }) => theme.weights.semiBold};
   color: ${({ theme }) => theme.colors.gray700};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray200};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const Td = styled.td`
-  padding: 14px 12px;
-  font-size: 14px;
+  padding: ${({ theme }) => `${theme.padding.sm} ${theme.padding.sm}`};
+  ${({ theme }) => theme.texts.textSM};
+  font-weight: ${({ theme }) => theme.weights.regular};
   color: ${({ theme }) => theme.colors.gray900};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray200};
   vertical-align: middle;
   gap: ${({ theme }) => theme.gap.xs};
-  max-width: 180px;
   white-space: nowrap;
+  max-width: 11.25rem;
   overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
   scrollbar-width: none;
   -ms-overflow-style: none;
   &::-webkit-scrollbar { display: none; }
-  &:hover, &:focus-within {
-    overflow-x: auto;
-    text-overflow: unset;
-  }
 `;
 
 const Tr = styled.tr`
+  &:last-child ${Td} {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.gray200};
+  }
+`;
+
+const TrHeader = styled.tr`
   &:last-child ${Td} {
     border-bottom: none;
   }
@@ -71,28 +91,32 @@ const LabelBadge = styled.span`
   display: inline-block;
   background: ${({ theme }) => theme.colors.gray100};
   color: ${({ theme }) => theme.colors.gray700};
-  border-radius: 12px;
+  border-radius: ${({ theme }) => theme.radius.xl};
   padding: 2px 10px;
-  font-size: 12px;
-  font-weight: 500;
+  ${({ theme }) => theme.texts.textXS};
+  font-weight: ${({ theme }) => theme.weights.medium};
   margin-right: 4px;
 `;
 
 const PaginationWrapper = styled.div`
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: ${({ theme }) => `${theme.padding.md} ${theme.padding.lg}`};
   border-top: 1px solid ${({ theme }) => theme.colors.gray200};
   background: ${({ theme }) => theme.colors.white};
+  width: 100%;
+  max-width: 100%;
 `;
 
-const IssueTable = ({ rows = [], page = 1, onPageChange, onEdit, onDelete }) => {
+const IssueTable = ({ rows = [], page = 1, onPageChange, variant='issue' }) => {
   const wrapperRef = useRef(null);
   const [pageSize, setPageSize] = useState(99);
   const HEADER_HEIGHT = 47; // px
   const PAGINATION_HEIGHT = 57; // px
   const ROW_HEIGHT = 52.5; // px
+  const navigate = useNavigate();
 
   // pageSize 계산 함수
   const calculatePageSize = () => {
@@ -115,50 +139,52 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, onEdit, onDelete }) => 
     };
   }, []);
 
+  const handleNext = () => {
+		if (variant === 'issue') navigate('/buildproject2');
+		else if (variant === 'request') navigate('/buildproject3');
+	};
+
   const total = Math.ceil(rows.length / pageSize) || 1;
   const pagedRows = rows.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <TableWrapper ref={wrapperRef}>
-      <Table>
-        <Thead>
-          <Tr>
-            <Th># 이슈번호</Th>
-            <Th>레포이름</Th>
-            <Th>제목</Th>
-            <Th>바디</Th>
-            <Th>어사이니</Th>
-            <Th>우선순위</Th>
-            <Th>이터레이션</Th>
-            <Th></Th>
-          </Tr>
-        </Thead>
-        <tbody>
-          {pagedRows.length === 0 ? (
-            <Tr>
-              <Td colSpan={8} style={{ textAlign: 'center', color: undefined }}>
-                <Typography variant="textMD" color="gray500" value="검색된 이슈가 없습니다." />
-              </Td>
-            </Tr>
-          ) : (
-            pagedRows.map((row, idx) => (
-              <Tr key={row.issue_number + row.title + idx}>
-                <Td># {row.issue_number}</Td>
-                <Td>{row.repo_fullname}</Td>
-                <Td>{row.title}</Td>
-                <Td>{row.body}</Td>
-                <Td>{row.assignee}</Td>
-                <Td><Badge priority={row.priority} /></Td>
-                <Td>Iteration {row.iteration}</Td>
-                <Td>
-                  <IconButton icon={<img src={TrashIcon} alt="Delete" />} onClick={() => onDelete && onDelete(row)} />
-                  <IconButton icon={<img src={EditIcon} alt="Edit" />} onClick={() => onEdit && onEdit(row)}/>
+      <TableScrollArea>
+        <Table>
+          <Thead>
+            <TrHeader>
+              <Th># 이슈번호</Th>
+              <Th>레포이름</Th>
+              <Th>제목</Th>
+              <Th>바디</Th>
+              <Th>어사이니</Th>
+              <Th>우선순위</Th>
+              <Th>이터레이션</Th>
+            </TrHeader>
+          </Thead>
+          <tbody>
+            {pagedRows.length === 0 ? (
+              <Tr>
+                <Td colSpan={8} style={{ textAlign: 'center', color: undefined }}>
+                  <Typography variant="textMD" color="gray500" value="검색된 이슈가 없습니다." />
                 </Td>
               </Tr>
-            ))
-          )}
-        </tbody>
-      </Table>
+            ) : (
+              pagedRows.map((row, idx) => (
+                <Tr key={row.issue_number + row.title + idx} onClick={handleNext}>
+                  <Td># {row.issue_number}</Td>
+                  <Td>{row.repo_fullname}</Td>
+                  <Td>{row.title}</Td>
+                  <Td>{row.body}</Td>
+                  <Td>{row.assignee}</Td>
+                  <Td><Badge priority={row.priority} /></Td>
+                  <Td>Iteration {row.iteration}</Td>
+                </Tr>
+              ))
+            )}
+          </tbody>
+        </Table>
+      </TableScrollArea>
       <PaginationWrapper>
         <Button 
           icon={<img src={ArrowLeftIcon} alt="이전" />} 
