@@ -4,7 +4,6 @@ import { BuildProject2 } from './pages/build_project/BuildProject2'
 import { BuildProject3 } from './pages/build_project/BuildProject3'
 import { Project } from './pages/project/Project'
 import { Home } from './pages/Home'
-
 import ComponentTest from '@pages/ComponentTest'
 
 function App () {
