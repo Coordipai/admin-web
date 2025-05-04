@@ -5,6 +5,7 @@ import { BuildProject3 } from './pages/build_project/BuildProject3'
 import { Project } from './pages/project/Project'
 import { Home } from './pages/Home'
 import ComponentTest from '@pages/ComponentTest'
+import { SettingProject } from './pages/build_project/SettingProject'
 
 function App () {
   return (
@@ -16,6 +17,7 @@ function App () {
         <Route path="/buildproject2" element={<BuildProject2/>}/>
         <Route path="/buildproject3" element={<BuildProject3/>}/>
         <Route path="/project" element={<Project/>}/>
+        <Route path="/settingproject" element={<SettingProject/>}/>
       </Routes>
     </BrowserRouter>
   )
