@@ -114,7 +114,7 @@ const CardDesc = styled.div`
 function ProjectCard({ name, createdAt, updatedAt, onClick, selected }) {
 	return (
 		<Card onClick={onClick} selected={selected}>
-			<Typography variant="displaySM" weight="medium" value={name} />
+			<Typography variant="displayXS" weight="semiBold" value={name} />
 			<Typography variant="textMD" weight="medium" color="gray500" value={`${createdAt} ~ ${updatedAt}`} />
 		</Card>
 	);
