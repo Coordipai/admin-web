@@ -14,6 +14,7 @@ import Badge from '@components/Edit/Badge';
 const Layout = styled.div`
 	display: flex;
 	width: 100vw;
+
 	height: 100vh;
 	background: ${({ theme }) => theme.colors.white};
 `;
@@ -38,8 +39,10 @@ const MainContainer = styled.div`
 	gap: ${({ theme }) => theme.gap.xl};
 	padding: ${({ theme }) => theme.padding.xl};
 	width: 100%;
+	max-width: 100%;
 	background: ${({ theme }) => theme.colors.white};
 	max-height: 100vh;
+	overflow: hidden;
 `;
 
 const HeaderSection = styled.div`
@@ -119,6 +122,7 @@ const Fieldset = styled.div`
 	align-items: stretch;
 	overflow-y: auto;
 	max-height: 100%;
+	overflow-x: hidden;
 `;
 
 const DropDownWrapper = styled.div`
@@ -135,7 +139,8 @@ const ButtonGroup = styled.div`
 `;
 
 const Section = styled.section`
-width: 100%;
+	width: 100%;
+	max-width: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
