@@ -7,6 +7,7 @@ import FormDropdown from '@components/FormDropdown'
 import Header from '@components/ChangeIssueHeader'
 import { EditContentHeader } from '../../components/Edit/EditContentHeader'
 import { ButtonBase } from '@styles/globalStyle'
+import IssueDetailModal from './IssueDetailModal'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -97,6 +98,8 @@ export default function changeIssuePage() {
   const [selectedSprint, setSelectedSprint] = useState(-1)
   const [username, setUsername] = useState('Oliva')
   const [userPart, setUserPart] = useState('프론트엔드')
+  const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
+
 
   return (
     <PageWrapper>
@@ -106,7 +109,8 @@ export default function changeIssuePage() {
           <div style={{padding: '2rem'}}>
             <EditContentHeader
               title="변경 요청서 작성"
-              subAction={{ label: '이슈 상세보기', onClick: () => alert('이슈 상세보기') }}
+              subAction={{ label: '이슈 상세보기', onClick: () => setIsIssueModalOpen(true) }}
+              
               buttonsData={[
                 { value: "변경 반려", onClick: () => {} },
                 { value: "변경 승인", onClick: () => {} }
@@ -200,6 +204,10 @@ export default function changeIssuePage() {
             </LabeledRow>
           </div>
       </FormWrapper>
+      {isIssueModalOpen && (
+        <IssueDetailModal onClose={() => setIsIssueModalOpen(false)} />
+      )}
+
     </PageWrapper>
   )
 }
