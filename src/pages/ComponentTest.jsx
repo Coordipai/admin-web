@@ -5,21 +5,25 @@ import SideBar from '@components/SideBar'
 
 import brandIcon from '@assets/brandIcon.png'
 
-
 const FormTextAreaTest = () => {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState('');
 
   return (
     <div>
       <FormTextarea
-        placeholder='Enter text'
+        label="설명"
+        placeholder="내용을 입력하세요"
         value={value}
-        handleChange={(v) => setValue(v)}
+        onChange={(v) => setValue(v)}
         readOnly={false}
         hideCursor={false}
         disabled={false}
+        require={false}
+        error={false}
       />
-      <div> value: {value}</div>
+      <div style={{ marginTop: '1rem' }}>
+        <strong>value:</strong> {value}
+      </div>
     </div>
   )
 }
@@ -109,8 +113,8 @@ const ComponentTest = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div> Component Test </div>
-        <FormTextAreaTest />
         <HeaderTest />
+        <FormTextAreaTest />
     </div>
   )
 }
