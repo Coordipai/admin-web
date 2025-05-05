@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from 'styled-components'
 
 export const GlobalStyle = createGlobalStyle`
   :root {
@@ -22,8 +22,18 @@ export const GlobalStyle = createGlobalStyle`
 
   input {
     background-color: ${({ theme }) => theme.colors.white};
+    font-family: Poppins, Inter, sans-serif;
   }
   input::-webkit-inner-spin-button {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+  }
+  textarea {
+    background-color: ${({ theme }) => theme.colors.white};
+    font-family: Poppins, Inter, sans-serif;
+  }
+  textarea::-webkit-inner-spin-button {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
@@ -158,4 +168,5 @@ export const GlobalStyle = createGlobalStyle`
     border-collapse: collapse;
     border-spacing: 0;
   }  
-`;
+`
+

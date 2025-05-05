@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled, { useTheme } from 'styled-components';
-import Typography from './Typography';
+import Typography from '@components/Edit/Typography';
 import { createPortal } from 'react-dom';
 
 const FieldWrapper = styled.div`

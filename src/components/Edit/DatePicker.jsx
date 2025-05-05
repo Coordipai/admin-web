@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import InputField from './InputField';
 
-import { ButtonBase } from "../../styles/globalStyle";
+import { ButtonBase } from "@styles/globalStyle";
 
 const ModalBackdrop = styled.div`
   position: fixed;

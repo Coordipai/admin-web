@@ -1,21 +1,21 @@
-import { useState } from "react";
-import styled from "styled-components";
-import PropTypes from "prop-types";
-import { InputFieldBase } from "../styles/globalStyle";
+import { useState } from 'react'
+import styled from 'styled-components'
+import PropTypes from 'prop-types'
+import { InputFieldBase } from '@styles/globalStyle'
 
 const FormTextareaLayout = styled.div`
   width: 100%;
   display: flex;
-`;
+`
 
 const FormTextareaBox = styled.textarea`
   width: 100%;
   display: flex;
   border: 0;
   outline: none;
-  caret-color: ${({ $hideCursor }) => ($hideCursor ? "transparent" : "auto")};
+  caret-color: ${({ $hideCursor }) => ($hideCursor ? 'transparent' : 'auto')};
   resize: vertical;
-`;
+`
 
 const FormTextarea = ({
   placeholder,
@@ -24,9 +24,9 @@ const FormTextarea = ({
   handleBlur = () => {},
   readOnly,
   hideCursor = false,
-  disabled = false,
+  disabled = false
 }) => {
-  const [focused, setFocused] = useState(false);
+  const [focused, setFocused] = useState(false)
 
   return (
     <FormTextareaLayout>
@@ -47,8 +47,8 @@ const FormTextarea = ({
         />
       </InputFieldBase>
     </FormTextareaLayout>
-  );
-};
+  )
+}
 
 FormTextarea.propTypes = {
   placeholder: PropTypes.string,
@@ -57,7 +57,7 @@ FormTextarea.propTypes = {
   handleBlur: PropTypes.func,
   readOnly: PropTypes.bool,
   hideCursor: PropTypes.bool,
-  disabled: PropTypes.bool,
-};
+  disabled: PropTypes.bool
+}
 
-export default FormTextarea;
+export default FormTextarea

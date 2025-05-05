@@ -6,10 +6,13 @@ import UserForm from './pages/UserPage/UserPage'
 import ChangeRequestPage from './pages/IssuePage/changeIssuePage'
 import RepositoryCheckPage from './pages/AccountSetupPage/RepositoryCheckPage'
 import { BuildProject } from './pages/build_project/BuildProject'
-import {BuildProject2} from './pages/build_project/BuildProject2' 
+import { BuildProject2 } from './pages/build_project/BuildProject2' 
 import { BuildProject3 } from './pages/build_project/BuildProject3'
+import { Project } from './pages/project/Project'
+import { Home } from './pages/Home'
+import ComponentTest from '@pages/ComponentTest'
 
-function App() {
+function App () {
   return (
     <BrowserRouter>
       <Routes>
@@ -20,9 +23,12 @@ function App() {
         <Route path="/userform" element={<UserForm />} />
         <Route path="/repositorycheckpage" element={<RepositoryCheckPage />} />
         <Route path="/changeIssuePage" element={<ChangeRequestPage />} />
+        <Route path='/' element={<Home />} />
+        <Route path='components' element={<ComponentTest />} />
         <Route path="/buildproject" element={<BuildProject/>}/>
         <Route path="/buildproject2" element={<BuildProject2/>}/>
         <Route path="/buildproject3" element={<BuildProject3/>}/>
+        <Route path="/project" element={<Project/>}/>
       </Routes>
     </BrowserRouter>
   )

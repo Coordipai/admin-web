@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Typography from './Typography';
-import Button from '../Common/Button';
-import IconButton from '../Common/IconButton';
-import FileModal from '../Common/FileModal';
+import Typography from '@components/Edit/Typography';
+import Button from '@components/Common/Button';
+import IconButton from '@components/Common/IconButton';
+import FileModal from '@components/Common/FileModal';
 
 const TableWrapper = styled.div`
   box-sizing: border-box;
@@ -118,6 +118,18 @@ const FileIconCell = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+  &:hover, &:focus-within {
+    overflow-x: auto;
+    text-overflow: unset;
+  }
 `;
 
 const FileInfoCell = styled.div`
@@ -125,6 +137,18 @@ const FileInfoCell = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+  &:hover, &:focus-within {
+    overflow-x: auto;
+    text-overflow: unset;
+  }
 `;
 
 const ActionCell = styled.div`
@@ -132,6 +156,18 @@ const ActionCell = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  max-width: 60px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+  &:hover, &:focus-within {
+    overflow-x: auto;
+    text-overflow: unset;
+  }
 `;
 
 const FileTable = ({ files, setFiles }) => {

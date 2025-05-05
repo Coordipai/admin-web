@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import InputField from './InputField';
+import InputField from '@components/Edit/InputField';
 import { createPortal } from 'react-dom';
-import searchIcon from '../../assets/icons/search-icon.svg';
+import searchIcon from '@assets/icons/search-icon.svg';
 
 // DropDownMenu, DropDownItem 스타일 재사용
-import { DropDownMenu, DropDownItem } from './DropDown.jsx';
+import { DropDownMenu, DropDownItem } from '@components/Edit/DropDown.jsx';
 
 /**
  * @param {object} props
@@ -51,13 +51,13 @@ const SearchInputField = ({
   }, [open]);
 
   useEffect(() => {
-    if (open) {
-      setFiltered(
-        value
-          ? options.filter(opt => opt.label.includes(value) || opt.value.includes(value))
-          : options
-      );
-    }
+    if (!open) return;
+    if (!options || options.length === 0) return;
+    setFiltered(
+      value
+        ? options.filter(opt => opt.label.includes(value) || opt.value.includes(value))
+        : options
+    );
   }, [value, options, open]);
 
   useEffect(() => {

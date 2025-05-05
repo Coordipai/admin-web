@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import FormInput from '@components/FormInput'
 import FormTextarea from '@components/FormTextarea'
 import FormDropdown from '@components/FormDropdown'
-import Header from '@components/Header'
+import Header from '@components/ChangeIssueHeader'
 import { EditContentHeader } from '../../components/Edit/EditContentHeader'
 import { ButtonBase } from '@styles/globalStyle'
 

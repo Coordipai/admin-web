@@ -1,14 +1,14 @@
-import InputField from '../../components/Edit/InputField'
+import InputField from '@components/Edit/InputField'
 import styled from "styled-components";
-import Typography from '../../components/Edit/Typography'
-import DropDown from '../../components/Edit/DropDown'
-import FileTable from '../../components/Edit/FileTable';
-import Button from '../../components/Common/Button';
+import Typography from '@components/Edit/Typography'
+import DropDown from '@components/Edit/DropDown'
+import FileTable from '@components/Edit/FileTable';
+import Button from '@components/Common/Button';
 import React, { useState } from 'react';
-import IconButton from '../../components/Common/IconButton';
-import UserTable from '../../components/Edit/UserTable';
-import SearchInputField from '../../components/Edit/SearchInputField';
-import { HorizontalDivider } from '../../styles/globalStyle';
+import IconButton from '@components/Common/IconButton';
+import UserTable from '@components/Edit/UserTable';
+import SearchInputField from '@components/Edit/SearchInputField';
+import { HorizontalDivider } from '@styles/globalStyle';
 import { useNavigate } from 'react-router-dom';
 
 const Layout = styled.div`

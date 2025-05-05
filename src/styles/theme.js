@@ -164,8 +164,8 @@ const weight = {
   medium: 500,
   semiBold: 600,
   bold: 700,
-  extraBold: 800,
-};
+  extraBold: 800
+}
 
 const text = {
   display2XL: `
@@ -222,32 +222,32 @@ const text = {
     font-size: 0.75rem;  // 12px
     line-height: 1.125rem;
     letter-spacing: -0.02em;
-    `,
-};
+    `
+}
 
 const padding = {
-  xs: '4px',   // 4px
-  sm: '8px',   // 8px
-  md: '16px',  // 16px
-  lg: '24px',  // 24px
-  xl: '32px',  // 32px
+  xs: '0.25rem',   // 4px
+  sm: '0.5rem',   // 8px
+  md: '1rem',     // 16px
+  lg: '1.5rem',   // 24px
+  xl: '2rem',     // 32px
 };
 
 const gap = {
-  xs: '4px',   // 4px
-  sm: '8px',   // 8px
-  md: '16px',  // 16px
-  lg: '24px',  // 24px
-  xl: '32px',  // 32px
+  xs: '0.25rem',   // 4px
+  sm: '0.5rem',   // 8px
+  md: '1rem',     // 16px
+  lg: '1.5rem',   // 24px
+  xl: '2rem',     // 32px
 };
 
 const margin = {
-  xs: '4px',   // 4px
-  sm: '8px',   // 8px
-  md: '16px',  // 16px
-  lg: '24px',  // 24px
-  xl: '32px',  // 32px
-  label: '6px', // 6px (label만 예외)
+  xs: '0.25rem',   // 4px
+  sm: '0.5rem',   // 8px
+  md: '1rem',     // 16px
+  lg: '1.5rem',   // 24px
+  xl: '2rem',     // 32px
+  label: '0.375rem', // 6px (label만 예외)
 };
 
 const radius = {
@@ -256,7 +256,6 @@ const radius = {
   lg: '0.5rem',    // 8px
   xl: '0.75rem',   // 12px
 };
-
 
 
 export const theme = {
@@ -270,4 +269,3 @@ export const theme = {
 };
 
 export { color, weight, text, padding, radius, margin, gap };
-  
