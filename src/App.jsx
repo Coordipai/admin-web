@@ -3,6 +3,7 @@ import { BuildProject } from './pages/build_project/BuildProject'
 import { BuildProject2 } from './pages/build_project/BuildProject2' 
 import { BuildProject3 } from './pages/build_project/BuildProject3'
 import { Project } from './pages/project/Project'
+import AddIssue from './pages/issue/AddIssue'
 
 import ComponentTest from '@pages/ComponentTest'
 
@@ -16,6 +17,7 @@ function App () {
         <Route path="/buildproject2" element={<BuildProject2/>}/>
         <Route path="/buildproject3" element={<BuildProject3/>}/>
         <Route path="/project" element={<Project/>}/>
+        <Route path="/issue/add" element={<AddIssue/>}/>
       </Routes>
     </BrowserRouter>
   )
