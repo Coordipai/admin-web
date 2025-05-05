@@ -56,7 +56,6 @@ const LabelBadge = styled.div`
 `;
 
 const IssueDetailPage = ({
-  isEdit = false,
   defaultIssueTitle = "",
   defaultIssueContent = "",
   defaultPriority = "M",
@@ -64,7 +63,8 @@ const IssueDetailPage = ({
   defaultLabels = [],
   defaultAssignees = [],
 }) => {
-  // options 변수들의 set함수들은 fetch함수에 이용용
+  const isEdit = false;
+  // options 변수들의 setter들은 fetch함수에 이용
   const [priorityOptions, setPriorityOptions] = useState([
     { value: 'M', label: '[M] Must Have' },
     { value: 'S', label: '[S] Should Have' },
@@ -109,15 +109,15 @@ const IssueDetailPage = ({
   const assigneeRef = useRef();
   const assigneeMenuRef = useRef();
   
-  const [menuStyle, setMenuStyle] = useState({});
-  const [menuStyle2, setMenuStyle2] = useState({});
+  const [badgeMenuStyle, setBadgeMenuStyle] = useState({});
+  const [iterationMenuStyle, setIterationMenuStyle] = useState({});
   const [labelMenuStyle, setLabelMenuStyle] = useState({});
-  const [menuStyle3, setMenuStyle3] = useState({});
+  const [assigneeMenuStyle, setAssigneeMenuStyle] = useState({});
 
   useEffect(() => {
     if (badgeDropdownOpen && badgeMenuRef.current) {
       const rect = badgeRef.current.getBoundingClientRect();
-      setMenuStyle({
+      setBadgeMenuStyle({
         position: 'absolute',
         top: rect.bottom + window.scrollY + 4,
         left: rect.left + window.scrollX,
@@ -130,7 +130,7 @@ const IssueDetailPage = ({
   useEffect(() => {
     if (iterationDropdownOpen && iterationMenuRef.current) {
       const rect = iterationRef.current.getBoundingClientRect();
-      setMenuStyle2({
+      setIterationMenuStyle({
         position: 'absolute',
         top: rect.bottom + window.scrollY + 4,
         left: rect.left + window.scrollX,
@@ -156,7 +156,7 @@ const IssueDetailPage = ({
   useEffect(() => {
     if (assigneeDropdownOpen && assigneeRef.current) {
       const rect = assigneeRef.current.getBoundingClientRect();
-      setMenuStyle3({
+      setAssigneeMenuStyle({
         position: 'absolute',
         top: rect.bottom + window.scrollY + 4,
         left: rect.left + window.scrollX,
@@ -219,7 +219,7 @@ const IssueDetailPage = ({
                   <Badge priority={priority} />
                 </div>
                 {badgeDropdownOpen && createPortal(
-                  <DropDownMenu ref={badgeMenuRef} style={menuStyle}>
+                  <DropDownMenu ref={badgeMenuRef} style={badgeMenuStyle}>
                     {priorityOptions.map((opt) => {
                       const isSelected = priority === opt.value;
                       return (
@@ -249,7 +249,7 @@ const IssueDetailPage = ({
                 </IterationBox>
                 </div>
                 {iterationDropdownOpen && createPortal(
-                  <DropDownMenu ref={iterationMenuRef} style={menuStyle2}>
+                  <DropDownMenu ref={iterationMenuRef} style={iterationMenuStyle}>
                     {iterationOptions.map((opt, index) => {
                       const isSelected = iteration.title === opt.title;
                       return (
@@ -313,7 +313,7 @@ const IssueDetailPage = ({
                   />
                 </div>
                 {assigneeDropdownOpen && createPortal(
-                  <DropDownMenu ref={assigneeMenuRef} style={menuStyle3}>
+                  <DropDownMenu ref={assigneeMenuRef} style={assigneeMenuStyle}>
                     {assigneeOptions.map((name, index) => {
                       const isSelected = assignees.includes(name);
                       return (
