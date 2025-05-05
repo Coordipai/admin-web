@@ -33,8 +33,10 @@ const LabelText = styled.span`
   color: {({ theme }) => theme.colors.gray700};
 `
 const Textarea = styled(FormTextarea)`
-  height: 600px !important;               // 원하는 높이
-  overflow-y: auto;           // 세로 스크롤 가능
+  textarea {
+    height: 1000px;
+    overflow-y: auto;
+  }
 `
 const Button = styled(ButtonBase)`
   width: 110px;                  // 원하는 너비
