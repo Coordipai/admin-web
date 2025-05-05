@@ -5,24 +5,6 @@ import SideBar from '@components/SideBar'
 
 import brandIcon from '@assets/brandIcon.png'
 
-const FormInputTest = () => {
-  const [value, setValue] = useState('')
-
-  return (
-    <div>
-      <FormInput
-        placeholder='Enter text'
-        value={value}
-        handleChange={(v) => setValue(v)}
-        readOnly={false}
-        type='text'
-        hideCursor={false}
-        disabled={false}
-      />
-      <div> value: {value}</div>
-    </div>
-  )
-}
 
 const FormTextAreaTest = () => {
   const [value, setValue] = useState('')
@@ -38,32 +20,6 @@ const FormTextAreaTest = () => {
         disabled={false}
       />
       <div> value: {value}</div>
-    </div>
-  )
-}
-
-const FormDropdownTest = () => {
-  const memus = [
-    { title: 'Option 1' },
-    { title: 'Option 2' },
-    { title: 'Option 3' }
-  ]
-
-  const [index, setIndex] = useState(0)
-  const handleChange = (index) => {
-    setIndex(index)
-  }
-
-  return (
-    <div>
-      <FormDropdown
-        placeholder='Select an option'
-        menus={memus}
-        selectedMenu={index}
-        handleChange={(i) => handleChange(i)}
-      />
-      <div> selected index: {index}</div>
-      <div> selected value: {memus[index].title}</div>
     </div>
   )
 }
@@ -151,15 +107,10 @@ const SidebarTest = () => {
 
 const ComponentTest = () => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <SidebarTest />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
         <div> Component Test </div>
-        <FormInputTest />
         <FormTextAreaTest />
-        <FormDropdownTest />
         <HeaderTest />
-      </div>
     </div>
   )
 }

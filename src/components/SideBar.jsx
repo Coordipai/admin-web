@@ -9,9 +9,9 @@ import {
   styledIcon
 } from '@styles/globalStyle'
 
-const LogOutIcon = styledIcon({ icon: LogOut01 })
-const CalendarIcon = styledIcon({ icon: Calendar })
-const ListIcon = styledIcon({ icon: List })
+const LogOutIcon = styledIcon({ icon: LogOut01, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' }})
+const CalendarIcon = styledIcon({ icon: Calendar, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' }})
+const ListIcon = styledIcon({ icon: List, style: { cursor: 'pointer' }})
 
 // 전체 레이아웃
 const SidebarLayout = styled.div`
@@ -172,8 +172,13 @@ const FormAccount = ({ text, supportingText, onClick, logout, image }) => {
         <FormAccountAvatarSupportingText>{supportingText}</FormAccountAvatarSupportingText>
       </FormAccountAvatar>
       {logout && (
-        <LogoutButton onClick={logout} style={{ display: 'flex', alignItems: 'center' }}>
-          <LogOutIcon strokecolor='#717680' style={{ cursor: 'pointer' }} />
+        <LogoutButton 
+          onClick={(e) => {
+          e.stopPropagation();
+          logout();
+        }} 
+        style={{ display: 'flex', alignItems: 'center' }}>
+          <LogOutIcon />
         </LogoutButton>
       )}
     </FormAccountContainer>
@@ -193,14 +198,14 @@ const NavBodySection = ({ projectName, iteration, issues, categories }) => {
     <NavBox>
       <NavProjectHeaderText>{projectName}</NavProjectHeaderText>
       <NavProjectItemBox>
-        <CalendarIcon strokecolor='#717680' style={{ width: '1.5rem', height: '1.5rem' }} />
+        <CalendarIcon />
         <NavProjectItemTextContainer>
           <NavProjectItemHeaderText>Iteration {iteration.week}</NavProjectItemHeaderText>
           <NavProjectItemSubText>기간 {iteration.period}</NavProjectItemSubText>
         </NavProjectItemTextContainer>
       </NavProjectItemBox>
       <NavProjectItemBox>
-        <ListIcon strokecolor='#717680' style={{ width: '1.5rem', height: '1.5rem' }} />
+        <ListIcon />
         <NavProjectItemTextContainer>
           <NavProjectItemHeaderText>Issues</NavProjectItemHeaderText>
           <NavProjectItemSubText>{issues}</NavProjectItemSubText>
@@ -252,6 +257,7 @@ const SideBar = ({
   brandTitle,
   project,
   userInfo,
+  userOnClick,
   logout
 }) => {
   const [currentProject, setCurrentProject] = useState(null)
@@ -293,7 +299,7 @@ const SideBar = ({
             text={userInfo.userName}
             supportingText={userInfo.githubId}
             logout={logout}
-            onClick={() => {}}
+            onClick={userOnClick}
           />
         </NavFooterSection>
       </ContentWrapper>
@@ -330,6 +336,7 @@ SideBar.propTypes = {
     userName: PropTypes.string.isRequired,
     githubId: PropTypes.string.isRequired
   }).isRequired,
+  userOnClick: PropTypes.func,
   logout: PropTypes.func.isRequired
 }
 
