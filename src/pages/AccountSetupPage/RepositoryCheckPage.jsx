@@ -5,6 +5,9 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
+import { useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+
 
 
 const FormWrapper = styled.div`
@@ -66,6 +69,9 @@ const Button = styled(ButtonBase)`
 
 export default function AccountSetupPage() {
   const [selectedRepos, setSelectedRepos] = useState([])
+  const location = useLocation()
+  const navigate = useNavigate()
+  const formData = location.state // 이전 페이지에서 전달된 데이터
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
@@ -74,6 +80,21 @@ export default function AccountSetupPage() {
         : [...prev, repo]
     )
   }
+
+  const handleCreateAccount = () =>{
+    const combinedData = {
+      ...formData,
+      repositories: selectedRepos,
+    }
+
+    navigate('/userform', {state: combinedData}) // 다음 페이지로 이동하면서 데이터 전달
+    console.log('보낼 데이터:', combinedData)
+  
+    // axios.post('/api/endpoint', payload) 등으로 연결 가능
+  
+    console.log(combinedData)
+  }
+
 
 
   const repoList = [
@@ -120,7 +141,7 @@ export default function AccountSetupPage() {
         </FieldWrapper>
 
         <ButtonWrapper>
-          <Button $isHighlighted>
+          <Button $isHighlighted onClick ={handleCreateAccount}>
             계정 생성하기
           </Button>
         </ButtonWrapper>

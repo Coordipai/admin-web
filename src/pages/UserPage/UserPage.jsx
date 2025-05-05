@@ -7,6 +7,7 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import SideBar from '@components/SideBar' // 경로는 실제 위치에 맞게 조정
 import brandIcon from '@assets/brandIcon.png' // 브랜드 로고 아이콘
+import { useLocation } from 'react-router-dom'
 
 
 const PageContainer = styled.div`
@@ -106,13 +107,45 @@ const TextButton = styled(ButtonBase)`
 
 
 export default function UserPage() {
-  const [username, setUsername] = useState('')
-  const [githubId, setGithubId] = useState('my-github-id') // OAuth 결과로 들어온 값
-  const [discordId, setDiscordId] = useState('')
-  const [career, setCareer] = useState('')
-  const [selectedField, setSelectedField] = useState(-1)
-  const [selectedRepos, setSelectedRepos] = useState([])
+  const location = useLocation()
+  const userdata = location.state
 
+  const [username, setUsername] = useState(userdata?.username || '')
+  const [githubId, setGithubId] = useState(userdata?.githubId || '') // OAuth 결과로 들어온 값
+  const [discordId, setDiscordId] = useState(userdata?.discordId || '')
+  const [career, setCareer] = useState(userdata?.career || '')
+  const [selectedRepos, setSelectedRepos] = useState(userdata?.repositories || [])
+  
+  const fieldOptions = [
+    { title: '프론트엔드' },
+    { title: '백엔드' },
+    { title: '기획' },
+    { title: '디자인' },
+    { title: '기타' },
+  ]
+  
+  const getFieldIndex = (fieldTitle) =>
+    fieldOptions.findIndex((option) => option.title === fieldTitle)
+  
+  const [field, setField] = useState(
+    getFieldIndex(userdata?.field)
+  )
+  
+  const handleSave = () => {
+    const payload = {
+      username,
+      githubId,
+      discordId,
+      career,
+      field: fieldOptions[field]?.title || '',
+      repositories: selectedRepos,
+    }
+  
+    console.log('보낼 데이터:', payload)
+  
+    // axios.post('/api/endpoint', payload) 등으로 연결 가능
+  }
+  
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
       prev.includes(repo)
@@ -121,13 +154,7 @@ export default function UserPage() {
     )
   }
 
-  const fieldOptions = [
-    { title: '프론트엔드' },
-    { title: '백엔드' },
-    { title: '기획' },
-    { title: '디자인' },
-    { title: '기타' },
-  ]
+  
 
   const repoList = [
     'coordipai/admin-web',
@@ -209,8 +236,8 @@ export default function UserPage() {
                 <FormDropdown
                     placeholder="분야 선택"
                     menus={fieldOptions}
-                    selectedMenu={selectedField}
-                    handleChange={setSelectedField}
+                    selectedMenu={field}
+                    handleChange={setField}
                 />
             </FieldWrapper>
 
@@ -244,7 +271,7 @@ export default function UserPage() {
                 <TextButton $isHighlighted>
                     탈퇴하기
                 </TextButton>
-                <Button $isHighlighted>
+                <Button $isHighlighted onClick={handleSave}>
                     저장하기
                 </Button>
                 <Button $isHighlighted>

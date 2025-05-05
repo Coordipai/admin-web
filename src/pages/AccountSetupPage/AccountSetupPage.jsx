@@ -5,6 +5,8 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
+import { useNavigate } from 'react-router-dom'
+
 
 
 const FormWrapper = styled.div`
@@ -52,6 +54,18 @@ export default function AccountSetupPage() {
   const [discordId, setDiscordId] = useState('')
   const [career, setCareer] = useState('')
   const [selectedField, setSelectedField] = useState(-1)
+  const navigate = useNavigate()
+  const handleNext = () => {
+    const formData = {
+      username,
+      githubId,
+      discordId,
+      career,
+      field: fieldOptions[selectedField]?.title || '',
+    }
+
+    navigate('/repositorycheckpage', { state: formData })
+  }
 
   const fieldOptions = [
     { title: '프론트엔드' },
@@ -101,7 +115,7 @@ export default function AccountSetupPage() {
         </FieldWrapper>
 
         <ButtonWrapper>
-          <Button $isHighlighted>
+          <Button $isHighlighted onClick={handleNext}>
             다음
           </Button>
         </ButtonWrapper>
