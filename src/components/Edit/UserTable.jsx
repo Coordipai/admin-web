@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Typography from '@components/Edit/Typography';
-import DropDown from '@components/Edit/DropDown';
-import IconButton from '@components/Common/IconButton';
+import Typography from './Typography';
+import DropDown from './DropDown';
+import IconButton from '../Common/IconButton';
 
 const TableWrapper = styled.div`
   box-sizing: border-box;
@@ -54,18 +54,6 @@ const NameCell = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.gap.md};
-  max-width: 220px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar { display: none; }
-  &:hover, &:focus-within {
-    overflow-x: auto;
-    text-overflow: unset;
-  }
 `;
 const ProfileImg = styled.img`
   width: 40px;
@@ -83,36 +71,12 @@ const FieldCell = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
-  max-width: 120px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar { display: none; }
-  &:hover, &:focus-within {
-    overflow-x: auto;
-    text-overflow: unset;
-  }
 `;
 const ActionCell = styled.div`
   flex: 0.3;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  max-width: 60px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar { display: none; }
-  &:hover, &:focus-within {
-    overflow-x: auto;
-    text-overflow: unset;
-  }
 `;
 
 const TableRowContainer = styled.div`
