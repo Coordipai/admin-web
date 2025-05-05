@@ -11,28 +11,13 @@ import {
   MainBox,
   ContainerBox,
   ButtonBase,
+  styledIcon
 } from "@styles/globalStyle";
 import FormTextarea from "../../components/FormTextarea";
+import { Plus, X } from "@untitled-ui/icons-react"
 
-// 셀렉트 박스 커스텀
-const SelectBox = styled.select`
-  width: 100%;
-  padding: ${({ theme }) => `${theme.padding.sm} ${theme.padding.md}`};
-  border: 0.0625rem solid ${({ theme }) => theme.colors.gray300};
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.gray900};
-  margin-top: 0.5rem;
-  ${({ theme }) => theme.texts.textMD}
-`;
-
-const Label = styled.div`
-  font-weight: ${({ theme }) => theme.weights.semiBold};
-  margin-bottom: 0.5rem;
-  ${({ theme }) => theme.texts.textMD}
-  color: ${({ theme }) => theme.colors.gray700};
-`;
+const PlusIcon = styledIcon({ icon: Plus, strokeColor: "9E77ED", style: { width: '1.5rem', height: '1.5rem' }})
+const CancelIcon = styledIcon({ icon: X , strokeColor: "9E77ED", style: { width: '1.5rem', height: '1.5rem' }}) 
 
 const Row = styled.div`
   display: flex;
@@ -44,6 +29,30 @@ const Row = styled.div`
 const IterationBox = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+const LabelContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.gap.sm};
+`;
+
+const LabelBadge = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  gap: 0.25rem;
+  background-color: ${({ theme }) => theme.colors.brand50};
+  border-radius: 1rem;
+  cursor: pointer;
+  ${({ theme }) => theme.texts.textSM}
+  color: ${({ theme }) => theme.colors.brand700};
+  
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.gray200};
+  }
 `;
 
 const AddIssue = () => {
@@ -89,6 +98,21 @@ const AddIssue = () => {
   const [menuStyle2, setMenuStyle2] = useState({});
   const [menuStyle3, setMenuStyle3] = useState({});
 
+  const labelOptions = [
+    { id: 1, name: 'bug' },
+    { id: 2, name: 'feature' },
+    { id: 3, name: 'documentation' },
+    { id: 4, name: 'enhancement' },
+    { id: 5, name: 'question' },
+    { id: 6, name: 'wontfix' },
+  ];
+
+  const [selectedLabels, setSelectedLabels] = useState([]);
+  const [labelDropdownOpen, setLabelDropdownOpen] = useState(false);
+  const labelRef = useRef();
+  const labelMenuRef = useRef();
+  const [labelMenuStyle, setLabelMenuStyle] = useState({});
+
   useEffect(() => {
     if (badgeDropdownOpen && badgeMenuRef.current) {
       const rect = badgeRef.current.getBoundingClientRect();
@@ -129,6 +153,19 @@ const AddIssue = () => {
   }, [assigneeDropdownOpen]);  
 
   useEffect(() => {
+    if (labelDropdownOpen && labelMenuRef.current) {
+      const rect = labelRef.current.getBoundingClientRect();
+      setLabelMenuStyle({
+        position: 'absolute',
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: 'auto',
+        zIndex: 9999,
+      });
+    }
+  }, [labelDropdownOpen]);
+
+  useEffect(() => {
     const handleClickOutside = (e) => {
       if (
         badgeDropdownOpen &&
@@ -137,7 +174,6 @@ const AddIssue = () => {
       ) {
         setBadgeDropdownOpen(false);
       }
-  
       if (
         iterationDropdownOpen &&
         !iterationRef.current?.contains(e.target) &&
@@ -145,7 +181,6 @@ const AddIssue = () => {
       ) {
         setIterationDropdownOpen(false);
       }
-
       if (
         assigneeDropdownOpen &&
         !assigneeRef.current?.contains(e.target) &&
@@ -153,13 +188,20 @@ const AddIssue = () => {
       ) {
         setAssigneeDropdownOpen(false);
       }
+      if (
+        labelDropdownOpen &&
+        !labelRef.current?.contains(e.target) &&
+        !labelMenuRef.current?.contains(e.target)
+      ) {
+        setLabelDropdownOpen(false);
+      }
     };
   
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [badgeDropdownOpen, iterationDropdownOpen, assigneeDropdownOpen]);
+  }, [badgeDropdownOpen, iterationDropdownOpen, assigneeDropdownOpen, labelDropdownOpen]);
   
   const renderAssigneeText = () => {
     if (assignees.length === 0) return '배정하기';
@@ -167,7 +209,14 @@ const AddIssue = () => {
     return ordered.join(', ');
   };
   
-  
+  const handleLabelClick = (label) => {
+    if (selectedLabels.some(l => l.id === label.id)) {
+      setSelectedLabels(prev => prev.filter(l => l.id !== label.id));
+    } else {
+      setSelectedLabels(prev => [...prev, label]);
+    }
+  };
+
   return (
     <MainBox>
         <Header text="이슈 추가" buttonsData={buttonsData} />
@@ -233,7 +282,35 @@ const AddIssue = () => {
               </Row>
               <Row>
                 <Typography value="Label" variant="textSM" weight="medium" color="gray900" />
-                
+                <LabelContainer>
+                  {selectedLabels.map((label) => (
+                    <LabelBadge key={label.id} onClick={() => handleLabelClick(label)}>
+                      <Typography value={label.name}variant='textXS' weight='medium' color='brand700'/>
+                      <CancelIcon/>
+                    </LabelBadge>
+                  ))}
+                  <LabelBadge ref={labelRef} onClick={() => setLabelDropdownOpen(prev => !prev)}>
+                    <PlusIcon/>
+                  </LabelBadge>
+                  {labelDropdownOpen && createPortal(
+                    <DropDownMenu ref={labelMenuRef} style={labelMenuStyle}>
+                      {labelOptions.map((label) => {
+                        const isSelected = selectedLabels.some(l => l.id === label.id);
+                        return (
+                          <DropDownItem
+                            key={label.id}
+                            selected={isSelected}
+                            onClick={() => handleLabelClick(label)}
+                            role="option"
+                          >
+                            {label.name}
+                          </DropDownItem>
+                        );
+                      })}
+                    </DropDownMenu>,
+                    document.body
+                  )}
+                </LabelContainer>
               </Row>
               <Row>
                 <Typography value="Assignee" variant="textSM" weight="medium" color="gray900" />
