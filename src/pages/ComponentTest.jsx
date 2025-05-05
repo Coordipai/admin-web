@@ -5,68 +5,28 @@ import SideBar from '@components/SideBar'
 
 import brandIcon from '@assets/brandIcon.png'
 
-const FormInputTest = () => {
-  const [value, setValue] = useState('')
-
-  return (
-    <div>
-      <FormInput
-        placeholder='Enter text'
-        value={value}
-        handleChange={(v) => setValue(v)}
-        readOnly={false}
-        type='text'
-        hideCursor={false}
-        disabled={false}
-      />
-      <div> value: {value}</div>
-    </div>
-  )
-}
-
 const FormTextAreaTest = () => {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState('');
 
   return (
     <div>
       <FormTextarea
-        placeholder='Enter text'
+        label="설명"
+        placeholder="내용을 입력하세요"
         value={value}
-        handleChange={(v) => setValue(v)}
+        onChange={(v) => setValue(v)}
         readOnly={false}
         hideCursor={false}
         disabled={false}
+        require={false}
+        error={false}
       />
-      <div> value: {value}</div>
+      <div style={{ marginTop: '1rem' }}>
+        <strong>value:</strong> {value}
+      </div>
     </div>
-  )
-}
-
-const FormDropdownTest = () => {
-  const memus = [
-    { title: 'Option 1' },
-    { title: 'Option 2' },
-    { title: 'Option 3' }
-  ]
-
-  const [index, setIndex] = useState(0)
-  const handleChange = (index) => {
-    setIndex(index)
-  }
-
-  return (
-    <div>
-      <FormDropdown
-        placeholder='Select an option'
-        menus={memus}
-        selectedMenu={index}
-        handleChange={(i) => handleChange(i)}
-      />
-      <div> selected index: {index}</div>
-      <div> selected value: {memus[index].title}</div>
-    </div>
-  )
-}
+  );
+};
 
 const HeaderTest = () => {
   return (
@@ -155,10 +115,8 @@ const ComponentTest = () => {
       <SidebarTest />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1rem' }}>
         <div> Component Test </div>
-        <FormInputTest />
-        <FormTextAreaTest />
-        <FormDropdownTest />
         <HeaderTest />
+        <FormTextAreaTest />
       </div>
     </div>
   )
