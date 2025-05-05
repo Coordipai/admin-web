@@ -8,14 +8,21 @@ import Header from '@components/ChangeIssueHeader'
 import { EditContentHeader } from '../../components/Edit/EditContentHeader'
 import { ButtonBase } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
+import SideBar from '@components/SideBar' // 경로는 실제 위치에 맞게 조정
+import brandIcon from '@assets/brandIcon.png' // 브랜드 로고 아이콘
 
 const PageWrapper = styled.div`
   display: flex;
 `
 
-const SidebarSpace = styled.div`
-  width: 300px;
-  flex-shrink: 0;
+const SidebarPlaceholder = styled.div`
+  height: 100vh;
+  min-width: 19.5rem;
+  display: flex;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
 `
 
 const FormWrapper = styled.div`
@@ -103,7 +110,45 @@ export default function changeIssuePage() {
 
   return (
     <PageWrapper>
-      <SidebarSpace />
+      <SidebarPlaceholder>
+      <SideBar
+        brandIcon={brandIcon}
+        brandTitle="CoordiPai"
+        project={{
+          projectName: 'KNU-AssignX',
+          iteration: { week: '9', period: '3/11 ~ 3/22' },
+          issues: 70,
+          categories: [
+            {
+              categoryName: 'Frontend',
+              people: [
+                { image: brandIcon, userName: '이름', githubId: 'Github ID' },
+                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
+              ]
+            },
+            {
+              categoryName: 'Backend',
+              people: [
+                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
+              ]
+            },
+            {
+              categoryName: 'AI',
+              people: [
+                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
+              ]
+            }
+          ]
+        }}
+        userInfo={{
+          image: brandIcon,
+          userName: '이름',
+          githubId: 'Github ID'
+        }}
+        logout={() => alert('로그아웃')}
+      />
+      </SidebarPlaceholder>
+
       <FormWrapper>
         <Header text="변경 요청서" />
           <div style={{padding: '2rem'}}>

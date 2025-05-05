@@ -5,6 +5,9 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
+import SideBar from '@components/SideBar' // 경로는 실제 위치에 맞게 조정
+import brandIcon from '@assets/brandIcon.png' // 브랜드 로고 아이콘
+
 
 const PageContainer = styled.div`
   display: flex;
@@ -12,10 +15,14 @@ const PageContainer = styled.div`
   min-height: 100vh;
 `
 
-// TODO: 사이드바 컴포넌트로 대체
 const SidebarPlaceholder = styled.div`
-  width: 300px;
-  flex-shrink: 0;
+  height: 100vh;
+  min-width: 19.5rem;
+  display: flex;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
 `
 
 const ContentArea = styled.div`
@@ -136,10 +143,47 @@ export default function UserPage() {
 
   return (
     <PageContainer>
-      <SidebarPlaceholder />
+      <SidebarPlaceholder>
+      <SideBar
+        brandIcon={brandIcon}
+        brandTitle="CoordiPai"
+        project={{
+          projectName: 'KNU-AssignX',
+          iteration: { week: '9', period: '3/11 ~ 3/22' },
+          issues: 70,
+          categories: [
+            {
+              categoryName: 'Frontend',
+              people: [
+                { image: brandIcon, userName: '이름', githubId: 'Github ID' },
+                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
+              ]
+            },
+            {
+              categoryName: 'Backend',
+              people: [
+                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
+              ]
+            },
+            {
+              categoryName: 'AI',
+              people: [
+                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
+              ]
+            }
+          ]
+        }}
+        userInfo={{
+          image: brandIcon,
+          userName: '이름',
+          githubId: 'Github ID'
+        }}
+        logout={() => alert('로그아웃')}
+      />
+      </SidebarPlaceholder>
       <ContentArea>
         <FormWrapper>
-            <Header text="계정 생성하기" />
+            <Header text="계정 정보" />
             <FieldWrapper>
                 <LabelText>사용자 이름</LabelText>
                 <FormInput placeholder="이름을 입력해주세요" value={username} handleChange={setUsername} />
