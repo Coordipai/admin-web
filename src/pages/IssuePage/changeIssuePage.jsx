@@ -35,10 +35,10 @@ const FormWrapper = styled.div`
 `
 
 const LabeledRow = styled.div`
-  display: flex;
-  align-items: flex-start;
+  width: filled;
+  display: flex;;
   gap: 2rem;
-  padding: 1.25rem 0;
+  padding: 2rem ;
 `
 
 const TextareaWrapper = styled.div`
@@ -68,18 +68,15 @@ const RowGroup2 = styled.div`
 `
 
 const ButtonWrapper = styled.div`
+  height: 100%;
   display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
-  align-items: end;
-  padding-top: 2.5rem;
+  align-items: flex-end;
 `
 
 const Button = styled(ButtonBase)`
-  width: 98px;
-  height: 34px;
-  padding: 0rem;
+  width: filled;
+  height: filled;
+  padding: 0.5rem 0.87rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -242,7 +239,7 @@ export default function changeIssuePage() {
                 <FormTextarea value="너가 못한거잖아ㅋㅋㅋ" />
               </TextareaWrapper>
               <ButtonWrapper>
-                <Button $isHighlighted style={{ height: '40px'}}>
+                <Button $isHighlighted>
                     피드백 재요청
                 </Button>
               </ButtonWrapper>
