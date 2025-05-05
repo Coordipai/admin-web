@@ -15,18 +15,7 @@ const Layout = styled.div`
 	background: ${({ theme }) => theme.colors.white};
 `;
 
-const Sidebar = styled.div`
-	width: 312px;
-	min-width: 240px;
-	background: ${({ theme }) => theme.colors.white};
-	border-right: 1px solid ${({ theme }) => theme.colors.gray200};
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 1.25rem;
-	font-weight: ${({ theme }) => theme.weights.semiBold};
-	color: ${({ theme }) => theme.colors.gray400};
-`;
+
 
 const MainContainer = styled.div`
 	display: flex;
@@ -102,7 +91,6 @@ export const BuildProject = () => {
 
 	return (
 		<Layout>
-			<Sidebar>sidebar</Sidebar>
 			<MainContainer>
 			<HeaderSection>
 					<Typography variant="textXL" weight="bold" value="프로젝트 생성" />
