@@ -55,63 +55,64 @@ const LabelBadge = styled.div`
   }
 `;
 
-const AddIssue = () => {
-  const buttonsData = [
-    { value: "저장", onClick: () => console.log("저장 클릭"), isHighlighted: true },
-    { value: "취소", onClick: () => console.log("취소 클릭") },
-  ];
-
-  const priorityOptions = [
+const IssueDetailPage = ({
+  isEdit = false,
+  defaultIssueTitle = "",
+  defaultIssueContent = "",
+  defaultPriority = "M",
+  defaultIteration,
+  defaultLabels = [],
+  defaultAssignees = [],
+}) => {
+  // options 변수들의 set함수들은 fetch함수에 이용용
+  const [priorityOptions, setPriorityOptions] = useState([
     { value: 'M', label: '[M] Must Have' },
     { value: 'S', label: '[S] Should Have' },
     { value: 'C', label: '[C] Could Have' },
     { value: 'W', label: '[W] Won\'t Have' },
-  ];
+  ]);
 
-  const iterationOptions = [
+  const [iterationOptions, setIterationOptions] = useState([
     { title: 'Iteration 1', period: '3.4~3.10' },
     { title: 'Iteration 2', period: '3.11~3.17' },
     { title: 'Iteration 3', period: '3.18~3.24' },
     { title: 'Iteration 4', period: '3.25~3.31' },
     { title: 'Iteration 5', period: '4.1~4.7' },
-  ];
+  ]);
 
-  const assigneeOptions = [
-    '김철수', '이영희', '박민수', '정다은', '홍길동'
-  ];
+  const [labelOptions, setLabelOptions] = useState([
+    'Feature', 'Setting', 'Refactor', 'Bugfix'
+  ])
+
+  const [assigneeOptions, setAssigneeOptions] = useState([
+    '김준형', '송재훈', '윤정훈', '이곤우', '조재용'
+  ]);
   
-  const [priority, setPriority] = useState("M");
+  const [issueTitle, setIssueTitle] = useState(defaultIssueTitle);
+  const [issueContent, setIssueContent] = useState(defaultIssueContent);
+  const [priority, setPriority] = useState(defaultPriority);
+  const [iteration, setIteration] = useState(defaultIteration || iterationOptions[0]);
+  const [selectedLabels, setSelectedLabels] = useState(defaultLabels);
+  const [assignees, setAssignees] = useState(defaultAssignees);
+
   const [badgeDropdownOpen, setBadgeDropdownOpen] = useState(false);
-  const [iteration, setIteration] = useState(iterationOptions[0]);
   const [iterationDropdownOpen, setIterationDropdownOpen] = useState(false);
-  const [assignees, setAssignees] = useState([]);
+  const [labelDropdownOpen, setLabelDropdownOpen] = useState(false);
   const [assigneeDropdownOpen, setAssigneeDropdownOpen] = useState(false);
 
   const badgeRef = useRef();
   const badgeMenuRef = useRef();
   const iterationRef = useRef();
   const iterationMenuRef = useRef();
+  const labelRef = useRef();
+  const labelMenuRef = useRef();
   const assigneeRef = useRef();
   const assigneeMenuRef = useRef();
   
   const [menuStyle, setMenuStyle] = useState({});
   const [menuStyle2, setMenuStyle2] = useState({});
-  const [menuStyle3, setMenuStyle3] = useState({});
-
-  const labelOptions = [
-    { id: 1, name: 'bug' },
-    { id: 2, name: 'feature' },
-    { id: 3, name: 'documentation' },
-    { id: 4, name: 'enhancement' },
-    { id: 5, name: 'question' },
-    { id: 6, name: 'wontfix' },
-  ];
-
-  const [selectedLabels, setSelectedLabels] = useState([]);
-  const [labelDropdownOpen, setLabelDropdownOpen] = useState(false);
-  const labelRef = useRef();
-  const labelMenuRef = useRef();
   const [labelMenuStyle, setLabelMenuStyle] = useState({});
+  const [menuStyle3, setMenuStyle3] = useState({});
 
   useEffect(() => {
     if (badgeDropdownOpen && badgeMenuRef.current) {
@@ -140,19 +141,6 @@ const AddIssue = () => {
   }, [iterationDropdownOpen]);
 
   useEffect(() => {
-    if (assigneeDropdownOpen && assigneeRef.current) {
-      const rect = assigneeRef.current.getBoundingClientRect();
-      setMenuStyle3({
-        position: 'absolute',
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-        width: 'auto',
-        zIndex: 9999,
-      });
-    }
-  }, [assigneeDropdownOpen]);  
-
-  useEffect(() => {
     if (labelDropdownOpen && labelMenuRef.current) {
       const rect = labelRef.current.getBoundingClientRect();
       setLabelMenuStyle({
@@ -166,41 +154,28 @@ const AddIssue = () => {
   }, [labelDropdownOpen]);
 
   useEffect(() => {
+    if (assigneeDropdownOpen && assigneeRef.current) {
+      const rect = assigneeRef.current.getBoundingClientRect();
+      setMenuStyle3({
+        position: 'absolute',
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: 'auto',
+        zIndex: 9999,
+      });
+    }
+  }, [assigneeDropdownOpen]);  
+
+  useEffect(() => {
     const handleClickOutside = (e) => {
-      if (
-        badgeDropdownOpen &&
-        !badgeRef.current?.contains(e.target) &&
-        !badgeMenuRef.current?.contains(e.target)
-      ) {
-        setBadgeDropdownOpen(false);
-      }
-      if (
-        iterationDropdownOpen &&
-        !iterationRef.current?.contains(e.target) &&
-        !iterationMenuRef.current?.contains(e.target)
-      ) {
-        setIterationDropdownOpen(false);
-      }
-      if (
-        assigneeDropdownOpen &&
-        !assigneeRef.current?.contains(e.target) &&
-        !assigneeMenuRef.current?.contains(e.target)
-      ) {
-        setAssigneeDropdownOpen(false);
-      }
-      if (
-        labelDropdownOpen &&
-        !labelRef.current?.contains(e.target) &&
-        !labelMenuRef.current?.contains(e.target)
-      ) {
-        setLabelDropdownOpen(false);
-      }
+      if (badgeDropdownOpen && !badgeRef.current?.contains(e.target) && !badgeMenuRef.current?.contains(e.target)) setBadgeDropdownOpen(false);
+      if (iterationDropdownOpen && !iterationRef.current?.contains(e.target) && !iterationMenuRef.current?.contains(e.target)) setIterationDropdownOpen(false);
+      if (assigneeDropdownOpen && !assigneeRef.current?.contains(e.target) && !assigneeMenuRef.current?.contains(e.target)) setAssigneeDropdownOpen(false);
+      if (labelDropdownOpen && !labelRef.current?.contains(e.target) && !labelMenuRef.current?.contains(e.target)) setLabelDropdownOpen(false);
     };
   
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [badgeDropdownOpen, iterationDropdownOpen, assigneeDropdownOpen, labelDropdownOpen]);
   
   const renderAssigneeText = () => {
@@ -210,19 +185,34 @@ const AddIssue = () => {
   };
   
   const handleLabelClick = (label) => {
-    if (selectedLabels.some(l => l.id === label.id)) {
-      setSelectedLabels(prev => prev.filter(l => l.id !== label.id));
-    } else {
-      setSelectedLabels(prev => [...prev, label]);
-    }
+    setSelectedLabels(prev =>
+      prev.includes(label)
+        ? prev.filter(l => l !== label)
+        : [...prev, label]
+    );
+    setLabelDropdownOpen(false);
   };
 
   return (
     <MainBox>
-        <Header text="이슈 추가" buttonsData={buttonsData} />
+        <Header
+          text={isEdit ? "이슈 수정" : "이슈 추가"}
+          buttonsData={
+            isEdit
+              ? [
+                  { value: "저장", onClick: () => console.log("수정 저장"), isHighlighted: true },
+                  { value: "삭제", onClick: () => console.log("삭제 클릭"), isHighlighted: true },
+                  { value: "취소", onClick: () => window.history.back() },
+                ]
+              : [
+                  { value: "저장", onClick: () => console.log("추가 저장"), isHighlighted: true },
+                  { value: "취소", onClick: () => window.history.back() },
+                ]
+          }
+        />
           <ContainerBox>
-              <InputField label="이슈 타이틀" placeholder="이슈 제목을 입력해주세요." />
-              <FormTextarea label="이슈 내용" placeholder="이슈 내용을 입력해주세요." />
+              <InputField label="이슈 타이틀" placeholder="이슈 제목을 입력해주세요." value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)}/>
+              <FormTextarea label="이슈 내용" placeholder="이슈 내용을 입력해주세요." value={issueContent} onChange={setIssueContent}/>
               <Row>
                 <Typography value="Priority" variant="textSM" weight="medium" color="gray900" />
                 <div ref={badgeRef} onClick={() => setBadgeDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
@@ -283,10 +273,10 @@ const AddIssue = () => {
               <Row>
                 <Typography value="Label" variant="textSM" weight="medium" color="gray900" />
                 <LabelContainer>
-                  {selectedLabels.map((label) => (
-                    <LabelBadge key={label.id} onClick={() => handleLabelClick(label)}>
-                      <Typography value={label.name}variant='textXS' weight='medium' color='brand700'/>
-                      <CancelIcon/>
+                {selectedLabels.map((label) => (
+                    <LabelBadge key={label} onClick={() => handleLabelClick(label)}>
+                      <Typography value={label} variant='textXS' weight='medium' color='brand700' />
+                      <CancelIcon />
                     </LabelBadge>
                   ))}
                   <LabelBadge ref={labelRef} onClick={() => setLabelDropdownOpen(prev => !prev)}>
@@ -295,15 +285,15 @@ const AddIssue = () => {
                   {labelDropdownOpen && createPortal(
                     <DropDownMenu ref={labelMenuRef} style={labelMenuStyle}>
                       {labelOptions.map((label) => {
-                        const isSelected = selectedLabels.some(l => l.id === label.id);
+                        const isSelected = selectedLabels.includes(label);
                         return (
                           <DropDownItem
-                            key={label.id}
+                            key={label}
                             selected={isSelected}
                             onClick={() => handleLabelClick(label)}
                             role="option"
                           >
-                            {label.name}
+                            {label}
                           </DropDownItem>
                         );
                       })}
@@ -352,4 +342,4 @@ const AddIssue = () => {
   );
 };
 
-export default AddIssue;
+export default IssueDetailPage;
