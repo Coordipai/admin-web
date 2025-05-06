@@ -1,11 +1,19 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+
+import LoginPage from './pages/login/LoginPage'
+import FirstAccountPage from './pages/AccountSetupPage/AccountSetupPage'
+import IssueModalTest from './pages/IssuePage/IssueModalTest'
+import UserForm from './pages/UserPage/UserPage'
+import ChangeIssuePage from './pages/IssuePage/ChangeIssuePage'
+import RepositoryCheckPage from './pages/AccountSetupPage/RepositoryCheckPage'
 import { BuildProject } from './pages/build_project/BuildProject'
-import { BuildProject2 } from './pages/build_project/BuildProject2'
+import { BuildProject2 } from './pages/build_project/BuildProject2' 
 import { BuildProject3 } from './pages/build_project/BuildProject3'
 import { Project } from './pages/project/Project'
 import { Home } from './pages/Home'
 import ComponentTest from '@pages/ComponentTest'
 import { SettingProject } from './pages/build_project/SettingProject'
+import IssueDetailPage from './pages/issue/IssueDetailPage'
 import PropTypes from 'prop-types'
 import { ToastContainer } from 'react-toastify'
 
@@ -30,6 +38,13 @@ function App () {
     <BrowserRouter>
       <ToastContainer />
       <Routes>
+        <Route path="/" element={<h1>hello world</h1>} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/firstaccount" element={<FirstAccountPage />} />
+        <Route path="/issueModalTest" element={<IssueModalTest />} />
+        <Route path="/userform" element={<UserForm />} />
+        <Route path="/repositorycheckpage" element={<RepositoryCheckPage />} />
+        <Route path="/changeIssuePage" element={<ChangeIssuePage />} />
         <Route path='/' element={<PrivateRoute element={Home} />} />
         <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />
         <Route path='/buildproject' element={<PrivateRoute element={BuildProject} />} />
