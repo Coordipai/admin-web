@@ -76,7 +76,7 @@ const EditHeaderTabsDivider = styled.div`
 
 /**
  * Header Component
- * 
+ *
  * @param {string} text - 헤더 타이틀 텍스트
  * @param {array} buttonsData - 버튼 목록 [{ value, onClick, icon, isHighlighted }]
  * @param {boolean} isTab - true면 하단에 이슈/요청 탭 표시

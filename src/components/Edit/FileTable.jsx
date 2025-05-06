@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import Typography from '@components/Edit/Typography';
-import Button from '@components/Common/Button';
-import IconButton from '@components/Common/IconButton';
-import FileModal from '@components/Common/FileModal';
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import Typography from '@components/Edit/Typography'
+import Button from '@components/Common/Button'
+import IconButton from '@components/Common/IconButton'
+import FileModal from '@components/Common/FileModal'
 
 const TableWrapper = styled.div`
   box-sizing: border-box;
@@ -16,7 +16,7 @@ const TableWrapper = styled.div`
   box-shadow: 0px 1px 2px rgba(16, 24, 40, 0.06), 0px 1px 3px rgba(16, 24, 40, 0.1);
   display: flex;
   flex-direction: column;
-`;
+`
 
 const TableHeader = styled.div`
   display: flex;
@@ -25,7 +25,7 @@ const TableHeader = styled.div`
   padding: 16px 24px;
   height: fit-content;
   flex-shrink: 0;
-`;
+`
 
 const Table = styled.div`
   width: 100%;
@@ -35,7 +35,7 @@ const Table = styled.div`
   min-height: 0;
   display: flex;
   flex-direction: column;
-`;
+`
 
 const TableHeaderRow = styled.div`
   display: flex;
@@ -43,13 +43,13 @@ const TableHeaderRow = styled.div`
   padding: 12px 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray200};
   background: ${({ theme }) => theme.colors.white};
-`;
+`
 
 const TableHeaderCell = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
-`;
+`
 
 const TableRowContainer = styled.div`
   width: 100%;
@@ -73,7 +73,7 @@ const TableRowContainer = styled.div`
   &::-webkit-scrollbar-thumb:hover {
     background: ${({ theme }) => theme.colors.gray400};
   }
-`;
+`
 
 const TableRow = styled.div`
   display: flex;
@@ -83,7 +83,7 @@ const TableRow = styled.div`
   height: fit-content;
   background: ${({ $isEven, theme }) => $isEven ? theme.colors.gray25 : theme.colors.white};
   &:last-child { border-bottom: none; }
-`;
+`
 
 const FileIcon = styled.div`
   display: flex;
@@ -94,11 +94,11 @@ const FileIcon = styled.div`
   background: ${({ theme }) => theme.colors.brand50};
   border-radius: 20px;
   margin-right: 12px;
-`;
+`
 
 const FileInfo = styled.div`
   flex: 1;
-`;
+`
 
 const DeleteButton = styled.button`
   background: none;
@@ -111,7 +111,7 @@ const DeleteButton = styled.button`
   &:hover {
     opacity: 0.7;
   }
-`;
+`
 
 const FileIconCell = styled.div`
   flex: 0.3;
@@ -130,7 +130,7 @@ const FileIconCell = styled.div`
     overflow-x: auto;
     text-overflow: unset;
   }
-`;
+`
 
 const FileInfoCell = styled.div`
   flex: 1.5;
@@ -149,7 +149,7 @@ const FileInfoCell = styled.div`
     overflow-x: auto;
     text-overflow: unset;
   }
-`;
+`
 
 const ActionCell = styled.div`
   flex: 0.2;
@@ -168,15 +168,15 @@ const ActionCell = styled.div`
     overflow-x: auto;
     text-overflow: unset;
   }
-`;
+`
 
 const FileTable = ({ files, setFiles }) => {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false)
 
   // 파일 삭제
   const handleDelete = (name) => {
-    setFiles(files.filter((f) => f.name !== name));
-  };
+    setFiles(files.filter((f) => f.name !== name))
+  }
 
   // 파일 첨부(모달에서 Attach 클릭)
   const handleAttach = (newFiles) => {
@@ -190,11 +190,11 @@ const FileTable = ({ files, setFiles }) => {
       ...newFiles.map(f => ({
         name: f.name,
         size: f.size,
-        icon: 'file',
+        icon: 'file'
       }))
-    ]);
-    setModalOpen(false);
-  };
+    ])
+    setModalOpen(false)
+  }
 
   return (
     <>
@@ -205,19 +205,19 @@ const FileTable = ({ files, setFiles }) => {
       />
       <TableWrapper>
         <TableHeader>
-          <Typography variant="displayMD" weight="medium" value="프로젝트 자료" />
+          <Typography variant='displayMD' weight='medium' value='프로젝트 자료' />
           <Button
-            text="Upload"
-            icon={<img src="/src/assets/icons/upload-icon.svg" alt="Upload" />}
-            variant="default"
-            type="button"
+            text='Upload'
+            icon={<img src='/src/assets/icons/upload-icon.svg' alt='Upload' />}
+            variant='default'
+            type='button'
             onClick={() => setModalOpen(true)}
           />
         </TableHeader>
         <Table>
           <TableHeaderRow>
             <TableHeaderCell>
-              <Typography variant="textXS" weight="medium" value="File name" />
+              <Typography variant='textXS' weight='medium' value='File name' />
             </TableHeaderCell>
           </TableHeaderRow>
           <TableRowContainer>
@@ -232,13 +232,13 @@ const FileTable = ({ files, setFiles }) => {
                   </FileIcon>
                 </FileIconCell>
                 <FileInfoCell>
-                  <Typography variant="textSM" weight="medium" value={file.name} />
-                  <Typography variant="textSM" weight="regular" color="gray500" value={typeof file.size === 'number' ? formatFileSize(file.size) : file.size} />
+                  <Typography variant='textSM' weight='medium' value={file.name} />
+                  <Typography variant='textSM' weight='regular' color='gray500' value={typeof file.size === 'number' ? formatFileSize(file.size) : file.size} />
                 </FileInfoCell>
                 <ActionCell>
                   <IconButton
-                    icon={<img src="/src/assets/icons/trash-icon.svg" alt="Delete" />}
-                    type="button"
+                    icon={<img src='/src/assets/icons/trash-icon.svg' alt='Delete' />}
+                    type='button'
                     onClick={() => handleDelete(file.name)}
                   />
                 </ActionCell>
@@ -248,17 +248,17 @@ const FileTable = ({ files, setFiles }) => {
         </Table>
       </TableWrapper>
     </>
-  );
-};
-
-// 파일 크기 변환 함수 (FileModal에서 사용한 것과 동일하게 복사)
-function formatFileSize(bytes) {
-  const n = Number(bytes);
-  if (isNaN(n) || n < 0) return '0 B';
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  if (n < 1024 * 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`;
-  return `${(n / 1024 / 1024 / 1024).toFixed(1)} GB`;
+  )
 }
 
-export default FileTable; 
+// 파일 크기 변환 함수 (FileModal에서 사용한 것과 동일하게 복사)
+function formatFileSize (bytes) {
+  const n = Number(bytes)
+  if (isNaN(n) || n < 0) return '0 B'
+  if (n < 1024) return `${n} B`
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
+  if (n < 1024 * 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`
+  return `${(n / 1024 / 1024 / 1024).toFixed(1)} GB`
+}
+
+export default FileTable

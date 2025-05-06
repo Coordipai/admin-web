@@ -7,13 +7,13 @@ import brandIcon from '@assets/brandIcon.png'
 import { MainBox } from '@styles/globalStyle'
 
 const FormTextAreaTest = () => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState('')
 
   return (
     <div>
       <FormTextarea
-        label="설명"
-        placeholder="내용을 입력하세요"
+        label='설명'
+        placeholder='내용을 입력하세요'
         value={value}
         onChange={(v) => setValue(v)}
         readOnly={false}
@@ -113,9 +113,9 @@ const SidebarTest = () => {
 const ComponentTest = () => {
   return (
     <MainBox>
-        {/* <div> Component Test </div> */}
-        <HeaderTest />
-        <FormTextAreaTest />
+      {/* <div> Component Test </div> */}
+      <HeaderTest />
+      <FormTextAreaTest />
     </MainBox>
   )
 }

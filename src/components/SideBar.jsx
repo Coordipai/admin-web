@@ -9,9 +9,9 @@ import {
   styledIcon
 } from '@styles/globalStyle'
 
-const LogOutIcon = styledIcon({ icon: LogOut01, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' }})
-const CalendarIcon = styledIcon({ icon: Calendar, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' }})
-const ListIcon = styledIcon({ icon: List, style: { cursor: 'pointer' }})
+const LogOutIcon = styledIcon({ icon: LogOut01, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' } })
+const CalendarIcon = styledIcon({ icon: Calendar, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' } })
+const ListIcon = styledIcon({ icon: List, style: { cursor: 'pointer' } })
 
 // 전체 레이아웃
 const SidebarLayout = styled.div`
@@ -171,12 +171,13 @@ const FormAccount = ({ text, supportingText, onClick, logout, image }) => {
         <FormAccountAvatarSupportingText>{supportingText}</FormAccountAvatarSupportingText>
       </FormAccountAvatar>
       {logout && (
-        <LogoutButton 
+        <LogoutButton
           onClick={(e) => {
-          e.stopPropagation();
-          logout();
-        }} 
-        style={{ display: 'flex', alignItems: 'center' }}>
+            e.stopPropagation()
+            logout()
+          }}
+          style={{ display: 'flex', alignItems: 'center' }}
+        >
           <LogOutIcon />
         </LogoutButton>
       )}

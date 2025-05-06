@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { BuildProject } from './pages/build_project/BuildProject'
-import { BuildProject2 } from './pages/build_project/BuildProject2' 
+import { BuildProject2 } from './pages/build_project/BuildProject2'
 import { BuildProject3 } from './pages/build_project/BuildProject3'
 import { Project } from './pages/project/Project'
 import { Home } from './pages/Home'
@@ -21,7 +21,7 @@ import IssueDetailPage from './pages/issue/IssueDetailPage'
     path='project'
     element={<PrivateRoute element={Project} />}
   />
-  형태로 사용하면 되고, sidebar가 없는 페이지의 경우 
+  형태로 사용하면 되고, sidebar가 없는 페이지의 경우
   hasSideBar={false}로 설정
 */
 function App () {
@@ -30,17 +30,16 @@ function App () {
       <Routes>
         <Route path='/' element={<PrivateRoute element={Home} />} />
         <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />
-        <Route path="/buildproject" element={<PrivateRoute element={BuildProject} />} />
-        <Route path="/buildproject2" element={<PrivateRoute element={BuildProject2} />} />
-        <Route path="/buildproject3" element={<PrivateRoute element={BuildProject3} />} />
-        <Route path="/project" element={<PrivateRoute element={Project} />} />
-        <Route path="/settingproject" element={<PrivateRoute element={SettingProject} />} />
-        <Route path="/issue" element={<PrivateRoute element={IssueDetailPage} />} />
+        <Route path='/buildproject' element={<PrivateRoute element={BuildProject} />} />
+        <Route path='/buildproject2' element={<PrivateRoute element={BuildProject2} />} />
+        <Route path='/buildproject3' element={<PrivateRoute element={BuildProject3} />} />
+        <Route path='/project' element={<PrivateRoute element={Project} />} />
+        <Route path='/settingproject' element={<PrivateRoute element={SettingProject} />} />
+        <Route path='/issue' element={<PrivateRoute element={IssueDetailPage} />} />
       </Routes>
     </BrowserRouter>
   )
 }
-
 
 const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
   // const location = useLocation();
@@ -95,22 +94,22 @@ const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
     image: brandIcon,
     userName: 'TestUser',
     githubId: 'testuser123'
-  }; 
+  }
 
   const userOnClick = () => {
     // Handle user click event
-    console.log('User clicked!');
-  };
+    console.log('User clicked!')
+  }
 
   const logout = () => {
     // Handle logout event
-    console.log('Logout clicked!');
-  };
+    console.log('Logout clicked!')
+  }
 
   return hasSideBar ? (
     <PageBox>
       {
-      // authData && 
+      // authData &&
       hasSideBar && (
         <SideBar
           brandIcon={brandIcon}
@@ -120,17 +119,18 @@ const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
           userOnClick={userOnClick}
           logout={logout}
         />
-      )}
+      )
+}
       <Component />
     </PageBox>
   ) : (
     <Component />
-  );
-};
+  )
+}
 
 PrivateRoute.propTypes = {
   element: PropTypes.elementType.isRequired,
-  hasSideBar: PropTypes.bool,
-};
+  hasSideBar: PropTypes.bool
+}
 
 export default App

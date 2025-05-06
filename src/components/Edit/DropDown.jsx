@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import styled, { useTheme } from 'styled-components';
-import Typography from '@components/Edit/Typography';
-import { createPortal } from 'react-dom';
+import React, { useState, useRef, useEffect } from 'react'
+import styled, { useTheme } from 'styled-components'
+import Typography from '@components/Edit/Typography'
+import { createPortal } from 'react-dom'
 
 const FieldWrapper = styled.div`
   display: flex;
@@ -11,13 +11,13 @@ const FieldWrapper = styled.div`
   max-width: 100%;
   
   position: relative;
-`;
+`
 
 const Label = styled.label`
   ${({ theme }) => theme.texts.textSM}
   font-weight: ${({ theme }) => theme.weights.medium};
   color: ${({ theme }) => theme.colors.gray700};
-`;
+`
 
 const DropDownBase = styled.button`
   box-sizing: border-box;
@@ -50,7 +50,7 @@ const DropDownBase = styled.button`
     border-top: 0.375rem solid ${({ theme }) => theme.colors.gray500};
     vertical-align: middle;
   }
-`;
+`
 
 const DropDownMenu = styled.ul`
   position: absolute;
@@ -71,7 +71,7 @@ const DropDownMenu = styled.ul`
   overflow-x: hidden;
   white-space: nowrap;
   pointer-events: auto;
-`;
+`
 
 const DropDownItem = styled.li`
   box-sizing: border-box;
@@ -99,12 +99,12 @@ const DropDownItem = styled.li`
     background: ${({ theme, disabled, $isplaceholder }) =>
       disabled || $isplaceholder ? theme.colors.white : theme.colors.brand50};
   }
-`;
+`
 
 const HelperText = styled.span`
   ${({ theme }) => theme.texts.textSM}
   color: ${({ theme, $error }) => ($error ? theme.colors.error500 : theme.colors.gray500)} !important;
-`;
+`
 
 /**
  * @param {object} props - 컴포넌트의 props
@@ -119,7 +119,7 @@ const HelperText = styled.span`
  * @param {string} [props.placeholder='선택하세요'] - 기본 표시 텍스트
  * @param {boolean} [props.require=false] - 필수 선택 여부
  * @returns {JSX.Element} 스타일이 적용된 드롭다운 컴포넌트
- * 
+ *
  * @example
  * // 기본 사용법
  * <DropDown
@@ -131,7 +131,7 @@ const HelperText = styled.span`
  *     { value: 'drink', label: '음료' }
  *   ]}
  * />
- * 
+ *
  * // 다중 선택 사용
  * <DropDown
  *   label="태그"
@@ -156,12 +156,12 @@ const DropDown = ({
   require = false,
   ...props
 }) => {
-  const [open, setOpen] = useState(false);
-  const ref = useRef();
-  const baseRef = useRef();
-  const menuRef = useRef();
-  const [menuStyle, setMenuStyle] = useState({});
-  const theme = useTheme();
+  const [open, setOpen] = useState(false)
+  const ref = useRef()
+  const baseRef = useRef()
+  const menuRef = useRef()
+  const [menuStyle, setMenuStyle] = useState({})
+  const theme = useTheme()
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -171,80 +171,82 @@ const DropDown = ({
         menuRef.current &&
         !menuRef.current.contains(e.target)
       ) {
-        setOpen(false);
+        setOpen(false)
       }
-    };
-    if (open) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open]);
+    }
+    if (open) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open])
 
   useEffect(() => {
     if (open && baseRef.current) {
-      const rect = baseRef.current.getBoundingClientRect();
+      const rect = baseRef.current.getBoundingClientRect()
       setMenuStyle({
         position: 'absolute',
         top: rect.bottom + window.scrollY,
         left: rect.left + window.scrollX,
         width: rect.width,
-        zIndex: 9999,
-      });
+        zIndex: 9999
+      })
     }
-  }, [open]);
+  }, [open])
 
   const getLabel = (val) => {
     if (multi) {
-      if (!Array.isArray(val) || val.length === 0) return '';
+      if (!Array.isArray(val) || val.length === 0) return ''
       return options
         .filter(opt => val.map(String).includes(String(opt.value)))
         .map(opt => opt.label)
-        .join(', ');
+        .join(', ')
     } else {
-      if (val === undefined || val === null || val === '') return '';
-      const found = options.find(opt => String(opt.value) === String(val));
-      return found ? found.label : '';
+      if (val === undefined || val === null || val === '') return ''
+      const found = options.find(opt => String(opt.value) === String(val))
+      return found ? found.label : ''
     }
-  };
+  }
   const hasValue = (() => {
     if (multi) {
-      return Array.isArray(value) && value.length > 0 && value.some(v => options.some(opt => String(opt.value) === String(v)));
+      return Array.isArray(value) && value.length > 0 && value.some(v => options.some(opt => String(opt.value) === String(v)))
     } else {
-      if (value === undefined || value === null || value === '') return false;
-      return options.some(opt => String(opt.value) === String(value));
+      if (value === undefined || value === null || value === '') return false
+      return options.some(opt => String(opt.value) === String(value))
     }
-  })();
+  })()
 
-  let showHelper = undefined;
+  let showHelper
   if (error) {
-    showHelper = helperText || (require ? '필수 선택 항목입니다.' : undefined);
+    showHelper = helperText || (require ? '필수 선택 항목입니다.' : undefined)
   }
 
   return (
     <FieldWrapper ref={ref}>
-      {label && <Label>{label}{require && <span style={{color:theme.colors.error500,marginLeft:4}}>*</span>}</Label>}
+      {label && <Label>{label}{require && <span style={{ color: theme.colors.error500, marginLeft: 4 }}>*</span>}</Label>}
       <DropDownBase
-        type="button"
+        type='button'
         onClick={() => !disabled && setOpen((prev) => !prev)}
         disabled={disabled}
         $error={error}
         $hasValue={hasValue}
         tabIndex={0}
-        aria-haspopup="listbox"
+        aria-haspopup='listbox'
         aria-expanded={open}
         {...props}
         ref={baseRef}
       >
-        {hasValue ? (
-          <Typography variant="textSM" weight="medium" color="gray700" value={getLabel(value)} />
-        ) : (
-          <Typography variant="textSM" weight="medium" color="gray500" value={placeholder} />
-        )}
+        {hasValue
+          ? (
+            <Typography variant='textSM' weight='medium' color='gray700' value={getLabel(value)} />
+            )
+          : (
+            <Typography variant='textSM' weight='medium' color='gray500' value={placeholder} />
+            )}
       </DropDownBase>
       {open && createPortal(
-        <DropDownMenu ref={menuRef} role="listbox" style={menuStyle}>
+        <DropDownMenu ref={menuRef} role='listbox' style={menuStyle}>
           {options.map((opt) => {
             const isSelected = multi
               ? Array.isArray(value) && value.map(String).includes(String(opt.value))
-              : String(value) === String(opt.value);
+              : String(value) === String(opt.value)
             return (
               <DropDownItem
                 key={opt.value}
@@ -252,35 +254,35 @@ const DropDown = ({
                 disabled={opt.disabled || opt.value === ''}
                 $isplaceholder={opt.value === '' ? 'true' : undefined}
                 onClick={() => {
-                  if (opt.disabled || opt.value === '') return;
+                  if (opt.disabled || opt.value === '') return
                   if (multi) {
-                    let newValue = Array.isArray(value) ? [...value] : [];
+                    let newValue = Array.isArray(value) ? [...value] : []
                     if (newValue.map(String).includes(String(opt.value))) {
-                      newValue = newValue.filter(v => String(v) !== String(opt.value));
+                      newValue = newValue.filter(v => String(v) !== String(opt.value))
                     } else {
-                      newValue.push(opt.value);
+                      newValue.push(opt.value)
                     }
-                    onChange(newValue);
+                    onChange(newValue)
                   } else {
-                    onChange(opt.value);
-                    setOpen(false);
+                    onChange(opt.value)
+                    setOpen(false)
                   }
-                  if (!multi) setOpen(false);
+                  if (!multi) setOpen(false)
                 }}
-                role="option"
+                role='option'
                 aria-selected={isSelected}
               >
                 {opt.label}
               </DropDownItem>
-            );
+            )
           })}
         </DropDownMenu>,
         document.body
       )}
       {showHelper && <HelperText $error={error}>{showHelper}</HelperText>}
     </FieldWrapper>
-  );
-};
+  )
+}
 
-export default DropDown;
-export { DropDownMenu, DropDownItem }; 
+export default DropDown
+export { DropDownMenu, DropDownItem }

@@ -169,4 +169,3 @@ export const GlobalStyle = createGlobalStyle`
     border-spacing: 0;
   }  
 `
-

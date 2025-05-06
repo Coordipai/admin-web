@@ -1,6 +1,6 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
-import Typography from '@components/Edit/Typography';
+import React from 'react'
+import styled, { css } from 'styled-components'
+import Typography from '@components/Edit/Typography'
 
 const StyledButton = styled.button`
   display: inline-flex;
@@ -53,13 +53,13 @@ const StyledButton = styled.button`
         color: ${theme.colors.brand600};
       }
     `}
-`;
+`
 
 const IconWrapper = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
+`
 
 /**
  * 버튼 컴포넌트
@@ -71,31 +71,31 @@ const IconWrapper = styled.span`
  * @param {boolean} disabled - 버튼의 비활성화 여부
  * @param {Object} props - 추가 props
  * @returns {JSX.Element} 버튼 컴포넌트
- * 
+ *
  * @example
  * // 기본 버튼
  * <Button text="확인" onClick={() => console.log('clicked')} />
- * 
+ *
  * @example
  * // 아이콘이 있는 버튼
- * <Button 
- *   text="업로드" 
- *   icon={<UploadIcon />} 
- *   onClick={handleUpload} 
+ * <Button
+ *   text="업로드"
+ *   icon={<UploadIcon />}
+ *   onClick={handleUpload}
  * />
- * 
+ *
  * @example
  * // 텍스트 변형 버튼
- * <Button 
- *   text="더 보기" 
- *   variant="text" 
+ * <Button
+ *   text="더 보기"
+ *   variant="text"
  *   onClick={handleShowMore}
  * />
- * 
+ *
  * @example
  * // 제출 버튼
- * <Button 
- *   text="저장" 
+ * <Button
+ *   text="저장"
  *   type="submit"
  *   disabled={!isValid}
  * />
@@ -122,14 +122,14 @@ const Button = ({
       {icon && <IconWrapper>{icon}</IconWrapper>}
       {text && (
         <Typography
-          variant="textMD"
+          variant='textMD'
           weight={variant === 'text' ? 'medium' : 'semibold'}
           color={color === 'white' ? 'gray700' : 'white'}
           value={text}
         />
       )}
     </StyledButton>
-  );
-};
+  )
+}
 
-export default Button; 
+export default Button
