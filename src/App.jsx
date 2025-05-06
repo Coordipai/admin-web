@@ -7,10 +7,12 @@ import IssueDetailPage from '@pages/issue/IssueDetailPage'
 import { Home } from './pages/Home'
 import ComponentTest from '@pages/ComponentTest'
 import { SettingProject } from './pages/build_project/SettingProject'
+import { ToastContainer } from 'react-toastify'
 
 function App () {
   return (
     <BrowserRouter>
+      <ToastContainer />
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='components' element={<ComponentTest />} />
