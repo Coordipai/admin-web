@@ -146,6 +146,20 @@ export default function UserPage() {
     // axios.post('/api/endpoint', payload) 등으로 연결 가능
   }
   
+  const handleWithdraw = () => {
+    // 추후 API 연결을 위한 준비 작업
+    const confirmed = window.confirm('정말로 탈퇴하시겠습니까?');
+    if (confirmed) {
+      console.log('탈퇴 처리 진행');
+      // 예: axios.post('/api/user/delete', { githubId })
+    }
+  }
+  
+  const handleEvaluationRequest = () => {
+    console.log('평가 요청 처리 진행');
+    // 예: axios.post('/api/evaluation/request', { githubId, field })
+  }
+  
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
       prev.includes(repo)
@@ -268,16 +282,17 @@ export default function UserPage() {
             </FieldWrapper>
 
             <ButtonWrapper>
-                <TextButton $isHighlighted>
-                    탈퇴하기
-                </TextButton>
-                <Button $isHighlighted onClick={handleSave}>
-                    저장하기
-                </Button>
-                <Button $isHighlighted>
-                    평가요청
-                </Button>
+              <TextButton $isHighlighted onClick={handleWithdraw}>
+                탈퇴하기
+              </TextButton>
+              <Button $isHighlighted onClick={handleSave}>
+                저장하기
+              </Button>
+              <Button $isHighlighted onClick={handleEvaluationRequest}>
+                평가요청
+              </Button>
             </ButtonWrapper>
+
         </FormWrapper>
       </ContentArea>
     </PageContainer>
