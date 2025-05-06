@@ -1,40 +1,13 @@
-import {useState} from 'react'
+import { useState } from 'react'
 import InputField from '@components/Edit/InputField'
 import styled from "styled-components";
 import Typography from '@components/Edit/Typography'
 import DropDown from '@components/Edit/DropDown'
 import FileTable from '@components/Edit/FileTable';
 import Button from '@components/Common/Button';
-import { HorizontalDivider } from '@styles/globalStyle';
+import { HorizontalDivider, MainBox } from '@styles/globalStyle';
 import { useNavigate } from 'react-router-dom';
-
-const Layout = styled.div`
-	display: flex;
-	width: 100vw;
-	height: 100vh;
-	background: ${({ theme }) => theme.colors.white};
-`;
-
-
-
-const MainContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: ${({ theme }) => theme.gap.xl};
-	padding: ${({ theme }) => theme.padding.xl};
-	width: 100%;
-	background: ${({ theme }) => theme.colors.white};
-	max-height: 100vh;
-`;
-
-const HeaderSection = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: ${({ theme }) => theme.gap.lg};
-	width: 100%;
-`;
-
+import Header from '@components/Header';
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -47,7 +20,6 @@ const Fieldset = styled.div`
 	align-items: stretch;
 	overflow-y: auto;
 `;
-
 
 const ButtonGroup = styled.div`
 	display: flex;
@@ -75,26 +47,19 @@ export const BuildProject2 = () => {
 	const navigate = useNavigate();
 
 	return (
-		<Layout>
+		<MainBox>
+			<Header text="프로젝트 생성"/>
 
-			<MainContainer>
-				<HeaderSection>
-					<Typography variant="textXL" weight="bold" value="프로젝트 생성" />
-					<HorizontalDivider />
-				</HeaderSection>
-			
-				<Section>
-					<Fieldset>
-						<FileTable files={files} setFiles={setFiles} />
-					</Fieldset>
-					
-					<ButtonGroup>
-						<Button text="취소" type="button" onClick={() => navigate(-1)} />
-						<Button text="다음" type="button" onClick={() => navigate('/buildproject3')} />
-					</ButtonGroup>
-				</Section>
+			<Section>
+				<Fieldset>
+					<FileTable files={files} setFiles={setFiles} />
+				</Fieldset>
 				
-			</MainContainer>
-		</Layout>
-	);
+				<ButtonGroup>
+					<Button text="취소" type="button" onClick={() => navigate(-1)} />
+					<Button text="다음" type="button" onClick={() => navigate('/buildproject3')} />
+				</ButtonGroup>
+			</Section>
+		</MainBox>
+	)
 } 

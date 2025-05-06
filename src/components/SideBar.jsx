@@ -16,9 +16,8 @@ const ListIcon = styledIcon({ icon: List, style: { cursor: 'pointer' }})
 // 전체 레이아웃
 const SidebarLayout = styled.div`
   height: 100vh;
-  min-width: 19.5rem;
+  min-width: 20rem;
   display: flex;
-  justify-content: space-between;
 `
 
 const ContentWrapper = styled.div`

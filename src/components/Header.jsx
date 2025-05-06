@@ -7,6 +7,7 @@ import { ButtonBase, HorizontalDivider } from '@styles/globalStyle'
 const HeaderContainer = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 1.5rem;
 `
 

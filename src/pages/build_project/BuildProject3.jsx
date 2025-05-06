@@ -8,35 +8,9 @@ import React, { useState } from 'react';
 import IconButton from '@components/Common/IconButton';
 import UserTable from '@components/Edit/UserTable';
 import SearchInputField from '@components/Edit/SearchInputField';
-import { HorizontalDivider } from '@styles/globalStyle';
+import { HorizontalDivider, MainBox } from '@styles/globalStyle';
 import { useNavigate } from 'react-router-dom';
-
-const Layout = styled.div`
-	display: flex;
-	width: 100vw;
-	height: 100vh;
-	background: ${({ theme }) => theme.colors.white};
-`;
-
-
-
-const MainContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: ${({ theme }) => theme.gap.xl};
-	padding: ${({ theme }) => theme.padding.xl};
-	width: 100%;
-	background: ${({ theme }) => theme.colors.white};
-	max-height: 100vh;
-`;
-
-const HeaderSection = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: ${({ theme }) => theme.gap.lg};
-	width: 100%;
-`;
+import Header from '@components/Header';
 
 const Fieldset = styled.div`
 	max-height: 100%;
@@ -119,13 +93,8 @@ export const BuildProject3 = () => {
 	];
 
 	return (
-		<Layout>
-
-			<MainContainer>
-				<HeaderSection>
-					<Typography variant="textXL" weight="bold" value="프로젝트 생성" />
-					<HorizontalDivider />
-				</HeaderSection>
+		<MainBox>
+			<Header text="프로젝트 생성" />
 				<Section>
 					<Fieldset>
 						<SearchInputField
@@ -146,7 +115,6 @@ export const BuildProject3 = () => {
 						<Button text="완료" type="submit" />
 					</ButtonGroup>
 				</Section>
-			</MainContainer>
-		</Layout>
+		</MainBox>
 	);
 } 

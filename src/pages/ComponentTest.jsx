@@ -4,6 +4,7 @@ import Header from '@components/Header'
 import SideBar from '@components/SideBar'
 
 import brandIcon from '@assets/brandIcon.png'
+import { MainBox } from '@styles/globalStyle'
 
 const FormTextAreaTest = () => {
   const [value, setValue] = useState('');
@@ -33,7 +34,7 @@ const HeaderTest = () => {
     <div>
       <Header
         text='Header Title'
-        isTab
+        isTab={false}
         buttonsData={[
           {
             value: 'Button 1',
@@ -111,11 +112,11 @@ const SidebarTest = () => {
 
 const ComponentTest = () => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div> Component Test </div>
+    <MainBox>
+        {/* <div> Component Test </div> */}
         <HeaderTest />
         <FormTextAreaTest />
-    </div>
+    </MainBox>
   )
 }
 

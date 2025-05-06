@@ -10,34 +10,9 @@ import { useNavigate } from 'react-router-dom';
 import SearchInputField from '@components/Edit/SearchInputField'
 import UserTable from '@components/Edit/UserTable'
 import { DatePicker } from '@components/Edit/DatePicker';
+import Header from '@components/Header'
+import { MainBox } from '../../styles/globalStyle';
 
-const Layout = styled.div`
-	display: flex;
-	width: 100vw;
-	height: 100vh;
-	background: ${({ theme }) => theme.colors.white};
-`;
-
-
-
-const MainContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: ${({ theme }) => theme.gap.xl};
-	padding: ${({ theme }) => theme.padding.xl};
-	width: 100%;
-	background: ${({ theme }) => theme.colors.white};
-	max-height: 100vh;
-	overflow: hidden;
-`;
-
-const HeaderSection = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: ${({ theme }) => theme.gap.lg};
-	width: 100%;
-`;
 
 
 const Fieldset = styled.div`
@@ -151,107 +126,100 @@ export const SettingProject = () => {
 	const navigate = useNavigate();
 
 	return (
-		<Layout>
-
-			<MainContainer>
-				<HeaderSection>
-					<Typography variant="textXL" weight="bold" value="프로젝트 설정" />
-					<HorizontalDivider />
-				</HeaderSection>
-				<Section>
-					<Fieldset>
-					<InputField
-								label="프로젝트 명 입력"
-								placeholder="입력하세요"
-								value={projectName}
-								onChange={e => {
-									setProjectName(e.target.value);
-									if (error.projectName && e.target.value) setError(prev => ({ ...prev, projectName: false }));
-								}}
-								require
-								error={error.projectName}
-							/>
-							<DropDownWrapper>
-								<div style={{ width: '100%' }}>
-									<DatePicker
-										label="마감기한 설정"
-										require
-										paramYear={deadline ? Number(deadline.split('-')[0]) : undefined}
-										paramMonth={deadline ? Number(deadline.split('-')[1]) : undefined}
-										paramDate={deadline ? Number(deadline.split('-')[2]) : undefined}
-										setPickedDate={date => {
-											setDeadline(date);
-											if (error.deadline && date) setError(prev => ({ ...prev, deadline: false }));
-										}}
-										error={error.deadline}
-									/>
-								</div>
-								<DropDown
-									label="스프린트 단위"
-									placeholder="Select team member"
-									value={sprint}
-									onChange={v => {
-										setSprint(v);
-										if (error.sprint && v !== '') setError(prev => ({ ...prev, sprint: false }));
-									}}
-									options={[
-										{ value: '', label: 'Select team member' },
-										{ value: '1주', label: '1주' },
-										{ value: '2주', label: '2주' },
-										{ value: '1개월', label: '1개월' },
-									]}
-									require
-									error={error.sprint}
-								/>
-							</DropDownWrapper>
-							<InputField
-								label="Github Repo 주소 입력"
-								placeholder="입력하세요"
-								value={github}
-								onChange={e => {
-									setGithub(e.target.value);
-									if (error.github && e.target.value) setError(prev => ({ ...prev, github: false }));
-								}}
-								require
-								error={error.github}
-							/>
-							<InputField
-								label="Discord 서버 ID 입력"
-								placeholder="입력하세요"
-								value={discord}
-								onChange={e => {
-									setDiscord(e.target.value);
-									if (error.discord && e.target.value) setError(prev => ({ ...prev, discord: false }));
-								}}
-								require
-								error={error.discord}
-							/>
-						{/* buildproject2 (파일 테이블) */}
-						<TableWrapper>
-							<FileTable files={files} setFiles={setFiles} />
-						</TableWrapper>
-						{/* buildproject3 (팀원 검색 및 테이블) */}
-						<SearchInputField
-							label="팀원 검색"
-							value={search}
-							onChange={e => setSearch(e.target.value)}
-							options={searchOptions}
-							onSelect={(val, label) => {
-								setSearch(label);
+		<MainBox>
+			<Header text="프로젝트 설정" />
+			<Section>
+				<Fieldset>
+				<InputField
+							label="프로젝트 명 입력"
+							placeholder="입력하세요"
+							value={projectName}
+							onChange={e => {
+								setProjectName(e.target.value);
+								if (error.projectName && e.target.value) setError(prev => ({ ...prev, projectName: false }));
 							}}
-							placeholder="팀원을 검색하세요"
+							require
+							error={error.projectName}
 						/>
-						<TableWrapper>
-							<UserTable rows={rows} setRows={setRows} />
-						</TableWrapper>
-						<ButtonGroup>
-						<Button text="취소" type="button" onClick={() => navigate(-1)} />
-						<Button text="완료" type="button" onClick={() => navigate('/')} />
-					</ButtonGroup>
-					</Fieldset>
-					
-				</Section>
-			</MainContainer>
-		</Layout>
+						<DropDownWrapper>
+							<div style={{ width: '100%' }}>
+								<DatePicker
+									label="마감기한 설정"
+									require
+									paramYear={deadline ? Number(deadline.split('-')[0]) : undefined}
+									paramMonth={deadline ? Number(deadline.split('-')[1]) : undefined}
+									paramDate={deadline ? Number(deadline.split('-')[2]) : undefined}
+									setPickedDate={date => {
+										setDeadline(date);
+										if (error.deadline && date) setError(prev => ({ ...prev, deadline: false }));
+									}}
+									error={error.deadline}
+								/>
+							</div>
+							<DropDown
+								label="스프린트 단위"
+								placeholder="Select team member"
+								value={sprint}
+								onChange={v => {
+									setSprint(v);
+									if (error.sprint && v !== '') setError(prev => ({ ...prev, sprint: false }));
+								}}
+								options={[
+									{ value: '', label: 'Select team member' },
+									{ value: '1주', label: '1주' },
+									{ value: '2주', label: '2주' },
+									{ value: '1개월', label: '1개월' },
+								]}
+								require
+								error={error.sprint}
+							/>
+						</DropDownWrapper>
+						<InputField
+							label="Github Repo 주소 입력"
+							placeholder="입력하세요"
+							value={github}
+							onChange={e => {
+								setGithub(e.target.value);
+								if (error.github && e.target.value) setError(prev => ({ ...prev, github: false }));
+							}}
+							require
+							error={error.github}
+						/>
+						<InputField
+							label="Discord 서버 ID 입력"
+							placeholder="입력하세요"
+							value={discord}
+							onChange={e => {
+								setDiscord(e.target.value);
+								if (error.discord && e.target.value) setError(prev => ({ ...prev, discord: false }));
+							}}
+							require
+							error={error.discord}
+						/>
+					{/* buildproject2 (파일 테이블) */}
+					<TableWrapper>
+						<FileTable files={files} setFiles={setFiles} />
+					</TableWrapper>
+					{/* buildproject3 (팀원 검색 및 테이블) */}
+					<SearchInputField
+						label="팀원 검색"
+						value={search}
+						onChange={e => setSearch(e.target.value)}
+						options={searchOptions}
+						onSelect={(val, label) => {
+							setSearch(label);
+						}}
+						placeholder="팀원을 검색하세요"
+					/>
+					<TableWrapper>
+						<UserTable rows={rows} setRows={setRows} />
+					</TableWrapper>
+					<ButtonGroup>
+					<Button text="취소" type="button" onClick={() => navigate(-1)} />
+					<Button text="완료" type="button" onClick={() => navigate('/')} />
+				</ButtonGroup>
+				</Fieldset>
+			</Section>
+		</MainBox>
 	);
 } 

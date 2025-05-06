@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import { useState } from 'react'
 import InputField from '@components/Edit/InputField'
 import styled from "styled-components";
 import Typography from '@components/Edit/Typography'
@@ -6,35 +6,10 @@ import DropDown from '@components/Edit/DropDown'
 import FileTable from '@components/Edit/FileTable';
 import SearchInputField from '@components/Edit/SearchInputField';
 import Button from '@components/Common/Button';
-import { HorizontalDivider } from '@styles/globalStyle';
+import { HorizontalDivider, MainBox } from '@styles/globalStyle';
 import { useTheme } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-
-const Layout = styled.div`
-	display: flex;
-	width: 100vw;
-	height: 100vh;
-	background: ${({ theme }) => theme.colors.white};
-`;
-
-
-const MainContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: ${({ theme }) => theme.gap.xl};
-	padding: ${({ theme }) => theme.padding.xl};
-	width: 100%;
-	background: ${({ theme }) => theme.colors.white};
-	max-height: 100vh;
-`;
-
-const HeaderSection = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: ${({ theme }) => theme.gap.lg};
-	width: 100%;
-`;
+import Header from '@components/Header'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -126,45 +101,36 @@ export const Home = () => {
 		: projects;
 
 	return (
-		<Layout>
-
-			<MainContainer>
-				<HeaderSection>
-					<Typography variant="textXL" weight="bold" value="프로젝트" />
-					<HorizontalDivider />
-				</HeaderSection>
-			
-				<Section>
-				<div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-								<div style={{width:'40%'}}>
-									<SearchInputField
-										value={search}
-										onChange={e => setSearch(e.target.value)}
-										placeholder="프로젝트를 검색하세요"
-									/>
-								</div>
-								<Button text="프로젝트 생성"/>
-							</div>
-					
-					<Fieldset>
-						<div style={{ display: 'flex', gap: theme.gap.lg, flexWrap: 'wrap' }}>
-							{filteredProjects.map((project) => (
-								<ProjectCard
-									key={project.id}
-									{...project}
-									selected={selectedId === project.id}
-									onClick={() => {
-										setSelectedId(project.id);
-										navigate(`/project?id=${project.id}`);
-									}}
+		<MainBox>
+			<Header text="프로젝트" />
+			<Section>
+			<div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+							<div style={{width:'40%'}}>
+								<SearchInputField
+									value={search}
+									onChange={e => setSearch(e.target.value)}
+									placeholder="프로젝트를 검색하세요"
 								/>
-							))}
+							</div>
+							<Button text="프로젝트 생성"/>
 						</div>
-					</Fieldset> 
-					
-				</Section>
 				
-			</MainContainer>
-		</Layout>
+				<Fieldset>
+					<div style={{ display: 'flex', gap: theme.gap.lg, flexWrap: 'wrap' }}>
+						{filteredProjects.map((project) => (
+							<ProjectCard
+								key={project.id}
+								{...project}
+								selected={selectedId === project.id}
+								onClick={() => {
+									setSelectedId(project.id);
+									navigate(`/project?id=${project.id}`);
+								}}
+							/>
+						))}
+					</div>
+				</Fieldset> 
+			</Section>
+		</MainBox>
 	);
 } 

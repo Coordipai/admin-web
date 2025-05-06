@@ -13,6 +13,7 @@ import brandIcon from '@assets/brandIcon.png'
 import { PageBox } from '@styles/globalStyle'
 import SideBar from '@components/SideBar'
 import { useEffect } from 'react'
+import IssueDetailPage from './pages/issue/IssueDetailPage'
 
 /*
   route 설정 시, PrivateRoute를 사용하여,
@@ -27,13 +28,14 @@ function App () {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='components' element={<ComponentTest />} />
-        <Route path="/buildproject" element={<BuildProject/>}/>
-        <Route path="/buildproject2" element={<BuildProject2/>}/>
-        <Route path="/buildproject3" element={<BuildProject3/>}/>
-        <Route path="/project" element={<Project/>}/>
-        <Route path="/settingproject" element={<SettingProject/>}/>
+        <Route path='/' element={<PrivateRoute element={Home} />} />
+        <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />
+        <Route path="/buildproject" element={<PrivateRoute element={BuildProject} />} />
+        <Route path="/buildproject2" element={<PrivateRoute element={BuildProject2} />} />
+        <Route path="/buildproject3" element={<PrivateRoute element={BuildProject3} />} />
+        <Route path="/project" element={<PrivateRoute element={Project} />} />
+        <Route path="/settingproject" element={<PrivateRoute element={SettingProject} />} />
+        <Route path="/issue" element={<PrivateRoute element={IssueDetailPage} />} />
       </Routes>
     </BrowserRouter>
   )
