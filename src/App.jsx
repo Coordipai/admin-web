@@ -1,9 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import LoginPage from './pages/login/loginPage'
+import LoginPage from './pages/login/LoginPage'
 import FirstAccountPage from './pages/AccountSetupPage/AccountSetupPage'
 import IssueModalTest from './pages/IssuePage/IssueModalTest'
 import UserForm from './pages/UserPage/UserPage'
-import ChangeRequestPage from './pages/IssuePage/changeIssuePage'
+import ChangeRequestPage from './pages/IssuePage/ChangeIssuePage'
 import RepositoryCheckPage from './pages/AccountSetupPage/RepositoryCheckPage'
 import { BuildProject } from './pages/build_project/BuildProject'
 import { BuildProject2 } from './pages/build_project/BuildProject2' 
@@ -12,6 +12,7 @@ import { Project } from './pages/project/Project'
 import { Home } from './pages/Home'
 import ComponentTest from '@pages/ComponentTest'
 import { SettingProject } from './pages/build_project/SettingProject'
+import IssueDetailPage from './pages/issue/IssueDetailPage'
 
 function App () {
   return (

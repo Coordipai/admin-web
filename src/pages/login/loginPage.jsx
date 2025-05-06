@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import coordipaiLogo from '../../assets/coordipaiLogo.png'
 import githubLogo from '../../assets/gitHubLogo.png'
 import CheckLineGraphic from './CheckLineGraphic'
-import GitHubLoginButton from './loginButton'
+import GitHubLoginButton from './LoginButton'
 
 const Title = styled.h2`
   ${({ theme }) => theme.texts.displayMD};
