@@ -7,6 +7,7 @@ import { Home } from './pages/Home'
 import ComponentTest from '@pages/ComponentTest'
 import { SettingProject } from './pages/build_project/SettingProject'
 import PropTypes from 'prop-types'
+import { ToastContainer } from 'react-toastify'
 
 import brandIcon from '@assets/brandIcon.png'
 
@@ -27,6 +28,7 @@ import IssueDetailPage from './pages/issue/IssueDetailPage'
 function App () {
   return (
     <BrowserRouter>
+      <ToastContainer />
       <Routes>
         <Route path='/' element={<PrivateRoute element={Home} />} />
         <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />

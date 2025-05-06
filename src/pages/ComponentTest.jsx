@@ -2,6 +2,11 @@ import { useState } from 'react'
 import FormTextarea from '@components/FormTextArea'
 import Header from '@components/Header'
 import SideBar from '@components/SideBar'
+import { 
+  showSuccessToastMsg,
+  showWarningToastMsg,
+  showErrorToastMsg
+} from '@utils/showToastMsg'
 
 import brandIcon from '@assets/brandIcon.png'
 import { MainBox } from '@styles/globalStyle'
@@ -37,14 +42,19 @@ const HeaderTest = () => {
         isTab={false}
         buttonsData={[
           {
-            value: 'Button 1',
+            value: 'Success',
             isHighlighted: false,
-            onClick: () => console.log('Button 1 clicked')
+            onClick: () => showSuccessToastMsg('Success!')
           },
           {
-            value: 'Button 2',
+            value: 'Warning',
             isHighlighted: true,
-            onClick: () => console.log('Button 2 clicked')
+            onClick: () => showWarningToastMsg('Warning!')
+          },
+          {
+            value: 'Error',
+            isHighlighted: false,
+            onClick: () => showErrorToastMsg({ error: 'Error', message: 'An error occurred!' })
           }
         ]}
       />
