@@ -1,12 +1,12 @@
-import React, { useRef, useEffect, useState } from 'react';
-import styled from 'styled-components';
-import Typography from '@components/Edit/Typography';
-import Button from '@components/Common/Button';
-import IconButton from '@components/Common/IconButton';
-import Badge from '@components/Edit/Badge';
-import ArrowLeftIcon from '@assets/icons/arrow-left-icon.svg';
-import ArrowRightIcon from '@assets/icons/arrow-right-icon.svg';
-import { useNavigate } from 'react-router-dom';
+import React, { useRef, useEffect, useState } from 'react'
+import styled from 'styled-components'
+import Typography from '@components/Edit/Typography'
+import Button from '@components/Common/Button'
+import IconButton from '@components/Common/IconButton'
+import Badge from '@components/Edit/Badge'
+import ArrowLeftIcon from '@assets/icons/arrow-left-icon.svg'
+import ArrowRightIcon from '@assets/icons/arrow-right-icon.svg'
+import { useNavigate } from 'react-router-dom'
 
 const TableWrapper = styled.div`
   box-sizing: border-box;
@@ -19,7 +19,7 @@ const TableWrapper = styled.div`
   border-radius: ${({ theme }) => theme.radius.lg};
   box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.06), 0px 1px 3px 0px rgba(16, 24, 40, 0.1);
   overflow: hidden;
-`;
+`
 
 const TableScrollArea = styled.div`
   width: 100%;
@@ -28,18 +28,18 @@ const TableScrollArea = styled.div`
   scrollbar-width: none;
   -ms-overflow-style: none;
   &::-webkit-scrollbar { display: none; }
-`;
+`
 
 const Table = styled.table`
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   background: ${({ theme }) => theme.colors.white};
-`;
+`
 
 const Thead = styled.thead`
   background: ${({ theme }) => theme.colors.gray50};
-`;
+`
 
 const Th = styled.th`
   padding: ${({ theme }) => `${theme.padding.md} ${theme.padding.sm}`};
@@ -51,7 +51,7 @@ const Th = styled.th`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-`;
+`
 
 const Td = styled.td`
   padding: ${({ theme }) => `${theme.padding.sm} ${theme.padding.sm}`};
@@ -69,7 +69,7 @@ const Td = styled.td`
   scrollbar-width: none;
   -ms-overflow-style: none;
   &::-webkit-scrollbar { display: none; }
-`;
+`
 
 const Tr = styled.tr`
   &:last-child ${Td} {
@@ -79,13 +79,13 @@ const Tr = styled.tr`
   &:hover {
     background: ${({ theme }) => theme.colors.gray200};
   }
-`;
+`
 
 const TrHeader = styled.tr`
   &:last-child ${Td} {
     border-bottom: none;
   }
-`;
+`
 
 const LabelBadge = styled.span`
   display: inline-block;
@@ -96,7 +96,7 @@ const LabelBadge = styled.span`
   ${({ theme }) => theme.texts.textXS};
   font-weight: ${({ theme }) => theme.weights.medium};
   margin-right: 4px;
-`;
+`
 
 const PaginationWrapper = styled.div`
   box-sizing: border-box;
@@ -108,44 +108,44 @@ const PaginationWrapper = styled.div`
   background: ${({ theme }) => theme.colors.white};
   width: 100%;
   max-width: 100%;
-`;
+`
 
-const IssueTable = ({ rows = [], page = 1, onPageChange, variant='issue' }) => {
-  const wrapperRef = useRef(null);
-  const [pageSize, setPageSize] = useState(99);
-  const HEADER_HEIGHT = 47; // px
-  const PAGINATION_HEIGHT = 57; // px
-  const ROW_HEIGHT = 52.5; // px
-  const navigate = useNavigate();
+const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) => {
+  const wrapperRef = useRef(null)
+  const [pageSize, setPageSize] = useState(99)
+  const HEADER_HEIGHT = 47 // px
+  const PAGINATION_HEIGHT = 57 // px
+  const ROW_HEIGHT = 52.5 // px
+  const navigate = useNavigate()
 
   // pageSize 계산 함수
   const calculatePageSize = () => {
     if (wrapperRef.current) {
-      const height = wrapperRef.current.clientHeight;
-      const availableHeight = height - HEADER_HEIGHT - PAGINATION_HEIGHT;
-      return Math.max(1, Math.floor(availableHeight / ROW_HEIGHT));
+      const height = wrapperRef.current.clientHeight
+      const availableHeight = height - HEADER_HEIGHT - PAGINATION_HEIGHT
+      return Math.max(1, Math.floor(availableHeight / ROW_HEIGHT))
     }
-    return 1;
-  };
+    return 1
+  }
 
   useEffect(() => {
     const handleResize = () => {
-      setPageSize(calculatePageSize());
-    };
-    setPageSize(calculatePageSize());
-    window.addEventListener('resize', handleResize);
+      setPageSize(calculatePageSize())
+    }
+    setPageSize(calculatePageSize())
+    window.addEventListener('resize', handleResize)
     return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   const handleNext = () => {
-		if (variant === 'issue') navigate('/buildproject2');
-		else if (variant === 'request') navigate('/buildproject3');
-	};
+    if (variant === 'issue') navigate('/buildproject2')
+    else if (variant === 'request') navigate('/buildproject3')
+  }
 
-  const total = Math.ceil(rows.length / pageSize) || 1;
-  const pagedRows = rows.slice((page - 1) * pageSize, page * pageSize);
+  const total = Math.ceil(rows.length / pageSize) || 1
+  const pagedRows = rows.slice((page - 1) * pageSize, page * pageSize)
 
   return (
     <TableWrapper ref={wrapperRef}>
@@ -163,47 +163,49 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant='issue' }) => {
             </TrHeader>
           </Thead>
           <tbody>
-            {pagedRows.length === 0 ? (
-              <Tr>
-                <Td colSpan={8} style={{ textAlign: 'center', color: undefined }}>
-                  <Typography variant="textMD" color="gray500" value="검색된 이슈가 없습니다." />
-                </Td>
-              </Tr>
-            ) : (
-              pagedRows.map((row, idx) => (
-                <Tr key={row.issue_number + row.title + idx} onClick={handleNext}>
-                  <Td># {row.issue_number}</Td>
-                  <Td>{row.repo_fullname}</Td>
-                  <Td>{row.title}</Td>
-                  <Td>{row.body}</Td>
-                  <Td>{row.assignee}</Td>
-                  <Td><Badge priority={row.priority} /></Td>
-                  <Td>Iteration {row.iteration}</Td>
+            {pagedRows.length === 0
+              ? (
+                <Tr>
+                  <Td colSpan={8} style={{ textAlign: 'center', color: undefined }}>
+                    <Typography variant='textMD' color='gray500' value='검색된 이슈가 없습니다.' />
+                  </Td>
                 </Tr>
-              ))
-            )}
+                )
+              : (
+                  pagedRows.map((row, idx) => (
+                    <Tr key={row.issue_number + row.title + idx} onClick={handleNext}>
+                      <Td># {row.issue_number}</Td>
+                      <Td>{row.repo_fullname}</Td>
+                      <Td>{row.title}</Td>
+                      <Td>{row.body}</Td>
+                      <Td>{row.assignee}</Td>
+                      <Td><Badge priority={row.priority} /></Td>
+                      <Td>Iteration {row.iteration}</Td>
+                    </Tr>
+                  ))
+                )}
           </tbody>
         </Table>
       </TableScrollArea>
       <PaginationWrapper>
-        <Button 
-          icon={<img src={ArrowLeftIcon} alt="이전" />} 
-          color="white" 
-          style={{ minWidth: 32 }} 
-          onClick={() => onPageChange && onPageChange(page - 1)} 
-          disabled={page <= 1} 
+        <Button
+          icon={<img src={ArrowLeftIcon} alt='이전' />}
+          color='white'
+          style={{ minWidth: 32 }}
+          onClick={() => onPageChange && onPageChange(page - 1)}
+          disabled={page <= 1}
         />
-        <Typography variant="textSM" color="gray700" value={`Page ${page} of ${total}`}/>
-        <Button 
-          icon={<img src={ArrowRightIcon} alt="다음" />} 
-          color="white" 
-          style={{ minWidth: 32 }} 
-          onClick={() => onPageChange && onPageChange(page + 1)} 
-          disabled={page >= total} 
+        <Typography variant='textSM' color='gray700' value={`Page ${page} of ${total}`} />
+        <Button
+          icon={<img src={ArrowRightIcon} alt='다음' />}
+          color='white'
+          style={{ minWidth: 32 }}
+          onClick={() => onPageChange && onPageChange(page + 1)}
+          disabled={page >= total}
         />
       </PaginationWrapper>
     </TableWrapper>
-  );
-};
+  )
+}
 
-export default IssueTable; 
+export default IssueTable

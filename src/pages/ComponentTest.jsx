@@ -2,17 +2,23 @@ import { useState } from 'react'
 import FormTextarea from '@components/FormTextArea'
 import Header from '@components/Header'
 import SideBar from '@components/SideBar'
+import { 
+  showSuccessToastMsg,
+  showWarningToastMsg,
+  showErrorToastMsg
+} from '@utils/showToastMsg'
 
 import brandIcon from '@assets/brandIcon.png'
+import { MainBox } from '@styles/globalStyle'
 
 const FormTextAreaTest = () => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState('')
 
   return (
     <div>
       <FormTextarea
-        label="설명"
-        placeholder="내용을 입력하세요"
+        label='설명'
+        placeholder='내용을 입력하세요'
         value={value}
         onChange={(v) => setValue(v)}
         readOnly={false}
@@ -25,25 +31,30 @@ const FormTextAreaTest = () => {
         <strong>value:</strong> {value}
       </div>
     </div>
-  );
-};
+  )
+}
 
 const HeaderTest = () => {
   return (
     <div>
       <Header
         text='Header Title'
-        isTab
+        isTab={false}
         buttonsData={[
           {
-            value: 'Button 1',
+            value: 'Success',
             isHighlighted: false,
-            onClick: () => console.log('Button 1 clicked')
+            onClick: () => showSuccessToastMsg('Success!')
           },
           {
-            value: 'Button 2',
+            value: 'Warning',
             isHighlighted: true,
-            onClick: () => console.log('Button 2 clicked')
+            onClick: () => showWarningToastMsg('Warning!')
+          },
+          {
+            value: 'Error',
+            isHighlighted: false,
+            onClick: () => showErrorToastMsg({ error: 'Error', message: 'An error occurred!' })
           }
         ]}
       />
@@ -111,14 +122,11 @@ const SidebarTest = () => {
 
 const ComponentTest = () => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <SidebarTest />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1rem' }}>
-        <div> Component Test </div>
-        <HeaderTest />
-        <FormTextAreaTest />
-      </div>
-    </div>
+    <MainBox>
+      {/* <div> Component Test </div> */}
+      <HeaderTest />
+      <FormTextAreaTest />
+    </MainBox>
   )
 }
 
