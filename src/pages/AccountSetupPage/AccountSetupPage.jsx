@@ -7,8 +7,6 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate } from 'react-router-dom'
 
-
-
 const FormWrapper = styled.div`
   max-width: 800px;
   margin: 0 auto;
@@ -30,9 +28,9 @@ const ButtonWrapper = styled.div`
 `
 
 const LabelText = styled.span`
-  {({ theme }) => theme.texts.textMD};
-  font-weight: {({ theme }) => theme.weights.medium};
-  color: {({ theme }) => theme.colors.gray700};
+  ${({ theme }) => theme.texts.textMD};
+  font-weight: ${({ theme }) => theme.weights.medium};
+  color: ${({ theme }) => theme.colors.gray700};
 `
 const Textarea = styled(FormTextarea)`
   textarea {
@@ -41,31 +39,21 @@ const Textarea = styled(FormTextarea)`
   }
 `
 const Button = styled(ButtonBase)`
-  width: 110px;                  // 원하는 너비
-  display: flex;                // 혹시 ButtonBase가 안 가지고 있다면 안전하게 다시 선언
-  align-items: center;          // 세로 중앙 정렬
-  justify-content: center;      // 가로 중앙 정렬
+  width: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   ${({ theme }) => theme.texts.textSM};
 `
 
 export default function AccountSetupPage() {
   const [username, setUsername] = useState('')
-  const [githubId, setGithubId] = useState('my-github-id') // OAuth 결과로 들어온 값
+  const [githubId, setGithubId] = useState('my-github-id')
   const [discordId, setDiscordId] = useState('')
   const [career, setCareer] = useState('')
   const [selectedField, setSelectedField] = useState(-1)
+  const [error, setError] = useState({})
   const navigate = useNavigate()
-  const handleNext = () => {
-    const formData = {
-      username,
-      githubId,
-      discordId,
-      career,
-      field: fieldOptions[selectedField]?.title || '',
-    }
-
-    navigate('/repositorycheckpage', { state: formData })
-  }
 
   const fieldOptions = [
     { title: '프론트엔드' },
@@ -74,58 +62,91 @@ export default function AccountSetupPage() {
     { title: '디자인' },
     { title: '기타' },
   ]
-  
+
+  const handleNext = () => {
+    const newError = {}
+    if (!username.trim()) newError.username = true
+    if (!discordId.trim()) newError.discordId = true
+    if (!career.trim()) newError.career = true
+    if (selectedField === -1) newError.selectedField = true
+
+    setError(newError)
+
+    if (Object.keys(newError).length === 0) {
+      const formData = {
+        username,
+        githubId,
+        discordId,
+        career,
+        field: fieldOptions[selectedField]?.title || '',
+      }
+      navigate('/repositorycheckpage', { state: formData })
+    }
+  }
+
   return (
-    <>
-      <FormWrapper>
-        <Header text="계정 생성하기" />
-        <FieldWrapper>
-          <LabelText>사용자 이름</LabelText>
-          <FormInput placeholder="이름을 입력해주세요" value={username} handleChange={setUsername} />
-        </FieldWrapper>
+    <FormWrapper>
+      <Header text="계정 생성하기" />
 
-        <FieldWrapper>
-          <LabelText>GitHub 계정이름</LabelText>
-          <FormInput
-            placeholder="깃허브 계정"
-            value={githubId}
-            handleChange={setGithubId}
-            readOnly
-          />
-        </FieldWrapper>
+      <FieldWrapper>
+        <LabelText>사용자 이름</LabelText>
+        <FormInput
+          placeholder="이름을 입력해주세요"
+          value={username}
+          handleChange={(v) => {
+            setUsername(v)
+            if (error.username) setError((prev) => ({ ...prev, username: false }))
+          }}
+        />
+      </FieldWrapper>
 
-        <FieldWrapper>
-          <LabelText>Discord ID</LabelText>
-          <FormInput placeholder="디스코드 ID" value={discordId} handleChange={setDiscordId} />
-        </FieldWrapper>
+      <FieldWrapper>
+        <LabelText>GitHub 계정이름</LabelText>
+        <FormInput placeholder="깃허브 계정" value={githubId} handleChange={setGithubId} readOnly />
+      </FieldWrapper>
 
-        <FieldWrapper>
-          <LabelText>분야 선택</LabelText>
-          <FormDropdown
-            placeholder="분야 선택"
-            menus={fieldOptions}
-            selectedMenu={selectedField}
-            handleChange={setSelectedField}
-          />
-        </FieldWrapper>
+      <FieldWrapper>
+        <LabelText>Discord ID</LabelText>
+        <FormInput
+          placeholder="디스코드 ID"
+          value={discordId}
+          handleChange={(v) => {
+            setDiscordId(v)
+            if (error.discordId) setError((prev) => ({ ...prev, discordId: false }))
+          }}
+        />
+      </FieldWrapper>
 
-        <FieldWrapper>
-          <LabelText>간단한 경력을 입력해주세요.</LabelText>
-          <Textarea
-            placeholder="ex. 사이드 프로젝트 2회 경험"
-            value={career}
-            onChange={setCareer}  // 이렇게 직접 넘김
-          />
+      <FieldWrapper>
+        <LabelText>분야 선택</LabelText>
+        <FormDropdown
+          placeholder="분야 선택"
+          menus={fieldOptions}
+          selectedMenu={selectedField}
+          handleChange={(v) => {
+            setSelectedField(v)
+            if (error.selectedField) setError((prev) => ({ ...prev, selectedField: false }))
+          }}
+        />
+      </FieldWrapper>
 
-          </FieldWrapper>
+      <FieldWrapper>
+        <LabelText>간단한 경력을 입력해주세요.</LabelText>
+        <Textarea
+          placeholder="ex. 사이드 프로젝트 2회 경험"
+          value={career}
+          onChange={(v) => {
+            setCareer(v)
+            if (error.career) setError((prev) => ({ ...prev, career: false }))
+          }}
+        />
+      </FieldWrapper>
 
-        <ButtonWrapper>
-          <Button $isHighlighted onClick={handleNext}>
-            다음
-          </Button>
-        </ButtonWrapper>
-
-      </FormWrapper>
-    </>
+      <ButtonWrapper>
+        <Button $isHighlighted type="button" onClick={handleNext}>
+          다음
+        </Button>
+      </ButtonWrapper>
+    </FormWrapper>
   )
 }
