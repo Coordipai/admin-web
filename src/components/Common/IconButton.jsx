@@ -1,5 +1,5 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
+import React from 'react'
+import styled, { css } from 'styled-components'
 
 const StyledIconButton = styled.button`
   display: inline-flex;
@@ -19,7 +19,7 @@ const StyledIconButton = styled.button`
       color: ${theme.colors.gray300};
       cursor: not-allowed;
     `}
-`;
+`
 
 /**
  * 아이콘 버튼 컴포넌트
@@ -29,14 +29,14 @@ const StyledIconButton = styled.button`
  * @param {boolean} disabled - 버튼의 비활성화 여부
  * @param {Object} props - 추가 props
  * @returns {JSX.Element} 아이콘 버튼 컴포넌트
- * 
+ *
  * @example
  * // 기본 아이콘 버튼
- * <IconButton 
- *   icon={<DeleteIcon />} 
- *   onClick={handleDelete} 
+ * <IconButton
+ *   icon={<DeleteIcon />}
+ *   onClick={handleDelete}
  * />
- * 
+ *
  * @example
  * // 비활성화된 아이콘 버튼
  * <IconButton
@@ -49,6 +49,6 @@ const IconButton = ({ icon, onClick, type = 'button', disabled = false, ...props
   <StyledIconButton type={type} onClick={onClick} disabled={disabled} {...props}>
     {icon}
   </StyledIconButton>
-);
+)
 
-export default IconButton; 
+export default IconButton

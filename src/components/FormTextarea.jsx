@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import styled, { useTheme, css } from 'styled-components';
-import PropTypes from 'prop-types';
-import { InputFieldBase } from '@styles/globalStyle';
+import React, { useState } from 'react'
+import styled, { useTheme, css } from 'styled-components'
+import PropTypes from 'prop-types'
+import { InputFieldBase } from '@styles/globalStyle'
 
 const FieldWrapper = styled.div`
   box-sizing: border-box;
@@ -10,13 +10,13 @@ const FieldWrapper = styled.div`
   gap: ${({ theme }) => theme.margin.label};
   width: 100%;
   max-width: 100%;
-`;
+`
 
 const Label = styled.label`
   ${({ theme }) => theme.texts.textSM}
   font-weight: ${({ theme }) => theme.weights.medium};
   color: ${({ theme }) => theme.colors.gray700};
-`;
+`
 
 const StyledTextarea = styled.textarea`
   width: 100%;
@@ -41,12 +41,12 @@ const StyledTextarea = styled.textarea`
       color: ${theme.colors.gray400};
       cursor: not-allowed;
     `}
-`;
+`
 
 const HelperText = styled.span`
   ${({ theme }) => theme.texts.textSM}
   color: ${({ theme, $error }) => ($error ? theme.colors.error500 : theme.colors.gray500)} !important;
-`;
+`
 
 const FormTextarea = ({
   label,
@@ -62,12 +62,12 @@ const FormTextarea = ({
   require = false,
   ...props
 }) => {
-  const [focused, setFocused] = useState(false);
-  const theme = useTheme();
+  const [focused, setFocused] = useState(false)
+  const theme = useTheme()
 
-  let showHelper = undefined;
+  let showHelper
   if (error) {
-    showHelper = helperText || (require ? '필수 입력 항목입니다.' : undefined);
+    showHelper = helperText || (require ? '필수 입력 항목입니다.' : undefined)
   }
 
   return (
@@ -84,21 +84,21 @@ const FormTextarea = ({
           placeholder={placeholder}
           onChange={(e) => onChange(e.currentTarget.value)}
           onBlur={(e) => {
-            onBlur(e.currentTarget.value);
-            setFocused(false);
+            onBlur(e.currentTarget.value)
+            setFocused(false)
           }}
           onFocus={() => setFocused(true)}
           $hideCursor={hideCursor}
           readOnly={readOnly}
           disabled={disabled}
-          rows="6"
+          rows='6'
           {...props}
         />
       </InputFieldBase>
       {showHelper && <HelperText $error={error}>{showHelper}</HelperText>}
     </FieldWrapper>
-  );
-};
+  )
+}
 
 FormTextarea.propTypes = {
   label: PropTypes.string,
@@ -111,7 +111,7 @@ FormTextarea.propTypes = {
   disabled: PropTypes.bool,
   readOnly: PropTypes.bool,
   hideCursor: PropTypes.bool,
-  require: PropTypes.bool,
-};
+  require: PropTypes.bool
+}
 
-export default FormTextarea;
+export default FormTextarea

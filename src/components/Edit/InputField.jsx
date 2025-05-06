@@ -1,5 +1,5 @@
-import React from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import React from 'react'
+import styled, { css, useTheme } from 'styled-components'
 
 const FieldWrapper = styled.div`
   box-sizing: border-box;
@@ -8,18 +8,18 @@ const FieldWrapper = styled.div`
   gap: ${({ theme }) => theme.margin.label};
   width: 100%;
   max-width: 100%;
-`;
+`
 
 const Label = styled.label`
   ${({ theme }) => theme.texts.textSM}
   font-weight: ${({ theme }) => theme.weights.medium};
   color: ${({ theme }) => theme.colors.gray700};
-`;
+`
 
 const InputWrapper = styled.div`
   position: relative;
   width: 100%;
-`;
+`
 
 const StyledInput = styled.input`
   box-sizing: border-box;
@@ -57,12 +57,12 @@ const StyledInput = styled.input`
       color: ${theme.colors.gray400};
       cursor: not-allowed;
     `}
-`;
+`
 
 const HelperText = styled.span`
   ${({ theme }) => theme.texts.textSM}
   color: ${({ theme, $error }) => ($error ? theme.colors.error500 : theme.colors.gray500)} !important;
-`;
+`
 
 const IconImg = styled.img`
   width: 16px;
@@ -73,7 +73,7 @@ const IconImg = styled.img`
   transform: translateY(-50%);
   pointer-events: none;
   filter: brightness(0) saturate(100%) invert(62%) sepia(6%) saturate(0%) hue-rotate(175deg) brightness(97%) contrast(88%);
-`;
+`
 
 /**
  * @param {object} props - 컴포넌트의 props
@@ -118,18 +118,18 @@ const InputField = ({
   require = false,
   ...props
 }) => {
-  const theme = useTheme();
+  const theme = useTheme()
   // error가 true일 때만 helperText 노출, error가 false면 helperText도 무조건 숨김
-  let showHelper = undefined;
+  let showHelper
   if (error) {
-    showHelper = helperText || (require ? '필수 입력 항목입니다.' : undefined);
+    showHelper = helperText || (require ? '필수 입력 항목입니다.' : undefined)
   }
   return (
     <FieldWrapper>
-      {label && <Label>{label}{require && <span style={{color:theme.colors.error500,marginLeft:4}}>*</span>}</Label>}
+      {label && <Label>{label}{require && <span style={{ color: theme.colors.error500, marginLeft: 4 }}>*</span>}</Label>}
       <InputWrapper>
         {icon && (
-          <IconImg src={icon} alt="icon" />
+          <IconImg src={icon} alt='icon' />
         )}
         <StyledInput
           value={value}
@@ -143,7 +143,7 @@ const InputField = ({
       </InputWrapper>
       {showHelper && <HelperText $error={error}>{showHelper}</HelperText>}
     </FieldWrapper>
-  );
-};
+  )
+}
 
-export default InputField; 
+export default InputField

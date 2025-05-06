@@ -9,15 +9,16 @@ import {
 } from '@utils/showToastMsg'
 
 import brandIcon from '@assets/brandIcon.png'
+import { MainBox } from '@styles/globalStyle'
 
 const FormTextAreaTest = () => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState('')
 
   return (
     <div>
       <FormTextarea
-        label="설명"
-        placeholder="내용을 입력하세요"
+        label='설명'
+        placeholder='내용을 입력하세요'
         value={value}
         onChange={(v) => setValue(v)}
         readOnly={false}
@@ -30,15 +31,15 @@ const FormTextAreaTest = () => {
         <strong>value:</strong> {value}
       </div>
     </div>
-  );
-};
+  )
+}
 
 const HeaderTest = () => {
   return (
     <div>
       <Header
         text='Header Title'
-        isTab
+        isTab={false}
         buttonsData={[
           {
             value: 'Success',
@@ -121,14 +122,11 @@ const SidebarTest = () => {
 
 const ComponentTest = () => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <SidebarTest />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1rem' }}>
-        <div> Component Test </div>
-        <HeaderTest />
-        <FormTextAreaTest />
-      </div>
-    </div>
+    <MainBox>
+      {/* <div> Component Test </div> */}
+      <HeaderTest />
+      <FormTextAreaTest />
+    </MainBox>
   )
 }
 
