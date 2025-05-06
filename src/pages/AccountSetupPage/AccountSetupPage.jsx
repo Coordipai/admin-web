@@ -111,8 +111,13 @@ export default function AccountSetupPage() {
 
         <FieldWrapper>
           <LabelText>간단한 경력을 입력해주세요.</LabelText>
-          <Textarea placeholder="ex. 사이드 프로젝트 2회 경험" value={career} handleChange={setCareer} />
-        </FieldWrapper>
+          <Textarea
+            placeholder="ex. 사이드 프로젝트 2회 경험"
+            value={career}
+            onChange={setCareer}  // 이렇게 직접 넘김
+          />
+
+          </FieldWrapper>
 
         <ButtonWrapper>
           <Button $isHighlighted onClick={handleNext}>

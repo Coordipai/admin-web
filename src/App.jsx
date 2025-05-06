@@ -3,7 +3,7 @@ import LoginPage from './pages/login/LoginPage'
 import FirstAccountPage from './pages/AccountSetupPage/AccountSetupPage'
 import IssueModalTest from './pages/IssuePage/IssueModalTest'
 import UserForm from './pages/UserPage/UserPage'
-import ChangeRequestPage from './pages/IssuePage/ChangeIssuePage'
+import ChangeIssuePage from './pages/IssuePage/ChangeIssuePage'
 import RepositoryCheckPage from './pages/AccountSetupPage/RepositoryCheckPage'
 import { BuildProject } from './pages/build_project/BuildProject'
 import { BuildProject2 } from './pages/build_project/BuildProject2' 
@@ -24,7 +24,7 @@ function App () {
         <Route path="/issueModalTest" element={<IssueModalTest />} />
         <Route path="/userform" element={<UserForm />} />
         <Route path="/repositorycheckpage" element={<RepositoryCheckPage />} />
-        <Route path="/changeIssuePage" element={<ChangeRequestPage />} />
+        <Route path="/changeIssuePage" element={<ChangeIssuePage />} />
         <Route path='/' element={<Home />} />
         <Route path='components' element={<ComponentTest />} />
         <Route path="/buildproject" element={<BuildProject/>}/>

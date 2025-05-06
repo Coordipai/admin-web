@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import coordipaiLogo from '../../assets/coordipaiLogo.png'
 import githubLogo from '../../assets/gitHubLogo.png'
 import CheckLineGraphic from './CheckLineGraphic'
-import GitHubLoginButton from './LoginButton'
+import LoginButton from './LoginButton'
 
 const Title = styled.h2`
   ${({ theme }) => theme.texts.displayMD};
@@ -53,7 +53,7 @@ export default function LoginPage() {
           Authorize GitHub
         </h2>
 
-        <GitHubLoginButton onClick={handleGithubLogin} />
+        <LoginButton onClick={handleGithubLogin} />
       </ContentBox>
     </LoginWrapper>
   )

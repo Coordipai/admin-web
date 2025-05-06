@@ -35,7 +35,7 @@ const FormWrapper = styled.div`
 `
 
 const LabeledRow = styled.div`
-  width: filled;
+  width: 100%;
   display: flex;;
   gap: 2rem;
   padding: 2rem ;
@@ -43,6 +43,7 @@ const LabeledRow = styled.div`
 
 const TextareaWrapper = styled.div`
   width: 512px;
+  display: flex;
 `
 const Label = styled.span`
   width: 280px;
@@ -70,12 +71,13 @@ const RowGroup2 = styled.div`
 const ButtonWrapper = styled.div`
   height: 100%;
   display: flex;
-  align-items: flex-end;
+  align-self: flex-end;
+  margin-left: 2rem;
 `
 
 const Button = styled(ButtonBase)`
-  width: filled;
-  height: filled;
+  width: 100%;
+  height: 100%;
   padding: 0.5rem 0.87rem;
   display: flex;
   justify-content: center;
@@ -91,7 +93,7 @@ const Button = styled(ButtonBase)`
   `}
 `
 
-export default function changeIssuePage() {
+export default function ChangeIssuePage() {
   const [currentSprint, setCurrentSprint] = useState('sprint1')
   const sprintOptions = [
     { title: 'sprint 1' },

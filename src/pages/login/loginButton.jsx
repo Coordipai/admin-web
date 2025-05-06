@@ -13,7 +13,7 @@ const GitHubButton = styled(ButtonBase)`
   //fontFamily: 'Poppins'
 `
 
-export default function GitHubLoginButton({ onClick }) {
+export default function LoginButton({ onClick }) {
   return (
     <GitHubButton $isHighlighted={true} onClick={onClick}>
       GitHub 계정으로 로그인
