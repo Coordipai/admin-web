@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useEffect } from 'react'
 import arrowright from '../../assets/icons/arrow-right.svg'
 import styled from 'styled-components'
 import FormInput from '@components/FormInput'
@@ -94,17 +95,106 @@ const Button = styled(ButtonBase)`
 `
 
 export default function ChangeIssuePage() {
-  const [currentSprint, setCurrentSprint] = useState('sprint1')
+
+  const [issueData, setIssueData] = useState(null)
+  const [aiFeedback, setAiFeedback] = useState('')
+  const [aiFeedbackReason, setAiFeedbackReason] = useState('')
+
+  useEffect(() => {
+    const fetchIssueData = async () => {
+      try {
+        // const response = await axios.get('/api/issue/123')
+        const mockIssue = {
+          username: 'Oliva',
+          userPart: '프론트엔드',
+          reason: '변경 사유 내용',
+          currentSprint: 'sprint 1',
+          targetSprint: 'sprint 3',
+          oldAssignee: 'Oliva',
+          newAssignee: 'Lucas',
+        }
+        setIssueData(mockIssue)
+      } catch (error) {
+        console.error('이슈 데이터 가져오기 실패:', error)
+      }
+    }
+  
+    fetchIssueData()
+  }, [])
+
+  useEffect(() => {
+    const fetchAiFeedback = async () => {
+      try {
+        // const response = await axios.get('/api/issue/123/ai-feedback')
+        const mockFeedback = {
+          feedback: '이건 개선사항임',
+          reason: '너가 못한거잖아ㅋㅋㅋ',
+        }
+  
+        setAiFeedback(mockFeedback.feedback)
+        setAiFeedbackReason(mockFeedback.reason)
+      } catch (error) {
+        console.error('AI 피드백 불러오기 실패:', error)
+      }
+    }
+  
+    fetchAiFeedback()
+  }, [])
+  
   const sprintOptions = [
     { title: 'sprint 1' },
     { title: 'sprint 2' },
     { title: 'sprint 3' },
     { title: 'sprint 4' },
   ];
+
+  const assigneeOptions = [
+    { title: 'Lucas' },
+    { title: 'Mina' },
+    { title: 'Oliva' },
+    { title: 'Jisoo' },
+  ]
+  
   const [selectedSprint, setSelectedSprint] = useState(-1)
-  const [username, setUsername] = useState('Oliva')
-  const [userPart, setUserPart] = useState('프론트엔드')
+  useEffect(() => {
+    if (issueData) {
+      const sprintIndex = sprintOptions.findIndex(
+        (option) => option.title === issueData.targetSprint
+      )
+      setSelectedSprint(sprintIndex)
+    }
+  }, [issueData])
+
+  const [selectedAssignee, setSelectedAssignee] = useState(-1)
+  
+  useEffect(() => {
+    if (issueData) {
+      const index = assigneeOptions.findIndex(opt => opt.title === issueData.newAssignee)
+      setSelectedAssignee(index)
+    }
+  }, [issueData])
+  
+
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
+
+  const handleRejectChange = () => {
+    const confirmed = window.confirm('정말로 변경을 반려하시겠습니까?')
+    if (confirmed) {
+      console.log('변경 반려 요청 처리')
+      // TODO: axios.post('/api/issue/reject', { issueId })
+    }
+  }
+  
+  const handleApproveChange = () => {
+    console.log('변경 승인 요청 처리')
+    // TODO: axios.post('/api/issue/approve', { issueId })
+  }
+  
+  const handleRequestFeedbackAgain = () => {
+    console.log('AI 피드백 재요청 처리')
+    // TODO: axios.post('/api/issue/feedback-request', { issueId })
+  }
+  
 
 
   return (
@@ -156,19 +246,19 @@ export default function ChangeIssuePage() {
               subAction={{ label: '이슈 상세보기', onClick: () => setIsIssueModalOpen(true) }}
               
               buttonsData={[
-                { value: "변경 반려", onClick: () => {} },
-                { value: "변경 승인", onClick: () => {} }
+                { value: "변경 반려", onClick: handleRejectChange },
+                { value: "변경 승인", onClick: handleApproveChange }
               ]}
             />
             <LabeledRow>
               <Label>담당자 / 분야 </Label>
               <RowGroup2>
                 <div style={{ width: '244px' }}>
-                  <FormInput value={username} handleChange={setUsername} readOnly />
+                  <FormInput value={issueData?.username || ''} readOnly />
                 </div>
                 <span></span>
                 <div style={{ width: '244px' }}>
-                  <FormInput value={userPart} handleChange={setUserPart} readOnly />
+                  <FormInput value={issueData?.userPart || ''} readOnly />
                 </div>
                 
               </RowGroup2>
@@ -178,7 +268,7 @@ export default function ChangeIssuePage() {
             <LabeledRow>
               <Label>사유</Label>
               <div style={{ width: '512px' }}>
-                <FormTextarea value="변경 사유 내용" />
+                <FormTextarea value={issueData?.reason || '' } readOnly />
               </div>
             </LabeledRow>
             <Divider />
@@ -187,7 +277,7 @@ export default function ChangeIssuePage() {
               <Label>변경 기한</Label>
               <RowGroup>
                 <div style={{ width: '244px' }}>
-                  <FormInput value={currentSprint} handleChange={setCurrentSprint} readOnly />
+                  <FormInput value={issueData?.currentSprint || ''} readOnly />
                 </div>
                 <div style={{ padding: '0.275rem', alignContent: 'center'}}> 
                   <img src={arrowright} alt="arrow" width="12" height="12" />
@@ -198,7 +288,7 @@ export default function ChangeIssuePage() {
                   placeholder="스프린트를 선택하세요"
                   menus={sprintOptions}
                   selectedMenu={selectedSprint}
-                  handleChange={setSelectedSprint}
+                  handleChange={setSelectedSprint}  
                 />
                 </div>
               </RowGroup>
@@ -209,7 +299,7 @@ export default function ChangeIssuePage() {
               <Label>담당자 변경</Label>
               <RowGroup>
                 <div style={{ width: '244px' }}>
-                  <FormInput value="Oliva" readOnly />
+                  <FormInput value={issueData?.oldAssignee || ''} readOnly />
                 </div>
                 <div style={{padding: '0.275rem', alignContent: 'center'}}> 
                   <img src={arrowright} alt="arrow" width="12" height="12" />
@@ -217,9 +307,10 @@ export default function ChangeIssuePage() {
                 <div style={{ width: '244px' }}>
                   <FormDropdown
                     placeholder="변경할 사용자를 선택하세요"
-                    menus={sprintOptions}
-                    selectedMenu={selectedSprint}
-                    handleChange={setSelectedSprint}
+                    menus={assigneeOptions}
+                    selectedMenu={selectedAssignee}
+                    handleChange={setSelectedAssignee}
+                
                   />
                 </div>
                 
@@ -230,7 +321,7 @@ export default function ChangeIssuePage() {
             <LabeledRow>
               <Label>AI 피드백</Label>
               <TextareaWrapper>
-                <FormTextarea value="이건 개선사항임" />
+                <FormTextarea value={aiFeedback} readOnly />
               </TextareaWrapper>
             </LabeledRow>
 
@@ -238,10 +329,10 @@ export default function ChangeIssuePage() {
             <LabeledRow>
               <Label>AI 피드백 사유</Label>
               <TextareaWrapper>
-                <FormTextarea value="너가 못한거잖아ㅋㅋㅋ" />
+                <FormTextarea value={aiFeedbackReason} readOnly />
               </TextareaWrapper>
               <ButtonWrapper>
-                <Button $isHighlighted>
+                <Button $isHighlighted onClick={handleRequestFeedbackAgain}>
                     피드백 재요청
                 </Button>
               </ButtonWrapper>
