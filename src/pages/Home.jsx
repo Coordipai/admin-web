@@ -7,6 +7,7 @@ import FileTable from '@components/Edit/FileTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import Button from '@components/Common/Button'
 import { HorizontalDivider, MainBox } from '@styles/globalStyle'
+import { useProjectStore } from '@store/useProjectStore'
 
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
@@ -74,11 +75,11 @@ const CardDesc = styled.div`
 	width: fit-content;
 `
 
-function ProjectCard ({ name, createdAt, updatedAt, onClick, selected }) {
+function ProjectCard ({ name, start_date, end_date, onClick, selected }) {
   return (
     <Card onClick={onClick} selected={selected}>
       <Typography variant='displayXS' weight='semiBold' value={name} />
-      <Typography variant='textMD' weight='medium' color='gray500' value={`${createdAt} ~ ${updatedAt}`} />
+      <Typography variant='textMD' weight='medium' color='gray500' value={`${start_date} ~ ${end_date}`} />
     </Card>
   )
 }
@@ -86,10 +87,12 @@ function ProjectCard ({ name, createdAt, updatedAt, onClick, selected }) {
 export const Home = () => {
   const theme = useTheme()
   const navigate = useNavigate()
+  // const setProject = useProjectStore((state) => state.setProject)
+
   const [projects] = useState([
-    { id: 1, name: '프로젝트1', createdAt: '2021-01-01', updatedAt: '2021-01-01' },
-    { id: 2, name: '프로젝트2', createdAt: '2021-01-01', updatedAt: '2021-01-01' },
-    { id: 3, name: '프로젝트3', createdAt: '2021-01-01', updatedAt: '2021-01-01' }
+    { id: 1, name: '프로젝트1', start_date: '2021-01-01', end_date: '2021-01-01' },
+    { id: 2, name: '프로젝트2', start_date: '2021-01-01', end_date: '2021-01-01' },
+    { id: 3, name: '프로젝트3', start_date: '2021-01-01', end_date: '2021-01-01' }
   ])
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState(null)
@@ -124,6 +127,7 @@ export const Home = () => {
                 selected={selectedId === project.id}
                 onClick={() => {
                   setSelectedId(project.id)
+                  // setProject(project)
                   navigate(`/project/${project.id}#issue`)
                 }}
               />
