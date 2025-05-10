@@ -112,7 +112,7 @@ export const Home = () => {
               placeholder='프로젝트를 검색하세요'
             />
           </div>
-          <Button text='프로젝트 생성' />
+          <Button text='프로젝트 생성' onClick={()=>{navigate('/buildproject')}} />
         </div>
 
         <Fieldset>
