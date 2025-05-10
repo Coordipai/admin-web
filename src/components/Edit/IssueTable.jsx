@@ -6,7 +6,7 @@ import IconButton from '@components/Common/IconButton'
 import Badge from '@components/Edit/Badge'
 import ArrowLeftIcon from '@assets/icons/arrow-left-icon.svg'
 import ArrowRightIcon from '@assets/icons/arrow-right-icon.svg'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const TableWrapper = styled.div`
   box-sizing: border-box;
@@ -117,6 +117,7 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
   const PAGINATION_HEIGHT = 57 // px
   const ROW_HEIGHT = 52.5 // px
   const navigate = useNavigate()
+  const location = useLocation()
 
   // pageSize 계산 함수
   const calculatePageSize = () => {
@@ -139,9 +140,11 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
     }
   }, [])
 
-  const handleNext = () => {
-    if (variant === 'issue') navigate('/buildproject2')
-    else if (variant === 'request') navigate('/buildproject3')
+  const handleNext = (issueNumber) => {
+    const basePath = location.pathname
+    if (variant === 'issue') navigate(`${basePath}/issue/${issueNumber}`)
+    else if (variant === 'request') navigate(`${basePath}/request/${issueNumber}`)
+    else navigate(`/notfound`)
   }
 
   const total = Math.ceil(rows.length / pageSize) || 1
@@ -173,7 +176,7 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
                 )
               : (
                   pagedRows.map((row, idx) => (
-                    <Tr key={row.issue_number + row.title + idx} onClick={handleNext}>
+                    <Tr key={row.issue_number + row.title + idx} onClick={() => handleNext(row.issue_number)}>
                       <Td># {row.issue_number}</Td>
                       <Td>{row.repo_fullname}</Td>
                       <Td>{row.title}</Td>

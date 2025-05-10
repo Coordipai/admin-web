@@ -124,7 +124,7 @@ export const Home = () => {
                 selected={selectedId === project.id}
                 onClick={() => {
 								  setSelectedId(project.id)
-                  navigate(`/project?id=${project.id}`)
+                  navigate(`/project/${project.id}`)
                 }}
               />
             ))}

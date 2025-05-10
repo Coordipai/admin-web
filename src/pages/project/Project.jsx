@@ -8,29 +8,10 @@ import React, { useState } from 'react'
 import IconButton from '@components/Common/IconButton'
 import IssueTable from '@components/Edit/IssueTable'
 import SearchInputField from '@components/Edit/SearchInputField'
-import { HorizontalDivider } from '@styles/globalStyle'
+import { HorizontalDivider, MainBox } from '@styles/globalStyle'
 import Badge from '@components/Edit/Badge'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 
-const Layout = styled.div`
-	display: flex;
-	width: 100vw;
-
-	height: 100vh;
-	background: ${({ theme }) => theme.colors.white};
-`
-
-const MainContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: ${({ theme }) => theme.gap.xl};
-	padding: ${({ theme }) => theme.padding.xl};
-	width: 100%;
-	max-width: 100%;
-	background: ${({ theme }) => theme.colors.white};
-	max-height: 100vh;
-	overflow: hidden;
-`
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -149,6 +130,10 @@ const EmptyIssueWrapper = styled.div`
 `
 
 export const Project = () => {
+  // const { id } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const [issueRows] = useState([
     { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
     { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
@@ -200,9 +185,7 @@ export const Project = () => {
   const [activeTab, setActiveTab] = useState('issue')
 
   return (
-    <Layout>
-
-      <MainContainer>
+    <MainBox>
         <HeaderSection>
           <HeaderRow>
 
@@ -227,49 +210,49 @@ export const Project = () => {
             </TabsRow>
             <TabsDivider />
           </TabsWrapper>
-        </HeaderSection>
-        <Section>
-          {activeTab === 'issue' && (
-            <Fieldset>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ width: '40%' }}>
-                  <SearchInputField
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder='이슈를 검색하세요'
-                />
-                </div>
-                <Button text='이슈 추가' color='white' />
-              </div>
-              <IssueTable
-                rows={filteredRows.length > 0 ? filteredRows : []}
-                page={page}
-                onPageChange={setPage}
-                variant='issue'
+      </HeaderSection>
+
+      <Section>
+        {activeTab === 'issue' && (
+          <Fieldset>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ width: '40%' }}>
+                <SearchInputField
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder='이슈를 검색하세요'
               />
-            </Fieldset>
-          )}
-          {activeTab === 'request' && (
-            <Fieldset>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ width: '40%' }}>
-                  <SearchInputField
-                  value={requestSearch}
-                  onChange={e => setRequestSearch(e.target.value)}
-                  placeholder='변경 요청을 검색하세요'
-                />
-                </div>
               </div>
-              <IssueTable
-                rows={filteredRequestRows.length > 0 ? filteredRequestRows : []}
-                page={page}
-                onPageChange={setPage}
-                variant='request'
+              <Button text='이슈 추가' color='white' onClick={() => navigate(`${location.pathname}/issue/new`)}/>
+            </div>
+            <IssueTable
+              rows={filteredRows.length > 0 ? filteredRows : []}
+              page={page}
+              onPageChange={setPage}
+              variant='issue'
+            />
+          </Fieldset>
+        )}
+        {activeTab === 'request' && (
+          <Fieldset>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ width: '40%' }}>
+                <SearchInputField
+                value={requestSearch}
+                onChange={e => setRequestSearch(e.target.value)}
+                placeholder='변경 요청을 검색하세요'
               />
-            </Fieldset>
-          )}
-        </Section>
-      </MainContainer>
-    </Layout>
+              </div>
+            </div>
+            <IssueTable
+              rows={filteredRequestRows.length > 0 ? filteredRequestRows : []}
+              page={page}
+              onPageChange={setPage}
+              variant='request'
+            />
+          </Fieldset>
+        )}
+      </Section>
+    </MainBox>
   )
 }

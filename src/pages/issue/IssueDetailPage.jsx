@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useParams } from 'react-router-dom'
 import Badge from '@components/Edit/Badge'
 import InputField from '@components/Edit/InputField'
 import Typography from '@components/Edit/Typography'
@@ -63,7 +64,8 @@ const IssueDetailPage = ({
   defaultLabels = [],
   defaultAssignees = []
 }) => {
-  const isEdit = false
+  const { issueId } = useParams()
+
   // options 변수들의 setter들은 fetch함수에 이용
   const [priorityOptions, setPriorityOptions] = useState([
     { value: 'M', label: '[M] Must Have' },
@@ -196,16 +198,17 @@ const IssueDetailPage = ({
   return (
     <MainBox>
       <Header
-        text={isEdit ? '이슈 수정' : '이슈 추가'}
+        text={issueId === 'new' ? '이슈 추가' : '이슈 수정'}
         buttonsData={
-            isEdit
+            issueId === 'new'
               ? [
-                  { value: '저장', onClick: () => console.log('수정 저장'), isHighlighted: true },
-                  { value: '삭제', onClick: () => console.log('삭제 클릭'), isHighlighted: true },
+                  { value: '저장', onClick: () => console.log('추가 저장'), isHighlighted: true },
                   { value: '취소', onClick: () => window.history.back() }
                 ]
-              : [
-                  { value: '저장', onClick: () => console.log('추가 저장'), isHighlighted: true },
+              : 
+                [
+                  { value: '저장', onClick: () => console.log('수정 저장'), isHighlighted: true },
+                  { value: '삭제', onClick: () => console.log('삭제 클릭'), isHighlighted: true },
                   { value: '취소', onClick: () => window.history.back() }
                 ]
           }

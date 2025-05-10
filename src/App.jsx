@@ -22,7 +22,7 @@ import brandIcon from '@assets/brandIcon.png'
 import { PageBox } from '@styles/globalStyle'
 import SideBar from '@components/SideBar'
 import { useEffect } from 'react'
-import IssueDetailPage from './pages/issue/IssueDetailPage'
+
 
 /*
   route 설정 시, PrivateRoute를 사용하여,
@@ -38,21 +38,26 @@ function App () {
     <BrowserRouter>
       <ToastContainer />
       <Routes>
-        <Route path="/" element={<h1>hello world</h1>} />
+        <Route path='/' element={<PrivateRoute element={Home} />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/firstaccount" element={<FirstAccountPage />} />
         <Route path="/issueModalTest" element={<IssueModalTest />} />
         <Route path="/userform" element={<UserForm />} />
         <Route path="/repositorycheckpage" element={<RepositoryCheckPage />} />
         <Route path="/changeIssuePage" element={<ChangeIssuePage />} />
-        <Route path='/' element={<PrivateRoute element={Home} />} />
+        
         <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />
+        
+        {/* BuildProject Page*/}
         <Route path='/buildproject' element={<PrivateRoute element={BuildProject} />} />
         <Route path='/buildproject2' element={<PrivateRoute element={BuildProject2} />} />
         <Route path='/buildproject3' element={<PrivateRoute element={BuildProject3} />} />
-        <Route path='/project' element={<PrivateRoute element={Project} />} />
+        
+        {/* Project Page */}
+        <Route path="/project/:projectId" element={<PrivateRoute element={Project} />} />
+        <Route path="/project/:projectId/issue/:issueId" element={<PrivateRoute element={IssueDetailPage} />} />
+
         <Route path='/settingproject' element={<PrivateRoute element={SettingProject} />} />
-        <Route path='/issue' element={<PrivateRoute element={IssueDetailPage} />} />
       </Routes>
     </BrowserRouter>
   )

@@ -20,8 +20,7 @@ export const MainBox = styled.div`
 export const ContainerBox = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 0 2rem;
+  gap: 1rem;
 `
 
 export const ButtonBase = styled.div`
