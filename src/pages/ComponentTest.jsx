@@ -8,7 +8,7 @@ import {
   showErrorToastMsg
 } from '@utils/showToastMsg'
 
-import brandIcon from '@assets/brandIcon.png'
+import brandIcon from '@assets/CoordiPAILogo.png'
 import { MainBox } from '@styles/globalStyle'
 
 const FormTextAreaTest = () => {

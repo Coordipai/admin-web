@@ -36,6 +36,7 @@ const NavHeaderSection = styled.div`
   align-items: flex-start;
   padding: 2rem 1rem 1rem 1rem;
   gap: 1.5rem;
+  cursor: pointer;
 `
 
 const NavHeaderBox = styled.div`
@@ -255,6 +256,7 @@ NavBodySection.propTypes = {
 const SideBar = ({
   brandIcon,
   brandTitle,
+  titleOnClick,
   project,
   userInfo,
   userOnClick,
@@ -275,7 +277,7 @@ const SideBar = ({
   return (
     <SidebarLayout>
       <ContentWrapper>
-        <NavHeaderSection>
+        <NavHeaderSection onClick={titleOnClick}>
           <NavHeaderBox>
             <NavHeaderImg src={brandIcon} />
             <NavHeaderText>{brandTitle}</NavHeaderText>
@@ -311,6 +313,7 @@ const SideBar = ({
 SideBar.propTypes = {
   brandIcon: PropTypes.elementType.isRequired,
   brandTitle: PropTypes.string.isRequired,
+  titleOnClick: PropTypes.func.isRequired,
   project: PropTypes.shape({
     projectName: PropTypes.string.isRequired,
     iteration: PropTypes.shape({

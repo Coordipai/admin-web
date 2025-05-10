@@ -6,7 +6,7 @@ import FormInput from '@components/FormInput'
 import FormTextarea from '@components/FormTextarea'
 import FormDropdown from '@components/FormDropdown'
 import Header from '@components/Header'
-import { EditContentHeader } from '../../components/Edit/EditContentHeader'
+import { EditContentHeader } from '@components/Edit/EditContentHeader'
 import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
 
@@ -78,7 +78,7 @@ const Button = styled(ButtonBase)`
   `}
 `
 
-export default function ChangeIssuePage() {
+export default function IssueRequestPage() {
   const { requestId } = useParams()
   const [issueData, setIssueData] = useState(null)
   const [aiFeedback, setAiFeedback] = useState('')
@@ -248,10 +248,8 @@ export default function ChangeIssuePage() {
                   menus={assigneeOptions}
                   selectedMenu={selectedAssignee}
                   handleChange={setSelectedAssignee}
-              
                 />
               </div>
-              
             </RowGroup>
           </LabeledRow>
           <Divider />
@@ -262,7 +260,6 @@ export default function ChangeIssuePage() {
               <FormTextarea value={aiFeedback} readOnly />
             </TextareaWrapper>
           </LabeledRow>
-
 
           <LabeledRow>
             <Label>AI 피드백 사유</Label>

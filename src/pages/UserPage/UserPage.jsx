@@ -5,25 +5,12 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import SideBar from '@components/SideBar' // 경로는 실제 위치에 맞게 조정
-import brandIcon from '@assets/brandIcon.png' // 브랜드 로고 아이콘
 import { useLocation } from 'react-router-dom'
-
 
 const PageContainer = styled.div`
   display: flex;
   width: 100%;
   min-height: 100vh;
-`
-
-const SidebarPlaceholder = styled.div`
-  height: 100vh;
-  min-width: 19.5rem;
-  display: flex;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
 `
 
 const ContentArea = styled.div`
@@ -39,6 +26,7 @@ const FormWrapper = styled.div`
   flex-direction: column;
   gap: 1.5rem;
   overflow-y: auto;
+  overflow-x: hidden; // x축 스크롤 제거
 `
 
 const FieldWrapper = styled.div`
@@ -105,7 +93,6 @@ const TextButton = styled(ButtonBase)`
   }
 `
 
-
 export default function UserPage() {
   const location = useLocation()
   const userdata = location.state
@@ -168,8 +155,6 @@ export default function UserPage() {
     )
   }
 
-  
-
   const repoList = [
     'coordipai/admin-web',
     'coordipai/admin-api',
@@ -180,48 +165,9 @@ export default function UserPage() {
     '레포14231423342432',
     '레포1234125253125',
   ]
-  
 
   return (
     <PageContainer>
-      <SidebarPlaceholder>
-      <SideBar
-        brandIcon={brandIcon}
-        brandTitle="CoordiPai"
-        project={{
-          projectName: 'KNU-AssignX',
-          iteration: { week: '9', period: '3/11 ~ 3/22' },
-          issues: 70,
-          categories: [
-            {
-              categoryName: 'Frontend',
-              people: [
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' },
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
-              ]
-            },
-            {
-              categoryName: 'Backend',
-              people: [
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
-              ]
-            },
-            {
-              categoryName: 'AI',
-              people: [
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
-              ]
-            }
-          ]
-        }}
-        userInfo={{
-          image: brandIcon,
-          userName: '이름',
-          githubId: 'Github ID'
-        }}
-        logout={() => alert('로그아웃')}
-      />
-      </SidebarPlaceholder>
       <ContentArea>
         <FormWrapper>
             <Header text="계정 정보" />
@@ -292,10 +238,8 @@ export default function UserPage() {
                 평가요청
               </Button>
             </ButtonWrapper>
-
         </FormWrapper>
       </ContentArea>
     </PageContainer>
   )
-  
 }
