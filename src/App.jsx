@@ -21,6 +21,7 @@ import { Home } from './pages/Home'
 import ComponentTest from '@pages/ComponentTest'
 import { SettingProject } from './pages/build_project/SettingProject'
 import IssueDetailPage from './pages/issue/IssueDetailPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 
 /*
@@ -61,6 +62,9 @@ function App () {
         <Route path="/project/:projectId/issue/:issueId" element={<PrivateRoute element={IssueDetailPage} />} />
         <Route path='/project/:projectId/edit' element={<PrivateRoute element={SettingProject} />} />
         <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={IssueRequestPage} />} />
+
+        {/* Not Found Page */}
+        <Route path='*' element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   )
