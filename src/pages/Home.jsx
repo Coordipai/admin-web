@@ -8,6 +8,7 @@ import SearchInputField from '@components/Edit/SearchInputField'
 import Button from '@components/Common/Button'
 import { HorizontalDivider, MainBox } from '@styles/globalStyle'
 import { useProjectStore } from '@store/useProjectStore'
+import { extractDate } from '@utils/dateUtils'
 
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
@@ -80,7 +81,12 @@ function ProjectCard ({ name, start_date, end_date, onClick, selected }) {
   return (
     <Card onClick={onClick} selected={selected}>
       <Typography variant='displayXS' weight='semiBold' value={name} />
-      <Typography variant='textMD' weight='medium' color='gray500' value={`${start_date} ~ ${end_date}`} />
+      <Typography 
+        variant='textMD' 
+        weight='medium' 
+        color='gray500' 
+        value={`${extractDate(start_date)} ~ ${extractDate(end_date)}`} 
+      />
     </Card>
   )
 }
