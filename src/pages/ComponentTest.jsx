@@ -2,13 +2,13 @@ import { useState } from 'react'
 import FormTextarea from '@components/FormTextArea'
 import Header from '@components/Header'
 import SideBar from '@components/SideBar'
-import { 
+import {
   showSuccessToastMsg,
   showWarningToastMsg,
   showErrorToastMsg
 } from '@utils/showToastMsg'
 
-import brandIcon from '@assets/brandIcon.png'
+import brandIcon from '@assets/CoordiPAILogo.png'
 import { MainBox } from '@styles/globalStyle'
 
 const FormTextAreaTest = () => {

@@ -5,25 +5,12 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import SideBar from '@components/SideBar' // 경로는 실제 위치에 맞게 조정
-import brandIcon from '@assets/brandIcon.png' // 브랜드 로고 아이콘
 import { useLocation } from 'react-router-dom'
-
 
 const PageContainer = styled.div`
   display: flex;
   width: 100%;
   min-height: 100vh;
-`
-
-const SidebarPlaceholder = styled.div`
-  height: 100vh;
-  min-width: 19.5rem;
-  display: flex;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
 `
 
 const ContentArea = styled.div`
@@ -39,6 +26,7 @@ const FormWrapper = styled.div`
   flex-direction: column;
   gap: 1.5rem;
   overflow-y: auto;
+  overflow-x: hidden; // x축 스크롤 제거
 `
 
 const FieldWrapper = styled.div`
@@ -105,8 +93,7 @@ const TextButton = styled(ButtonBase)`
   }
 `
 
-
-export default function UserPage() {
+export default function UserPage () {
   const location = useLocation()
   const userdata = location.state
 
@@ -115,22 +102,22 @@ export default function UserPage() {
   const [discordId, setDiscordId] = useState(userdata?.discordId || '')
   const [career, setCareer] = useState(userdata?.career || '')
   const [selectedRepos, setSelectedRepos] = useState(userdata?.repositories || [])
-  
+
   const fieldOptions = [
     { title: '프론트엔드' },
     { title: '백엔드' },
     { title: '기획' },
     { title: '디자인' },
-    { title: '기타' },
+    { title: '기타' }
   ]
-  
+
   const getFieldIndex = (fieldTitle) =>
     fieldOptions.findIndex((option) => option.title === fieldTitle)
-  
+
   const [field, setField] = useState(
     getFieldIndex(userdata?.field)
   )
-  
+
   const handleSave = () => {
     const payload = {
       username,
@@ -138,28 +125,28 @@ export default function UserPage() {
       discordId,
       career,
       field: fieldOptions[field]?.title || '',
-      repositories: selectedRepos,
+      repositories: selectedRepos
     }
-  
+
     console.log('보낼 데이터:', payload)
-  
+
     // axios.post('/api/endpoint', payload) 등으로 연결 가능
   }
-  
+
   const handleWithdraw = () => {
     // 추후 API 연결을 위한 준비 작업
-    const confirmed = window.confirm('정말로 탈퇴하시겠습니까?');
+    const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
     if (confirmed) {
-      console.log('탈퇴 처리 진행');
+      console.log('탈퇴 처리 진행')
       // 예: axios.post('/api/user/delete', { githubId })
     }
   }
-  
+
   const handleEvaluationRequest = () => {
-    console.log('평가 요청 처리 진행');
+    console.log('평가 요청 처리 진행')
     // 예: axios.post('/api/evaluation/request', { githubId, field })
   }
-  
+
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
       prev.includes(repo)
@@ -167,8 +154,6 @@ export default function UserPage() {
         : [...prev, repo]
     )
   }
-
-  
 
   const repoList = [
     'coordipai/admin-web',
@@ -178,124 +163,83 @@ export default function UserPage() {
     '레포22',
     '레포3333333',
     '레포14231423342432',
-    '레포1234125253125',
+    '레포1234125253125'
   ]
-  
 
   return (
     <PageContainer>
-      <SidebarPlaceholder>
-      <SideBar
-        brandIcon={brandIcon}
-        brandTitle="CoordiPai"
-        project={{
-          projectName: 'KNU-AssignX',
-          iteration: { week: '9', period: '3/11 ~ 3/22' },
-          issues: 70,
-          categories: [
-            {
-              categoryName: 'Frontend',
-              people: [
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' },
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
-              ]
-            },
-            {
-              categoryName: 'Backend',
-              people: [
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
-              ]
-            },
-            {
-              categoryName: 'AI',
-              people: [
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
-              ]
-            }
-          ]
-        }}
-        userInfo={{
-          image: brandIcon,
-          userName: '이름',
-          githubId: 'Github ID'
-        }}
-        logout={() => alert('로그아웃')}
-      />
-      </SidebarPlaceholder>
       <ContentArea>
         <FormWrapper>
-            <Header text="계정 정보" />
-            <FieldWrapper>
-                <LabelText>사용자 이름</LabelText>
-                <FormInput placeholder="이름을 입력해주세요" value={username} handleChange={setUsername} />
-            </FieldWrapper>
+          <Header text='계정 정보' />
+          <FieldWrapper>
+            <LabelText>사용자 이름</LabelText>
+            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={setUsername} />
+          </FieldWrapper>
 
-            <FieldWrapper>
-                <LabelText>GitHub 계정이름</LabelText>
-                <FormInput
-                    placeholder="깃허브 계정"
-                    value={githubId}
-                    handleChange={setGithubId}
-                    readOnly
-                />
-            </FieldWrapper>
+          <FieldWrapper>
+            <LabelText>GitHub 계정이름</LabelText>
+            <FormInput
+              placeholder='깃허브 계정'
+              value={githubId}
+              handleChange={setGithubId}
+              readOnly
+            />
+          </FieldWrapper>
 
-            <FieldWrapper>
-                <LabelText>Discord ID</LabelText>
-                <FormInput placeholder="디스코드 ID" value={discordId} handleChange={setDiscordId} />
-            </FieldWrapper>
+          <FieldWrapper>
+            <LabelText>Discord ID</LabelText>
+            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={setDiscordId} />
+          </FieldWrapper>
 
-            <FieldWrapper>
-                <LabelText>분야 선택</LabelText>
-                <FormDropdown
-                    placeholder="분야 선택"
-                    menus={fieldOptions}
-                    selectedMenu={field}
-                    handleChange={setField}
-                />
-            </FieldWrapper>
+          <FieldWrapper>
+            <LabelText>분야 선택</LabelText>
+            <FormDropdown
+              placeholder='분야 선택'
+              menus={fieldOptions}
+              selectedMenu={field}
+              handleChange={setField}
+            />
+          </FieldWrapper>
 
-            <FieldWrapper>
-                <LabelText>간단한 경력을 입력해주세요.</LabelText>
-                <FormTextarea placeholder="ex. 사이드 프로젝트 2회 경험" value={career} handleChange={setCareer} />
-            </FieldWrapper>
+          <FieldWrapper>
+            <LabelText>간단한 경력을 입력해주세요.</LabelText>
+            <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} handleChange={setCareer} />
+          </FieldWrapper>
 
-            <FieldWrapper>
-                <LabelText>적용할 레포지토리</LabelText>
+          <FieldWrapper>
+            <LabelText>적용할 레포지토리</LabelText>
 
-                <CheckboxList>
-                    {repoList.map((repo) => {
-                    const isChecked = selectedRepos.includes(repo)
+            <CheckboxList>
+              {repoList.map((repo) => {
+                const isChecked = selectedRepos.includes(repo)
 
-                    return (
-                        <RepositoryBox key={repo} $checked={isChecked} onClick={() => toggleRepo(repo)}>
-                        <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => toggleRepo(repo)} 
-                        />
-                        {repo}
-                        </RepositoryBox>
-                    )
-                    })}
-                </CheckboxList>
-            </FieldWrapper>
+                return (
+                  <RepositoryBox key={repo} $checked={isChecked} onClick={() => toggleRepo(repo)}>
+                    <input
+                      type='checkbox'
+                      checked={isChecked}
+                      onChange={() => toggleRepo(repo)}
+                    />
+                    {repo}
+                  </RepositoryBox>
+                )
+              })}
+            </CheckboxList>
+          </FieldWrapper>
 
-            <ButtonWrapper>
-              <TextButton $isHighlighted onClick={handleWithdraw}>
-                탈퇴하기
-              </TextButton>
-              <Button $isHighlighted onClick={handleSave}>
-                저장하기
-              </Button>
-              <Button $isHighlighted onClick={handleEvaluationRequest}>
-                평가요청
-              </Button>
-            </ButtonWrapper>
-
+          <ButtonWrapper>
+            <TextButton $isHighlighted onClick={handleWithdraw}>
+              탈퇴하기
+            </TextButton>
+            <Button $isHighlighted onClick={handleSave}>
+              저장하기
+            </Button>
+            <Button $isHighlighted onClick={handleEvaluationRequest}>
+              평가요청
+            </Button>
+          </ButtonWrapper>
         </FormWrapper>
       </ContentArea>
     </PageContainer>
   )
-  
 }

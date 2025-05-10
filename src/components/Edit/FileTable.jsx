@@ -52,6 +52,7 @@ const TableHeaderCell = styled.div`
 `
 
 const TableRowContainer = styled.div`
+box-sizing: border-box;
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -76,6 +77,9 @@ const TableRowContainer = styled.div`
 `
 
 const TableRow = styled.div`
+box-sizing: border-box;
+  width: 100%;
+  min-width: 100%;
   display: flex;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray100};
@@ -96,10 +100,6 @@ const FileIcon = styled.div`
   margin-right: 12px;
 `
 
-const FileInfo = styled.div`
-  flex: 1;
-`
-
 const DeleteButton = styled.button`
   background: none;
   border: none;
@@ -114,11 +114,11 @@ const DeleteButton = styled.button`
 `
 
 const FileIconCell = styled.div`
-  flex: 0.3;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  max-width: 80px;
+  width: fit-content;
+  min-width: 52px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -133,11 +133,11 @@ const FileIconCell = styled.div`
 `
 
 const FileInfoCell = styled.div`
-  flex: 1.5;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 220px;
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -152,11 +152,11 @@ const FileInfoCell = styled.div`
 `
 
 const ActionCell = styled.div`
-  flex: 0.2;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  max-width: 60px;
+  width: fit-content;
+  min-width: 40px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

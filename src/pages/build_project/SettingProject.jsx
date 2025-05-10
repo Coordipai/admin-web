@@ -5,13 +5,12 @@ import Typography from '@components/Edit/Typography'
 import DropDown from '@components/Edit/DropDown'
 import FileTable from '@components/Edit/FileTable'
 import Button from '@components/Common/Button'
-import { HorizontalDivider } from '@styles/globalStyle'
+import { HorizontalDivider, MainBox } from '@styles/globalStyle'
 import { useNavigate } from 'react-router-dom'
 import SearchInputField from '@components/Edit/SearchInputField'
 import UserTable from '@components/Edit/UserTable'
 import { DatePicker } from '@components/Edit/DatePicker'
 import Header from '@components/Header'
-import { MainBox } from '../../styles/globalStyle'
 
 const Fieldset = styled.div`
 	flex: 1;

@@ -1,36 +1,10 @@
-import InputField from '@components/Edit/InputField'
 import styled from 'styled-components'
 import Typography from '@components/Edit/Typography'
-import DropDown from '@components/Edit/DropDown'
-import FileTable from '@components/Edit/FileTable'
-import Button from '@components/Common/Button'
-import React, { useState } from 'react'
-import IconButton from '@components/Common/IconButton'
+import React, { useState, useEffect } from 'react'
 import IssueTable from '@components/Edit/IssueTable'
 import SearchInputField from '@components/Edit/SearchInputField'
-import { HorizontalDivider } from '@styles/globalStyle'
-import Badge from '@components/Edit/Badge'
-
-const Layout = styled.div`
-	display: flex;
-	width: 100vw;
-
-	height: 100vh;
-	background: ${({ theme }) => theme.colors.white};
-`
-
-const MainContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: ${({ theme }) => theme.gap.xl};
-	padding: ${({ theme }) => theme.padding.xl};
-	width: 100%;
-	max-width: 100%;
-	background: ${({ theme }) => theme.colors.white};
-	max-height: 100vh;
-	overflow: hidden;
-`
+import { MainBox, ButtonBase } from '@styles/globalStyle'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -149,6 +123,33 @@ const EmptyIssueWrapper = styled.div`
 `
 
 export const Project = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [activeTab, setActiveTab] = useState(() => {
+    const hash = location.hash.replace('#', '')
+    return hash === 'request' ? 'request' : 'issue'
+  })
+
+  // URL 해시에 따라 탭 상태 설정
+  useEffect(() => {
+    const hash = location.hash.replace('#', '')
+    if (hash === 'request') {
+      setActiveTab('request')
+    } else {
+      setActiveTab('issue')
+      // 해시가 없거나 'issue'가 아닌 경우 'issue'로 설정
+      if (!hash || hash !== 'issue') {
+        navigate(`${location.pathname}#issue`, { replace: true })
+      }
+    }
+  }, [location.hash, navigate, location.pathname])
+
+  // 탭 변경 시 URL 해시 업데이트
+  const handleTabChange = (tab) => {
+    setActiveTab(tab)
+    navigate(`${location.pathname}#${tab}`, { replace: true })
+  }
+
   const [issueRows] = useState([
     { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
     { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
@@ -197,79 +198,84 @@ export const Project = () => {
     )
     : requestRows
   const [page, setPage] = useState(1)
-  const [activeTab, setActiveTab] = useState('issue')
 
   return (
-    <Layout>
+    <MainBox>
+      <HeaderSection>
+        <HeaderRow>
+          <Typography variant='displayXS' weight='semiBold' color='gray700' value='대시보드' />
+          <ButtonBase
+            $isHighlighted
+            onClick={() => navigate(`${location.pathname}/edit`)}
+          >
+            프로젝트 설정
+          </ButtonBase>
+        </HeaderRow>
+        <TabsWrapper>
+          <TabsRow>
+            <TabButton onClick={() => handleTabChange('issue')}>
+              <TabLabel $active={activeTab === 'issue'}>
+                <Typography variant='textSM' weight='semiBold' color={activeTab === 'issue' ? 'brand500' : 'gray700'} value='이슈 목록' />
+              </TabLabel>
+              <TabUnderline $active={activeTab === 'issue'} />
+            </TabButton>
+            <TabButton onClick={() => handleTabChange('request')}>
+              <TabLabel $active={activeTab === 'request'}>
+                <Typography variant='textSM' weight='semiBold' color={activeTab === 'request' ? 'brand500' : 'gray700'} value='변경 요청 목록' />
+              </TabLabel>
+              <TabUnderline $active={activeTab === 'request'} />
+            </TabButton>
+          </TabsRow>
+          <TabsDivider />
+        </TabsWrapper>
+      </HeaderSection>
 
-      <MainContainer>
-        <HeaderSection>
-          <HeaderRow>
-
-            <Typography variant='displayXS' weight='semiBold' color='gray700' value='대시보드' />
-
-            <Button text='프로젝트 설정' />
-          </HeaderRow>
-          <TabsWrapper>
-            <TabsRow>
-              <TabButton onClick={() => setActiveTab('issue')}>
-                <TabLabel $active={activeTab === 'issue'}>
-                  <Typography variant='textSM' weight='semiBold' color={activeTab === 'issue' ? 'brand500' : 'gray700'} value='이슈 목록' />
-                </TabLabel>
-                <TabUnderline $active={activeTab === 'issue'} />
-              </TabButton>
-              <TabButton onClick={() => setActiveTab('request')}>
-                <TabLabel $active={activeTab === 'request'}>
-                  <Typography variant='textSM' weight='semiBold' color={activeTab === 'request' ? 'brand500' : 'gray700'} value='변경 요청 목록' />
-                </TabLabel>
-                <TabUnderline $active={activeTab === 'request'} />
-              </TabButton>
-            </TabsRow>
-            <TabsDivider />
-          </TabsWrapper>
-        </HeaderSection>
-        <Section>
-          {activeTab === 'issue' && (
-            <Fieldset>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ width: '40%' }}>
-                  <SearchInputField
+      <Section>
+        {activeTab === 'issue' && (
+          <Fieldset>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ width: '40%' }}>
+                <SearchInputField
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder='이슈를 검색하세요'
                 />
-                </div>
-                <Button text='이슈 추가' color='white' />
               </div>
-              <IssueTable
-                rows={filteredRows.length > 0 ? filteredRows : []}
-                page={page}
-                onPageChange={setPage}
-                variant='issue'
-              />
-            </Fieldset>
-          )}
-          {activeTab === 'request' && (
-            <Fieldset>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ width: '40%' }}>
-                  <SearchInputField
+              <ButtonBase
+                $isHighlighted={false}
+                onClick={() => navigate(`${location.pathname}/issue/new`)}
+              >
+                이슈 추가
+              </ButtonBase>
+            </div>
+            <IssueTable
+              rows={filteredRows.length > 0 ? filteredRows : []}
+              page={page}
+              onPageChange={setPage}
+              variant='issue'
+            />
+          </Fieldset>
+        )}
+        {activeTab === 'request' && (
+          <Fieldset>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ width: '40%' }}>
+                <SearchInputField
                   value={requestSearch}
                   onChange={e => setRequestSearch(e.target.value)}
                   placeholder='변경 요청을 검색하세요'
                 />
-                </div>
               </div>
-              <IssueTable
-                rows={filteredRequestRows.length > 0 ? filteredRequestRows : []}
-                page={page}
-                onPageChange={setPage}
-                variant='request'
-              />
-            </Fieldset>
-          )}
-        </Section>
-      </MainContainer>
-    </Layout>
+            </div>
+            <IssueTable
+              rows={filteredRequestRows.length > 0 ? filteredRequestRows : []}
+              page={page}
+              onPageChange={setPage}
+              variant='request'
+            />
+          </Fieldset>
+        )}
+      </Section>
+    </MainBox>
   )
 }

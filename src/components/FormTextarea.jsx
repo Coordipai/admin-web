@@ -18,8 +18,16 @@ const Label = styled.label`
   color: ${({ theme }) => theme.colors.gray700};
 `
 
+const StyledInputFieldBase = styled(InputFieldBase)`
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+`
+
 const StyledTextarea = styled.textarea`
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   border: none;
   outline: none;
   resize: vertical;
@@ -27,7 +35,7 @@ const StyledTextarea = styled.textarea`
   color: ${({ theme }) => theme.colors.gray900};
   background: ${({ theme, disabled }) => (disabled ? theme.colors.gray50 : theme.colors.white)};
   caret-color: ${({ $hideCursor }) => ($hideCursor ? 'transparent' : 'auto')};
-  
+
   &::placeholder {
     ${({ theme }) => theme.texts.textSM}
     font-weight: ${({ theme }) => theme.weights.medium};
@@ -78,7 +86,7 @@ const FormTextarea = ({
           {require && <span style={{ color: theme.colors.error500, marginLeft: 4 }}>*</span>}
         </Label>
       )}
-      <InputFieldBase $focused={focused}>
+      <StyledInputFieldBase $focused={focused}>
         <StyledTextarea
           value={value}
           placeholder={placeholder}
@@ -94,7 +102,7 @@ const FormTextarea = ({
           rows='6'
           {...props}
         />
-      </InputFieldBase>
+      </StyledInputFieldBase>
       {showHelper && <HelperText $error={error}>{showHelper}</HelperText>}
     </FieldWrapper>
   )

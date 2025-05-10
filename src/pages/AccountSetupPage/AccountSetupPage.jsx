@@ -46,7 +46,7 @@ const Button = styled(ButtonBase)`
   ${({ theme }) => theme.texts.textSM};
 `
 
-export default function AccountSetupPage() {
+export default function AccountSetupPage () {
   const [username, setUsername] = useState('')
   const [githubId, setGithubId] = useState('my-github-id')
   const [discordId, setDiscordId] = useState('')
@@ -60,7 +60,7 @@ export default function AccountSetupPage() {
     { title: '백엔드' },
     { title: '기획' },
     { title: '디자인' },
-    { title: '기타' },
+    { title: '기타' }
   ]
 
   const handleNext = () => {
@@ -78,7 +78,7 @@ export default function AccountSetupPage() {
         githubId,
         discordId,
         career,
-        field: fieldOptions[selectedField]?.title || '',
+        field: fieldOptions[selectedField]?.title || ''
       }
       navigate('/repositorycheckpage', { state: formData })
     }
@@ -86,12 +86,12 @@ export default function AccountSetupPage() {
 
   return (
     <FormWrapper>
-      <Header text="계정 생성하기" />
+      <Header text='계정 생성하기' />
 
       <FieldWrapper>
         <LabelText>사용자 이름</LabelText>
         <FormInput
-          placeholder="이름을 입력해주세요"
+          placeholder='이름을 입력해주세요'
           value={username}
           handleChange={(v) => {
             setUsername(v)
@@ -102,13 +102,13 @@ export default function AccountSetupPage() {
 
       <FieldWrapper>
         <LabelText>GitHub 계정이름</LabelText>
-        <FormInput placeholder="깃허브 계정" value={githubId} handleChange={setGithubId} readOnly />
+        <FormInput placeholder='깃허브 계정' value={githubId} handleChange={setGithubId} readOnly />
       </FieldWrapper>
 
       <FieldWrapper>
         <LabelText>Discord ID</LabelText>
         <FormInput
-          placeholder="디스코드 ID"
+          placeholder='디스코드 ID'
           value={discordId}
           handleChange={(v) => {
             setDiscordId(v)
@@ -120,7 +120,7 @@ export default function AccountSetupPage() {
       <FieldWrapper>
         <LabelText>분야 선택</LabelText>
         <FormDropdown
-          placeholder="분야 선택"
+          placeholder='분야 선택'
           menus={fieldOptions}
           selectedMenu={selectedField}
           handleChange={(v) => {
@@ -133,7 +133,7 @@ export default function AccountSetupPage() {
       <FieldWrapper>
         <LabelText>간단한 경력을 입력해주세요.</LabelText>
         <Textarea
-          placeholder="ex. 사이드 프로젝트 2회 경험"
+          placeholder='ex. 사이드 프로젝트 2회 경험'
           value={career}
           onChange={(v) => {
             setCareer(v)
@@ -143,7 +143,7 @@ export default function AccountSetupPage() {
       </FieldWrapper>
 
       <ButtonWrapper>
-        <Button $isHighlighted type="button" onClick={handleNext}>
+        <Button $isHighlighted type='button' onClick={handleNext}>
           다음
         </Button>
       </ButtonWrapper>

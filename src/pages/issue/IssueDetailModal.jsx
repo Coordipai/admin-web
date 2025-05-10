@@ -44,6 +44,7 @@ const InputRow = styled.div`
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+  
 `
 
 const CloseButton = styled.button`
@@ -66,7 +67,7 @@ const LabelText = styled.span`
   color: {({ theme }) => theme.colors.gray700};
 `
 
-const IssueDetailModal = ({ title, assignee, period, description, onClose, onChange }) => {
+const IssueDetailModal = ({ title, assignee, period, description, onClose }) => {
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
@@ -78,18 +79,16 @@ const IssueDetailModal = ({ title, assignee, period, description, onClose, onCha
           <FieldWrapper>
             <LabelText>담당자</LabelText>
             <FormInput
-              placeholder="담당자"
+              placeholder='담당자'
               value={assignee}
-              handleChange={(value) => onChange('assignee', value)}
               readOnly
             />
           </FieldWrapper>
           <FieldWrapper>
             <LabelText>기간</LabelText>
             <FormInput
-              placeholder="기간"
+              placeholder='기간'
               value={period}
-              handleChange={(value) => onChange('period', value)}
               readOnly
             />
           </FieldWrapper>
@@ -97,9 +96,8 @@ const IssueDetailModal = ({ title, assignee, period, description, onClose, onCha
         <FieldWrapper>
           <LabelText>내용</LabelText>
           <FormTextarea
-            placeholder="내용을 입력하세요"
+            placeholder='내용을 입력하세요'
             value={description}
-            handleChange={(value) => onChange('description', value)}
             readOnly
           />
         </FieldWrapper>
@@ -113,8 +111,7 @@ IssueDetailModal.propTypes = {
   assignee: PropTypes.string.isRequired,
   period: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
 }
 
-export default IssueDetailModal;
+export default IssueDetailModal

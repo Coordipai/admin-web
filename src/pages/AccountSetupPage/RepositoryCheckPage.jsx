@@ -5,10 +5,7 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import { useLocation } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
-
-
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -67,7 +64,7 @@ const Button = styled(ButtonBase)`
   ${({ theme }) => theme.texts.textSM};
 `
 
-export default function AccountSetupPage() {
+export default function AccountSetupPage () {
   const [selectedRepos, setSelectedRepos] = useState([])
   const location = useLocation()
   const navigate = useNavigate()
@@ -81,21 +78,19 @@ export default function AccountSetupPage() {
     )
   }
 
-  const handleCreateAccount = () =>{
+  const handleCreateAccount = () => {
     const combinedData = {
       ...formData,
-      repositories: selectedRepos,
+      repositories: selectedRepos
     }
 
-    navigate('/userform', {state: combinedData}) // 다음 페이지로 이동하면서 데이터 전달
+    navigate('/userform', { state: combinedData }) // 다음 페이지로 이동하면서 데이터 전달
     console.log('보낼 데이터:', combinedData)
-  
+
     // axios.post('/api/endpoint', payload) 등으로 연결 가능
-  
+
     console.log(combinedData)
   }
-
-
 
   const repoList = [
     'coordipai/admin-web',
@@ -110,14 +105,13 @@ export default function AccountSetupPage() {
     'asdfasdfasdfasdfasdfas',
     'asdfasdfasdfasdfasdfasdf',
     'asdfasdfasdfasfddfasfsdafdsfd',
-    'assssssssbbbbbbbaaaaaaaaa',
+    'assssssssbbbbbbbaaaaaaaaa'
   ]
-  
 
   return (
     <>
       <FormWrapper>
-        <Header text="계정 생성하기" />
+        <Header text='계정 생성하기' />
 
         <FieldWrapper>
           <LabelText>적용할 레포지토리</LabelText>
@@ -129,9 +123,9 @@ export default function AccountSetupPage() {
               return (
                 <RepositoryBox key={repo} $checked={isChecked} onClick={() => toggleRepo(repo)}>
                   <input
-                    type="checkbox"
+                    type='checkbox'
                     checked={isChecked}
-                    onChange={() => toggleRepo(repo)} 
+                    onChange={() => toggleRepo(repo)}
                   />
                   {repo}
                 </RepositoryBox>
@@ -141,7 +135,7 @@ export default function AccountSetupPage() {
         </FieldWrapper>
 
         <ButtonWrapper>
-          <Button $isHighlighted onClick ={handleCreateAccount}>
+          <Button $isHighlighted onClick={handleCreateAccount}>
             계정 생성하기
           </Button>
         </ButtonWrapper>
