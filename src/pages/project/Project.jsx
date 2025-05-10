@@ -8,7 +8,7 @@ import React, { useState } from 'react'
 import IconButton from '@components/Common/IconButton'
 import IssueTable from '@components/Edit/IssueTable'
 import SearchInputField from '@components/Edit/SearchInputField'
-import { HorizontalDivider, MainBox } from '@styles/globalStyle'
+import { HorizontalDivider, MainBox, ButtonBase } from '@styles/globalStyle'
 import Badge from '@components/Edit/Badge'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 
@@ -191,7 +191,12 @@ export const Project = () => {
 
             <Typography variant='displayXS' weight='semiBold' color='gray700' value='대시보드' />
 
-            <Button text='프로젝트 설정' />
+            <ButtonBase
+              $isHighlighted={true}
+              onClick={() => navigate(`${location.pathname}/edit`)}
+            >
+              프로젝트 설정
+            </ButtonBase>
           </HeaderRow>
           <TabsWrapper>
             <TabsRow>
@@ -223,7 +228,12 @@ export const Project = () => {
                 placeholder='이슈를 검색하세요'
               />
               </div>
-              <Button text='이슈 추가' color='white' onClick={() => navigate(`${location.pathname}/issue/new`)}/>
+              <ButtonBase
+                $isHighlighted={false}
+                onClick={() => navigate(`${location.pathname}/issue/new`)}
+              >
+                이슈 추가
+              </ButtonBase>
             </div>
             <IssueTable
               rows={filteredRows.length > 0 ? filteredRows : []}

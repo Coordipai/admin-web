@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import arrowright from '../../assets/icons/arrow-right.svg'
 import styled from 'styled-components'
 import FormInput from '@components/FormInput'
@@ -7,24 +7,8 @@ import FormTextarea from '@components/FormTextarea'
 import FormDropdown from '@components/FormDropdown'
 import Header from '@components/Header'
 import { EditContentHeader } from '../../components/Edit/EditContentHeader'
-import { ButtonBase } from '@styles/globalStyle'
+import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
-import SideBar from '@components/SideBar' // 경로는 실제 위치에 맞게 조정
-import brandIcon from '@assets/brandIcon.png' // 브랜드 로고 아이콘
-
-const PageWrapper = styled.div`
-  display: flex;
-`
-
-const SidebarPlaceholder = styled.div`
-  height: 100vh;
-  min-width: 19.5rem;
-  display: flex;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
-`
 
 const FormWrapper = styled.div`
   max-width: 1120px;
@@ -95,7 +79,7 @@ const Button = styled(ButtonBase)`
 `
 
 export default function ChangeIssuePage() {
-
+  const { requestId } = useParams()
   const [issueData, setIssueData] = useState(null)
   const [aiFeedback, setAiFeedback] = useState('')
   const [aiFeedbackReason, setAiFeedbackReason] = useState('')
@@ -103,7 +87,8 @@ export default function ChangeIssuePage() {
   useEffect(() => {
     const fetchIssueData = async () => {
       try {
-        // const response = await axios.get('/api/issue/123')
+        console.log('Request ID:', requestId) // Log the requestId for debugging
+        // const response = await axios.get(`/api/issue/${requestId}`)
         const mockIssue = {
           username: 'Oliva',
           userPart: '프론트엔드',
@@ -120,12 +105,12 @@ export default function ChangeIssuePage() {
     }
   
     fetchIssueData()
-  }, [])
+  }, [requestId]) // Add requestId as a dependency
 
   useEffect(() => {
     const fetchAiFeedback = async () => {
       try {
-        // const response = await axios.get('/api/issue/123/ai-feedback')
+        // const response = await axios.get(`/api/issue/${requestId}/ai-feedback`)
         const mockFeedback = {
           feedback: '이건 개선사항임',
           reason: '너가 못한거잖아ㅋㅋㅋ',
@@ -139,7 +124,7 @@ export default function ChangeIssuePage() {
     }
   
     fetchAiFeedback()
-  }, [])
+  }, [requestId]) // Add requestId as a dependency
   
   const sprintOptions = [
     { title: 'sprint 1' },
@@ -178,11 +163,8 @@ export default function ChangeIssuePage() {
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
   const handleRejectChange = () => {
-    const confirmed = window.confirm('정말로 변경을 반려하시겠습니까?')
-    if (confirmed) {
-      console.log('변경 반려 요청 처리')
-      // TODO: axios.post('/api/issue/reject', { issueId })
-    }
+    console.log('변경 반려 요청 처리')
+    // TODO: axios.post('/api/issue/reject', { issueId })
   }
   
   const handleApproveChange = () => {
@@ -195,154 +177,108 @@ export default function ChangeIssuePage() {
     // TODO: axios.post('/api/issue/feedback-request', { issueId })
   }
   
-
-
   return (
-    <PageWrapper>
-      <SidebarPlaceholder>
-      <SideBar
-        brandIcon={brandIcon}
-        brandTitle="CoordiPai"
-        project={{
-          projectName: 'KNU-AssignX',
-          iteration: { week: '9', period: '3/11 ~ 3/22' },
-          issues: 70,
-          categories: [
-            {
-              categoryName: 'Frontend',
-              people: [
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' },
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
-              ]
-            },
-            {
-              categoryName: 'Backend',
-              people: [
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
-              ]
-            },
-            {
-              categoryName: 'AI',
-              people: [
-                { image: brandIcon, userName: '이름', githubId: 'Github ID' }
-              ]
-            }
-          ]
-        }}
-        userInfo={{
-          image: brandIcon,
-          userName: '이름',
-          githubId: 'Github ID'
-        }}
-        logout={() => alert('로그아웃')}
-      />
-      </SidebarPlaceholder>
-
-      <FormWrapper>
-        <Header text="변경 요청서" />
-          <div style={{padding: '2rem'}}>
-            <EditContentHeader
-              title="변경 요청서 작성"
-              subAction={{ label: '이슈 상세보기', onClick: () => setIsIssueModalOpen(true) }}
-              
-              buttonsData={[
-                { value: "변경 반려", onClick: handleRejectChange },
-                { value: "변경 승인", onClick: handleApproveChange }
-              ]}
-            />
-            <LabeledRow>
-              <Label>담당자 / 분야 </Label>
-              <RowGroup2>
-                <div style={{ width: '244px' }}>
-                  <FormInput value={issueData?.username || ''} readOnly />
-                </div>
-                <span></span>
-                <div style={{ width: '244px' }}>
-                  <FormInput value={issueData?.userPart || ''} readOnly />
-                </div>
-                
-              </RowGroup2>
-            </LabeledRow>
-            <Divider />
-
-            <LabeledRow>
-              <Label>사유</Label>
-              <div style={{ width: '512px' }}>
-                <FormTextarea value={issueData?.reason || '' } readOnly />
+    <MainBox>
+      <Header text="변경 요청서" />
+        <div style={{padding: '2rem'}}>
+          <EditContentHeader
+            title="변경 요청서 작성"
+            subAction={{ label: '이슈 상세보기', onClick: () => setIsIssueModalOpen(true) }}
+            buttonsData={[
+              { value: "변경 반려", onClick: handleRejectChange },
+              { value: "변경 승인", onClick: handleApproveChange }
+            ]}
+          />
+          <LabeledRow>
+            <Label>담당자 / 분야 </Label>
+            <RowGroup2>
+              <div style={{ width: '244px' }}>
+                <FormInput value={issueData?.username || ''} readOnly />
               </div>
-            </LabeledRow>
-            <Divider />
+              <span></span>
+              <div style={{ width: '244px' }}>
+                <FormInput value={issueData?.userPart || ''} readOnly />
+              </div>
+            </RowGroup2>
+          </LabeledRow>
+          <Divider />
 
-            <LabeledRow>
-              <Label>변경 기한</Label>
-              <RowGroup>
-                <div style={{ width: '244px' }}>
-                  <FormInput value={issueData?.currentSprint || ''} readOnly />
-                </div>
-                <div style={{ padding: '0.275rem', alignContent: 'center'}}> 
-                  <img src={arrowright} alt="arrow" width="12" height="12" />
-                </div>
-                <div style={{ width: '244px' }}>
+          <LabeledRow>
+            <Label>사유</Label>
+            <div style={{ width: '512px' }}>
+              <FormTextarea value={issueData?.reason || '' } readOnly />
+            </div>
+          </LabeledRow>
+          <Divider />
 
+          <LabeledRow>
+            <Label>변경 기한</Label>
+            <RowGroup>
+              <div style={{ width: '244px' }}>
+                <FormInput value={issueData?.currentSprint || ''} readOnly />
+              </div>
+              <div style={{ padding: '0.275rem', alignContent: 'center'}}> 
+                <img src={arrowright} alt="arrow" width="12" height="12" />
+              </div>
+              <div style={{ width: '244px' }}>
+
+              <FormDropdown
+                placeholder="스프린트를 선택하세요"
+                menus={sprintOptions}
+                selectedMenu={selectedSprint}
+                handleChange={setSelectedSprint}  
+              />
+              </div>
+            </RowGroup>
+          </LabeledRow>
+          <Divider />
+
+          <LabeledRow>
+            <Label>담당자 변경</Label>
+            <RowGroup>
+              <div style={{ width: '244px' }}>
+                <FormInput value={issueData?.oldAssignee || ''} readOnly />
+              </div>
+              <div style={{padding: '0.275rem', alignContent: 'center'}}> 
+                <img src={arrowright} alt="arrow" width="12" height="12" />
+              </div>
+              <div style={{ width: '244px' }}>
                 <FormDropdown
-                  placeholder="스프린트를 선택하세요"
-                  menus={sprintOptions}
-                  selectedMenu={selectedSprint}
-                  handleChange={setSelectedSprint}  
+                  placeholder="변경할 사용자를 선택하세요"
+                  menus={assigneeOptions}
+                  selectedMenu={selectedAssignee}
+                  handleChange={setSelectedAssignee}
+              
                 />
-                </div>
-              </RowGroup>
-            </LabeledRow>
-            <Divider />
+              </div>
+              
+            </RowGroup>
+          </LabeledRow>
+          <Divider />
 
-            <LabeledRow>
-              <Label>담당자 변경</Label>
-              <RowGroup>
-                <div style={{ width: '244px' }}>
-                  <FormInput value={issueData?.oldAssignee || ''} readOnly />
-                </div>
-                <div style={{padding: '0.275rem', alignContent: 'center'}}> 
-                  <img src={arrowright} alt="arrow" width="12" height="12" />
-                </div>
-                <div style={{ width: '244px' }}>
-                  <FormDropdown
-                    placeholder="변경할 사용자를 선택하세요"
-                    menus={assigneeOptions}
-                    selectedMenu={selectedAssignee}
-                    handleChange={setSelectedAssignee}
-                
-                  />
-                </div>
-                
-              </RowGroup>
-            </LabeledRow>
-            <Divider />
-
-            <LabeledRow>
-              <Label>AI 피드백</Label>
-              <TextareaWrapper>
-                <FormTextarea value={aiFeedback} readOnly />
-              </TextareaWrapper>
-            </LabeledRow>
+          <LabeledRow>
+            <Label>AI 피드백</Label>
+            <TextareaWrapper>
+              <FormTextarea value={aiFeedback} readOnly />
+            </TextareaWrapper>
+          </LabeledRow>
 
 
-            <LabeledRow>
-              <Label>AI 피드백 사유</Label>
-              <TextareaWrapper>
-                <FormTextarea value={aiFeedbackReason} readOnly />
-              </TextareaWrapper>
-              <ButtonWrapper>
-                <Button $isHighlighted onClick={handleRequestFeedbackAgain}>
-                    피드백 재요청
-                </Button>
-              </ButtonWrapper>
-            </LabeledRow>
-          </div>
-      </FormWrapper>
+          <LabeledRow>
+            <Label>AI 피드백 사유</Label>
+            <TextareaWrapper>
+              <FormTextarea value={aiFeedbackReason} readOnly />
+            </TextareaWrapper>
+            <ButtonWrapper>
+              <Button $isHighlighted onClick={handleRequestFeedbackAgain}>
+                  피드백 재요청
+              </Button>
+            </ButtonWrapper>
+          </LabeledRow>
+        </div>
       {isIssueModalOpen && (
         <IssueDetailModal onClose={() => setIsIssueModalOpen(false)} />
       )}
-
-    </PageWrapper>
+    </MainBox>
   )
 }
