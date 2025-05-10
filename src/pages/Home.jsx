@@ -123,8 +123,8 @@ export const Home = () => {
                 {...project}
                 selected={selectedId === project.id}
                 onClick={() => {
-								  setSelectedId(project.id)
-                  navigate(`/project/${project.id}`)
+                  setSelectedId(project.id)
+                  navigate(`/project/${project.id}#issue`)
                 }}
               />
             ))}

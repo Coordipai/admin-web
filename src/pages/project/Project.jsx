@@ -1,10 +1,10 @@
 import styled from 'styled-components'
 import Typography from '@components/Edit/Typography'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import IssueTable from '@components/Edit/IssueTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox, ButtonBase } from '@styles/globalStyle'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -123,9 +123,32 @@ const EmptyIssueWrapper = styled.div`
 `
 
 export const Project = () => {
-  // const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const [activeTab, setActiveTab] = useState(() => {
+    const hash = location.hash.replace('#', '')
+    return hash === 'request' ? 'request' : 'issue'
+  })
+
+  // URL 해시에 따라 탭 상태 설정
+  useEffect(() => {
+    const hash = location.hash.replace('#', '')
+    if (hash === 'request') {
+      setActiveTab('request')
+    } else {
+      setActiveTab('issue')
+      // 해시가 없거나 'issue'가 아닌 경우 'issue'로 설정
+      if (!hash || hash !== 'issue') {
+        navigate(`${location.pathname}#issue`, { replace: true })
+      }
+    }
+  }, [location.hash, navigate, location.pathname])
+
+  // 탭 변경 시 URL 해시 업데이트
+  const handleTabChange = (tab) => {
+    setActiveTab(tab)
+    navigate(`${location.pathname}#${tab}`, { replace: true })
+  }
 
   const [issueRows] = useState([
     { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
@@ -175,15 +198,12 @@ export const Project = () => {
     )
     : requestRows
   const [page, setPage] = useState(1)
-  const [activeTab, setActiveTab] = useState('issue')
 
   return (
     <MainBox>
       <HeaderSection>
         <HeaderRow>
-
           <Typography variant='displayXS' weight='semiBold' color='gray700' value='대시보드' />
-
           <ButtonBase
             $isHighlighted
             onClick={() => navigate(`${location.pathname}/edit`)}
@@ -193,13 +213,13 @@ export const Project = () => {
         </HeaderRow>
         <TabsWrapper>
           <TabsRow>
-            <TabButton onClick={() => setActiveTab('issue')}>
+            <TabButton onClick={() => handleTabChange('issue')}>
               <TabLabel $active={activeTab === 'issue'}>
                 <Typography variant='textSM' weight='semiBold' color={activeTab === 'issue' ? 'brand500' : 'gray700'} value='이슈 목록' />
               </TabLabel>
               <TabUnderline $active={activeTab === 'issue'} />
             </TabButton>
-            <TabButton onClick={() => setActiveTab('request')}>
+            <TabButton onClick={() => handleTabChange('request')}>
               <TabLabel $active={activeTab === 'request'}>
                 <Typography variant='textSM' weight='semiBold' color={activeTab === 'request' ? 'brand500' : 'gray700'} value='변경 요청 목록' />
               </TabLabel>
