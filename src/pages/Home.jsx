@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import InputField from '@components/Edit/InputField'
 import styled, { useTheme } from 'styled-components'
 import Typography from '@components/Edit/Typography'
@@ -11,6 +11,7 @@ import { useProjectStore } from '@store/useProjectStore'
 
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
+import { projectData } from '../mocks/project'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -87,13 +88,33 @@ function ProjectCard ({ name, start_date, end_date, onClick, selected }) {
 export const Home = () => {
   const theme = useTheme()
   const navigate = useNavigate()
-  // const setProject = useProjectStore((state) => state.setProject)
+  const setProject = useProjectStore((state) => state.setProject)
 
-  const [projects] = useState([
-    { id: 1, name: '프로젝트1', start_date: '2021-01-01', end_date: '2021-01-01' },
-    { id: 2, name: '프로젝트2', start_date: '2021-01-01', end_date: '2021-01-01' },
-    { id: 3, name: '프로젝트3', start_date: '2021-01-01', end_date: '2021-01-01' }
-  ])
+  // const [projects] = useState([
+  //   { id: 1, name: '프로젝트1', start_date: '2021-01-01', end_date: '2021-01-01' },
+  //   { id: 2, name: '프로젝트2', start_date: '2021-01-01', end_date: '2021-01-01' },
+  //   { id: 3, name: '프로젝트3', start_date: '2021-01-01', end_date: '2021-01-01' }
+  // ])
+
+  const [projects, setProjects] = useState([])
+
+  // useCallback을 사용하는 게 좋은가?
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const response = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(projectData) // projectData는 dummy data
+        }, 1000)
+      })
+
+      // content.data만 추출하여 projects로 설정
+      const extractedProjects = response.map(res => res.content.data)
+      setProjects(extractedProjects)
+    }
+
+    fetchProjects()
+  }, [])
+  
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState(null)
 
@@ -127,7 +148,7 @@ export const Home = () => {
                 selected={selectedId === project.id}
                 onClick={() => {
                   setSelectedId(project.id)
-                  // setProject(project)
+                  setProject(project)
                   navigate(`/project/${project.id}#issue`)
                 }}
               />
