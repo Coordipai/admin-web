@@ -8,13 +8,11 @@ import Header from '@components/Header'
 import { DropDownItem, DropDownMenu } from '@components/Edit/DropDown'
 import styled from 'styled-components'
 import {
-  PageBox,
   MainBox,
   ContainerBox,
-  ButtonBase,
   styledIcon
 } from '@styles/globalStyle'
-import FormTextarea from '../../components/FormTextarea'
+import FormTextarea from '@components/FormTextarea'
 import { Plus, X } from '@untitled-ui/icons-react'
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -205,8 +203,7 @@ const IssueDetailPage = ({
                   { value: '저장', onClick: () => console.log('추가 저장'), isHighlighted: true },
                   { value: '취소', onClick: () => window.history.back() }
                 ]
-              : 
-                [
+              : [
                   { value: '저장', onClick: () => console.log('수정 저장'), isHighlighted: true },
                   { value: '삭제', onClick: () => console.log('삭제 클릭'), isHighlighted: true },
                   { value: '취소', onClick: () => window.history.back() }

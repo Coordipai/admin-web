@@ -1,6 +1,6 @@
 import styled from 'styled-components'
-import coordipaiLogo from '../../assets/coordipaiLogo.png'
-import githubLogo from '../../assets/gitHubLogo.png'
+import coordipaiLogo from '@assets/coordipaiLogo.png'
+import githubLogo from '@assets/gitHubLogo.png'
 import CheckLineGraphic from './CheckLineGraphic'
 import LoginButton from './LoginButton'
 
@@ -35,21 +35,20 @@ const LogoRow = styled.div`
 // 로그인 handler
 const handleGithubLogin = () => {
   // TODO: 백엔드 OAuth 로그인 URL 배포용으로 교체 예정
-  window.location.href = 'https://coordipai-web-server.knuassignx.site/auth/github/login';
-};
+  window.location.href = 'https://coordipai-web-server.knuassignx.site/auth/github/login'
+}
 
-
-export default function LoginPage() {
+export default function LoginPage () {
   return (
     <LoginWrapper>
       <ContentBox>
         <LogoRow>
-          <img src={coordipaiLogo} alt="CoordiPAI Logo" width="100" height="100" />
+          <img src={coordipaiLogo} alt='CoordiPAI Logo' width='100' height='100' />
           <CheckLineGraphic />
-          <img src={githubLogo} alt="GitHub Logo" width="100" height="100" />
+          <img src={githubLogo} alt='GitHub Logo' width='100' height='100' />
         </LogoRow>
 
-        <h2 style={{ fontSize: '36px'}} >
+        <h2 style={{ fontSize: '36px' }}>
           Authorize GitHub
         </h2>
 

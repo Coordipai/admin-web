@@ -7,22 +7,21 @@ import brandIcon from '@assets/CoordiPAILogo.png'
 import { PageBox } from '@styles/globalStyle'
 import SideBar from '@components/SideBar'
 
-import LoginPage from './pages/login/LoginPage'
-import FirstAccountPage from './pages/AccountSetupPage/AccountSetupPage'
-import IssueModalTest from './pages/issue/IssueModalTest'
-import UserForm from './pages/UserPage/UserPage'
-import IssueRequestPage from './pages/issue/IssueRequestPage'
-import RepositoryCheckPage from './pages/AccountSetupPage/RepositoryCheckPage'
-import { BuildProject } from './pages/build_project/BuildProject'
-import { BuildProject2 } from './pages/build_project/BuildProject2' 
-import { BuildProject3 } from './pages/build_project/BuildProject3'
-import { Project } from './pages/project/Project'
-import { Home } from './pages/Home'
+import { Home } from '@pages/Home'
+import LoginPage from '@pages/login/LoginPage'
+import FirstAccountPage from '@pages/AccountSetupPage/AccountSetupPage'
+import RepositoryCheckPage from '@pages/AccountSetupPage/RepositoryCheckPage'
+import UserForm from '@pages/UserPage/UserPage'
 import ComponentTest from '@pages/ComponentTest'
-import { SettingProject } from './pages/build_project/SettingProject'
-import IssueDetailPage from './pages/issue/IssueDetailPage'
-import NotFoundPage from './pages/NotFoundPage'
-
+import IssueModalTest from '@pages/issue/IssueModalTest'
+import { BuildProject } from '@pages/build_project/BuildProject'
+import { BuildProject2 } from '@pages/build_project/BuildProject2'
+import { BuildProject3 } from '@pages/build_project/BuildProject3'
+import { Project } from '@pages/project/Project'
+import IssueDetailPage from '@pages/issue/IssueDetailPage'
+import { SettingProject } from '@pages/build_project/SettingProject'
+import IssueRequestPage from '@pages/issue/IssueRequestPage'
+import NotFoundPage from '@pages/NotFoundPage'
 
 /*
   route 설정 시, PrivateRoute를 사용하여,
@@ -39,27 +38,27 @@ function App () {
       <ToastContainer />
       <Routes>
         <Route path='/' element={<PrivateRoute element={Home} />} />
-        
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/firstaccount" element={<FirstAccountPage />} />
-        
-        <Route path="/repositorycheckpage" element={<RepositoryCheckPage />} />
-        
+
+        <Route path='/login' element={<LoginPage />} />
+        <Route path='/firstaccount' element={<FirstAccountPage />} />
+
+        <Route path='/repositorycheckpage' element={<RepositoryCheckPage />} />
+
         {/* Sidebar */}
-        <Route path="/user" element={<UserForm />} />
+        <Route path='/user' element={<UserForm />} />
 
         {/* Test Page */}
         <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />
-        <Route path="/issueModalTest" element={<IssueModalTest />} />
+        <Route path='/issueModalTest' element={<IssueModalTest />} />
 
-        {/* BuildProject Page*/}
+        {/* BuildProject Page */}
         <Route path='/buildproject' element={<PrivateRoute element={BuildProject} />} />
         <Route path='/buildproject2' element={<PrivateRoute element={BuildProject2} />} />
         <Route path='/buildproject3' element={<PrivateRoute element={BuildProject3} />} />
-        
+
         {/* Project Page */}
-        <Route path="/project/:projectId" element={<PrivateRoute element={Project} />} />
-        <Route path="/project/:projectId/issue/:issueId" element={<PrivateRoute element={IssueDetailPage} />} />
+        <Route path='/project/:projectId' element={<PrivateRoute element={Project} />} />
+        <Route path='/project/:projectId/issue/:issueId' element={<PrivateRoute element={IssueDetailPage} />} />
         <Route path='/project/:projectId/edit' element={<PrivateRoute element={SettingProject} />} />
         <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={IssueRequestPage} />} />
 
@@ -134,19 +133,19 @@ const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
   return hasSideBar ? (
     <PageBox>
       {
-      // authData &&
-      hasSideBar && (
-        <SideBar
-          brandIcon={brandIcon}
-          brandTitle='CoordiPai'
-          titleOnClick={() => navigate(`/`)}
-          project={project}
-          userInfo={userInfo}
-          userOnClick={() => navigate(`/user`)}
-          logout={logout}
-        />
-      )
-}
+        // authData &&
+        hasSideBar && (
+          <SideBar
+            brandIcon={brandIcon}
+            brandTitle='CoordiPai'
+            titleOnClick={() => navigate('/')}
+            project={project}
+            userInfo={userInfo}
+            userOnClick={() => navigate('/user')}
+            logout={logout}
+          />
+        )
+      }
       <Component />
     </PageBox>
   ) : (

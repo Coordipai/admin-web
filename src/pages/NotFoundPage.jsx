@@ -1,7 +1,7 @@
-import styled from "styled-components";
-import { ButtonBase, styledIcon } from "@styles/globalStyle";
-import { ArrowLeft } from "@untitled-ui/icons-react";
-import { useNavigate } from "react-router-dom";
+import styled from 'styled-components'
+import { ButtonBase, styledIcon } from '@styles/globalStyle'
+import { ArrowLeft } from '@untitled-ui/icons-react'
+import { useNavigate } from 'react-router-dom'
 
 const ContainerBox = styled.div`
   height: 100vh;
@@ -11,49 +11,49 @@ const ContainerBox = styled.div`
   align-items: center;
   justify-content: center;
   gap: 3rem;
-`;
+`
 
 const TextContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-`;
+`
 
 const TextHeader = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-`;
+`
 
 const ErrorCodeText = styled.span`
   ${({ theme }) => theme.texts.textMD};
   font-weight: ${({ theme }) => theme.weights.medium};
   color: ${({ theme }) => theme.colors.gray700};
-`;
+`
 
 const ErrorTitleText = styled.div`
   ${({ theme }) => theme.texts.displayXL};
   font-weight: ${({ theme }) => theme.weights.semiBold};
   color: ${({ theme }) => theme.colors.gray900};
-`;
+`
 
 const ErrorMessageText = styled.div`
   ${({ theme }) => theme.texts.textXL};
   font-weight: ${({ theme }) => theme.weights.regular};
   color: ${({ theme }) => theme.colors.gray600};
-`;
+`
 
 const ButtonContainer = styled.div`
   display: flex;
   gap: 0.75rem;
-`;
+`
 
-const ArrowLeftIcon = styledIcon({ icon: ArrowLeft, strokeColor: "#344054" });
+const ArrowLeftIcon = styledIcon({ icon: ArrowLeft, strokeColor: '#344054' })
 
 const NotFoundPage = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <ContainerBox>
@@ -71,12 +71,12 @@ const NotFoundPage = () => {
           <ArrowLeftIcon />
           뒤로가기
         </ButtonBase>
-        <ButtonBase $isHighlighted={true} onClick={() => navigate("/")}>
+        <ButtonBase $isHighlighted onClick={() => navigate('/')}>
           홈으로 이동
         </ButtonBase>
       </ButtonContainer>
     </ContainerBox>
-  );
-};
+  )
+}
 
-export default NotFoundPage;
+export default NotFoundPage

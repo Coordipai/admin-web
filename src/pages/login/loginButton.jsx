@@ -1,7 +1,6 @@
-import { ButtonBase } from '../../styles/globalStyle' // ButtonBase가 정의된 경로에 따라 조정
+import { ButtonBase } from '@styles/globalStyle' // ButtonBase가 정의된 경로에 따라 조정
 import styled from 'styled-components'
-//import color from '../../styles/theme'
-
+// import color from '../../styles/theme'
 
 const GitHubButton = styled(ButtonBase)`
   width: 300px;                  // 원하는 너비
@@ -13,9 +12,9 @@ const GitHubButton = styled(ButtonBase)`
   //fontFamily: 'Poppins'
 `
 
-export default function LoginButton({ onClick }) {
+export default function LoginButton ({ onClick }) {
   return (
-    <GitHubButton $isHighlighted={true} onClick={onClick}>
+    <GitHubButton $isHighlighted onClick={onClick}>
       GitHub 계정으로 로그인
     </GitHubButton>
   )

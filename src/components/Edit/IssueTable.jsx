@@ -144,7 +144,7 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
     const basePath = location.pathname
     if (variant === 'issue') navigate(`${basePath}/issue/${issueNumber}`)
     else if (variant === 'request') navigate(`${basePath}/request/${issueNumber}`)
-    else navigate(`/notfound`)
+    else navigate('/notfound')
   }
 
   const total = Math.ceil(rows.length / pageSize) || 1

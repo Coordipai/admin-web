@@ -99,7 +99,7 @@ const FormTextarea = ({
           $hideCursor={hideCursor}
           readOnly={readOnly}
           disabled={disabled}
-          rows="6"
+          rows='6'
           {...props}
         />
       </StyledInputFieldBase>

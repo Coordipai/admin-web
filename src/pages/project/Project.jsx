@@ -1,17 +1,10 @@
-import InputField from '@components/Edit/InputField'
 import styled from 'styled-components'
 import Typography from '@components/Edit/Typography'
-import DropDown from '@components/Edit/DropDown'
-import FileTable from '@components/Edit/FileTable'
-import Button from '@components/Common/Button'
 import React, { useState } from 'react'
-import IconButton from '@components/Common/IconButton'
 import IssueTable from '@components/Edit/IssueTable'
 import SearchInputField from '@components/Edit/SearchInputField'
-import { HorizontalDivider, MainBox, ButtonBase } from '@styles/globalStyle'
-import Badge from '@components/Edit/Badge'
+import { MainBox, ButtonBase } from '@styles/globalStyle'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -186,35 +179,35 @@ export const Project = () => {
 
   return (
     <MainBox>
-        <HeaderSection>
-          <HeaderRow>
+      <HeaderSection>
+        <HeaderRow>
 
-            <Typography variant='displayXS' weight='semiBold' color='gray700' value='대시보드' />
+          <Typography variant='displayXS' weight='semiBold' color='gray700' value='대시보드' />
 
-            <ButtonBase
-              $isHighlighted={true}
-              onClick={() => navigate(`${location.pathname}/edit`)}
-            >
-              프로젝트 설정
-            </ButtonBase>
-          </HeaderRow>
-          <TabsWrapper>
-            <TabsRow>
-              <TabButton onClick={() => setActiveTab('issue')}>
-                <TabLabel $active={activeTab === 'issue'}>
-                  <Typography variant='textSM' weight='semiBold' color={activeTab === 'issue' ? 'brand500' : 'gray700'} value='이슈 목록' />
-                </TabLabel>
-                <TabUnderline $active={activeTab === 'issue'} />
-              </TabButton>
-              <TabButton onClick={() => setActiveTab('request')}>
-                <TabLabel $active={activeTab === 'request'}>
-                  <Typography variant='textSM' weight='semiBold' color={activeTab === 'request' ? 'brand500' : 'gray700'} value='변경 요청 목록' />
-                </TabLabel>
-                <TabUnderline $active={activeTab === 'request'} />
-              </TabButton>
-            </TabsRow>
-            <TabsDivider />
-          </TabsWrapper>
+          <ButtonBase
+            $isHighlighted
+            onClick={() => navigate(`${location.pathname}/edit`)}
+          >
+            프로젝트 설정
+          </ButtonBase>
+        </HeaderRow>
+        <TabsWrapper>
+          <TabsRow>
+            <TabButton onClick={() => setActiveTab('issue')}>
+              <TabLabel $active={activeTab === 'issue'}>
+                <Typography variant='textSM' weight='semiBold' color={activeTab === 'issue' ? 'brand500' : 'gray700'} value='이슈 목록' />
+              </TabLabel>
+              <TabUnderline $active={activeTab === 'issue'} />
+            </TabButton>
+            <TabButton onClick={() => setActiveTab('request')}>
+              <TabLabel $active={activeTab === 'request'}>
+                <Typography variant='textSM' weight='semiBold' color={activeTab === 'request' ? 'brand500' : 'gray700'} value='변경 요청 목록' />
+              </TabLabel>
+              <TabUnderline $active={activeTab === 'request'} />
+            </TabButton>
+          </TabsRow>
+          <TabsDivider />
+        </TabsWrapper>
       </HeaderSection>
 
       <Section>
@@ -223,10 +216,10 @@ export const Project = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ width: '40%' }}>
                 <SearchInputField
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder='이슈를 검색하세요'
-              />
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder='이슈를 검색하세요'
+                />
               </div>
               <ButtonBase
                 $isHighlighted={false}
@@ -248,10 +241,10 @@ export const Project = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ width: '40%' }}>
                 <SearchInputField
-                value={requestSearch}
-                onChange={e => setRequestSearch(e.target.value)}
-                placeholder='변경 요청을 검색하세요'
-              />
+                  value={requestSearch}
+                  onChange={e => setRequestSearch(e.target.value)}
+                  placeholder='변경 요청을 검색하세요'
+                />
               </div>
             </div>
             <IssueTable

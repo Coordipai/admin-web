@@ -79,7 +79,7 @@ const IssueDetailModal = ({ title, assignee, period, description, onClose }) => 
           <FieldWrapper>
             <LabelText>담당자</LabelText>
             <FormInput
-              placeholder="담당자"
+              placeholder='담당자'
               value={assignee}
               readOnly
             />
@@ -87,7 +87,7 @@ const IssueDetailModal = ({ title, assignee, period, description, onClose }) => 
           <FieldWrapper>
             <LabelText>기간</LabelText>
             <FormInput
-              placeholder="기간"
+              placeholder='기간'
               value={period}
               readOnly
             />
@@ -96,7 +96,7 @@ const IssueDetailModal = ({ title, assignee, period, description, onClose }) => 
         <FieldWrapper>
           <LabelText>내용</LabelText>
           <FormTextarea
-            placeholder="내용을 입력하세요"
+            placeholder='내용을 입력하세요'
             value={description}
             readOnly
           />
@@ -114,4 +114,4 @@ IssueDetailModal.propTypes = {
   onClose: PropTypes.func.isRequired
 }
 
-export default IssueDetailModal;
+export default IssueDetailModal
