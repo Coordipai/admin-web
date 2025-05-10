@@ -124,7 +124,7 @@ const Button = ({
         <Typography
           variant='textMD'
           weight={variant === 'text' ? 'medium' : 'semibold'}
-          color={color === 'white' ? 'gray700' : 'white'}
+          color={variant === 'text' ? 'brand500' : 'white'}
           value={text}
         />
       )}
