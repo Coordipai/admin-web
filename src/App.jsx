@@ -40,7 +40,6 @@ function App () {
         <Route path='/' element={<PrivateRoute element={Home} />} />
 
         <Route path='/login' element={<LoginPage />} />
-        <Route path='/firstaccount' element={<FirstAccountPage />} />
         <Route path="/register/:githubId" element={<FirstAccountPage />} />
         <Route path="/repositorycheckpage/:githubId" element={<RepositoryCheckPage />} />
         <Route path="/userform/:githubId" element={<UserForm />} />

@@ -101,9 +101,18 @@ export default function AccountSetupPage () {
     const payload = selectedRepos.map((repo) => ({repo_fullname: repo}))
 
     try{
-      const res = await axios.post('https://coordipai-web-server.knuassignx.site/user-repo', payload, {
-        withCredentials: true,
-      })
+      const token = localStorage.getItem('accessToken')
+
+      const res = await axios.post(
+        'https://coordipai-web-server.knuassignx.site/user-repo',
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      )
 
       console.log('레포 등록 성공: ', res.data)
       const combinedData = {
