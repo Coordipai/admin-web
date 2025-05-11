@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import { useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const PageContainer = styled.div`
   display: flex;
@@ -94,14 +95,51 @@ const TextButton = styled(ButtonBase)`
 `
 
 export default function UserPage () {
-  const location = useLocation()
-  const userdata = location.state
+  const navigate = useNavigate(); // 추가 필요!
 
-  const [username, setUsername] = useState(userdata?.username || '')
-  const [githubId, setGithubId] = useState(userdata?.githubId || '') // OAuth 결과로 들어온 값
-  const [discordId, setDiscordId] = useState(userdata?.discordId || '')
-  const [career, setCareer] = useState(userdata?.career || '')
-  const [selectedRepos, setSelectedRepos] = useState(userdata?.repositories || [])
+  const [repoList, setRepoList] = useState([])
+  const [username, setUsername] = useState('')
+  const [githubId, setGithubId] = useState('')
+  const [discordId, setDiscordId] = useState('')
+  const [career, setCareer] = useState('')
+  const [selectedRepos, setSelectedRepos] = useState([])
+
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('accessToken')
+        if (!token) {
+          alert('로그인이 필요합니다.')
+          navigate('/login')
+          return
+        }
+        const userData = JSON.parse(localStorage.getItem('user'))
+
+        const repoRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        })
+        const repos = repoRes.data.content.data.map((r) => r.repo_fullname)
+
+        setUsername(userData.name || '')
+        setGithubId(userData.github_id || '')
+        setDiscordId(userData.discord_id || '')
+        setCareer(userData.career || '')
+        setField(fieldOptions.findIndex(f => f.title === userData.category))
+        setSelectedRepos(repos)
+        setRepoList(repos)
+      } catch (error) {
+        console.error('유저 정보 불러오기 실패:', error)
+        alert('로그인이 필요합니다.')
+        navigate('/login')
+      }
+    }
+
+    fetchUser()
+  }, [])
 
   const fieldOptions = [
     { title: '프론트엔드' },
@@ -114,9 +152,7 @@ export default function UserPage () {
   const getFieldIndex = (fieldTitle) =>
     fieldOptions.findIndex((option) => option.title === fieldTitle)
 
-  const [field, setField] = useState(
-    getFieldIndex(userdata?.field)
-  )
+  const [field, setField] = useState(-1)
 
   const handleSave = () => {
     const payload = {
@@ -154,17 +190,6 @@ export default function UserPage () {
         : [...prev, repo]
     )
   }
-
-  const repoList = [
-    'coordipai/admin-web',
-    'coordipai/admin-api',
-    'coordipai/landing-page',
-    '레포1111',
-    '레포22',
-    '레포3333333',
-    '레포14231423342432',
-    '레포1234125253125'
-  ]
 
   return (
     <PageContainer>
