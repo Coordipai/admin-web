@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
@@ -63,6 +63,30 @@ export default function AccountSetupPage () {
     { title: '디자인' },
     { title: '기타' }
   ]
+
+  // GitHub 로그인 이후, /register/:githubId 에 도달했을 때
+  useEffect(() => {
+    const login = async () => {
+      try {
+        const res = await axios.post(
+          'https://coordipai-web-server.knuassignx.site/auth/login',
+          {},
+          {
+            withCredentials: true
+          }
+        )
+        const token = res.data?.content?.data?.access_token
+        if (token) {
+          localStorage.setItem('accessToken', token)
+          console.log('🔐 Access token 저장됨!')
+        }
+      } catch (err) {
+        console.error('access token 요청 실패', err)
+      }
+    }
+
+    login()
+  }, [])
 
   const handleNext = async () => {
     const newError = {}
