@@ -21,9 +21,9 @@ const FormWrapper = styled.div`
 
 const LabeledRow = styled.div`
   width: 100%;
-  display: flex;;
+  display: flex;
   gap: 2rem;
-  padding: 2rem ;
+  padding: 2rem;
 `
 
 const TextareaWrapper = styled.div`
