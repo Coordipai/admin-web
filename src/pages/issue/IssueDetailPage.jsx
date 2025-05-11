@@ -15,6 +15,8 @@ import {
 import FormTextarea from '@components/FormTextarea'
 import { Plus, X } from '@untitled-ui/icons-react'
 
+import { createIssue, updateIssue, deleteIssue, fetchIssueDetail } from '@api/issueAPI'
+
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 
@@ -54,46 +56,51 @@ const LabelBadge = styled.div`
   }
 `
 
-const IssueDetailPage = ({
-  defaultIssueTitle = '',
-  defaultIssueContent = '',
-  defaultPriority = 'M',
-  defaultIteration,
-  defaultLabels = [],
-  defaultAssignees = []
-}) => {
-  const { issueId } = useParams()
+const IssueDetailPage = () => {
+  const { projectId, issueId } = useParams()
 
-  // options 변수들의 setter들은 fetch함수에 이용
-  const [priorityOptions, setPriorityOptions] = useState([
+  const [priorityOptions] = useState([
     { value: 'M', label: '[M] Must Have' },
     { value: 'S', label: '[S] Should Have' },
     { value: 'C', label: '[C] Could Have' },
     { value: 'W', label: '[W] Won\'t Have' }
   ])
-
   const [iterationOptions, setIterationOptions] = useState([
-    { title: 'Iteration 1', period: '3.4~3.10' },
-    { title: 'Iteration 2', period: '3.11~3.17' },
-    { title: 'Iteration 3', period: '3.18~3.24' },
-    { title: 'Iteration 4', period: '3.25~3.31' },
-    { title: 'Iteration 5', period: '4.1~4.7' }
+    { title: 'Iteration 1', period: '2023-10-01 ~ 2023-10-15' },
+    { title: 'Iteration 2', period: '2023-10-16 ~ 2023-10-31' },
+    { title: 'Iteration 3', period: '2023-11-01 ~ 2023-11-15' }
   ])
+  const [labelOptions] = useState(['기능', '설정', '테스트', '배포', '버그 수정', '문서', '리팩토링', '질문', '정리'])
+  const [assigneeOptions, setAssigneeOptions] = useState([])
 
-  const [labelOptions, setLabelOptions] = useState([
-    'Feature', 'Setting', 'Refactor', 'Bugfix'
-  ])
+  useEffect(() => {
+    if (issueId !== 'new') {
+      const response = fetchIssueDetail(projectId, issueId)
+      response.then((res) => {
+        // projectId에서 가져옴
+        // setIterationOptions(res.data.iteration)
+        // setAssigneeOptions(res.data.assignees)
 
-  const [assigneeOptions, setAssigneeOptions] = useState([
-    '김준형', '송재훈', '윤정훈', '이곤우', '조재용'
-  ])
+        console.log('res.data:', res.data)
+        setIssueTitle(res.data.title)
+        setIssueContent(res.data.body)
+        setPriority(res.data.priority)
+        setIteration(res.data.iteration)
+        setSelectedLabels(res.data.labels)
+        setAssignees(res.data.assignees)
+      }
+      ).catch((error) => {
+        console.error('Error fetching issue detail:', error) 
+      })
+    }
+  }, [projectId, issueId])
 
-  const [issueTitle, setIssueTitle] = useState(defaultIssueTitle)
-  const [issueContent, setIssueContent] = useState(defaultIssueContent)
-  const [priority, setPriority] = useState(defaultPriority)
-  const [iteration, setIteration] = useState(defaultIteration || iterationOptions[0])
-  const [selectedLabels, setSelectedLabels] = useState(defaultLabels)
-  const [assignees, setAssignees] = useState(defaultAssignees)
+  const [issueTitle, setIssueTitle] = useState('')
+  const [issueContent, setIssueContent] = useState('')
+  const [priority, setPriority] = useState(priorityOptions[0].value)
+  const [iteration, setIteration] = useState(iterationOptions[0])
+  const [selectedLabels, setSelectedLabels] = useState([])
+  const [assignees, setAssignees] = useState([])
 
   const [badgeDropdownOpen, setBadgeDropdownOpen] = useState(false)
   const [iterationDropdownOpen, setIterationDropdownOpen] = useState(false)
@@ -200,12 +207,56 @@ const IssueDetailPage = ({
         buttonsData={
             issueId === 'new'
               ? [
-                  { value: '저장', onClick: () => console.log('추가 저장'), isHighlighted: true },
+                  { 
+                    value: '저장',
+                    onClick: () => {  // issue 추가
+                      const issueData = {
+                        project_id: projectId,
+                        title: issueTitle,
+                        body: issueContent,
+                        assignees: assignees,
+                        priority: priority,
+                        iteration: iteration,
+                        labels: selectedLabels,
+                      }
+                      createIssue(issueData)
+                      window.history.back()
+                    }, 
+                    isHighlighted: true 
+                  },
                   { value: '취소', onClick: () => window.history.back() }
                 ]
               : [
-                  { value: '저장', onClick: () => console.log('수정 저장'), isHighlighted: true },
-                  { value: '삭제', onClick: () => console.log('삭제 클릭'), isHighlighted: true },
+                  { 
+                    value: '저장', 
+                    onClick: () => { // issue 수정
+                      const issueData = {
+                        project_id: projectId,
+                        issue_number: issueId,
+                        title: issueTitle,
+                        body: issueContent,
+                        assignees: assignees,
+                        priority: priority,
+                        iteration: iteration,
+                        labels: selectedLabels,
+                      }
+                      updateIssue(issueData)
+                      window.history.back()
+                    }, 
+                    isHighlighted: true 
+                  },
+                  { 
+                    value: '삭제', 
+                    onClick: () => {  // issue 삭제
+                      const issueData = {
+                        project_id: projectId,
+                        issue_number: issueId
+                      }
+                      deleteIssue(issueData)
+                      window.history.back()
+                    }, 
+                    isHighlighted: true 
+                  },
                   { value: '취소', onClick: () => window.history.back() }
                 ]
           }

@@ -67,10 +67,10 @@ export const updateIssue = async (issueData) => {
 }
 
 /**
- * 5. 이슈 닫기 (삭제로 간주)
+ * 5. 이슈 닫기
  * @param {object} closeData { project_id, issue_number }
  */
-export const closeIssue = async (closeData) => {
+export const deleteIssue = async (closeData) => {
   try {
     const response = await api.delete('/issue/', { data: closeData })
     return response.data
