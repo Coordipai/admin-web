@@ -83,12 +83,6 @@ const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
   //   return <Navigate to='/login' />;
   // }
 
-  const userInfo = {
-    profile_img: brandIcon,
-    userName: 'TestUser',
-    github_id: 'testuser123'
-  }
-
   const logout = () => {
     // Handle logout event
     console.log('Logout clicked!')
@@ -103,7 +97,6 @@ const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
             brandIcon={brandIcon}
             brandTitle='CoordiPai'
             titleOnClick={() => navigate('/')}
-            userInfo={userInfo}
             userOnClick={() => navigate('/user')}
             logout={logout}
           />
