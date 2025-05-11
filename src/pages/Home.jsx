@@ -96,7 +96,8 @@ function ProjectCard ({ name, start_date, end_date, onClick, selected }) {
 export const Home = () => {
   const theme = useTheme()
   const navigate = useNavigate()
-  const setProject = useProjectStore((state) => state.setProject)
+  const { setProject, clearProject } = useProjectStore();
+
   const setUser = useUserStore((state) => state.setUser)
 
   // const [projects] = useState([
@@ -133,7 +134,12 @@ export const Home = () => {
     )
     : projects
 
+  useEffect(() => {
+    clearProject()  
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
+
+  // 로그인 과정으로 옮겨야 함
   useEffect(() => {
     const fetchUser = async () => {
       const response = await new Promise((resolve) => {
@@ -143,7 +149,7 @@ export const Home = () => {
       })
 
       setUser(response)
-      console.log(response)
+      // console.log(response)
     }
     fetchUser()
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
