@@ -2,7 +2,7 @@ import { useState } from 'react'
 import FormTextarea from '@components/FormTextArea'
 import Header from '@components/Header'
 import SideBar from '@components/SideBar'
-import Modal from '@components/Modal'
+import Modal from '@components/ConfirmModal'
 import {
   showSuccessToastMsg,
   showWarningToastMsg,

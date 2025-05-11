@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import { Calendar, List, LogOut01 } from '@untitled-ui/icons-react'

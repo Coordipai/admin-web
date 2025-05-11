@@ -6,6 +6,7 @@ import InputField from '@components/Edit/InputField'
 import Typography from '@components/Edit/Typography'
 import Header from '@components/Header'
 import { DropDownItem, DropDownMenu } from '@components/Edit/DropDown'
+import Modal from '@components/ConfirmModal'
 import styled from 'styled-components'
 import {
   MainBox,
@@ -104,6 +105,7 @@ const IssueDetailPage = () => {
   const [selectedLabels, setSelectedLabels] = useState([])
   const [assignees, setAssignees] = useState([])
 
+  // UI
   const [badgeDropdownOpen, setBadgeDropdownOpen] = useState(false)
   const [iterationDropdownOpen, setIterationDropdownOpen] = useState(false)
   const [labelDropdownOpen, setLabelDropdownOpen] = useState(false)
@@ -122,6 +124,10 @@ const IssueDetailPage = () => {
   const [iterationMenuStyle, setIterationMenuStyle] = useState({})
   const [labelMenuStyle, setLabelMenuStyle] = useState({})
   const [assigneeMenuStyle, setAssigneeMenuStyle] = useState({})
+
+  const [showModal, setShowModal] = useState(false)
+  const [modalText, setModalText] = useState('Modal Text')
+  const [isEdit, setIsEdit] = useState(false)
 
   useEffect(() => {
     if (badgeDropdownOpen && badgeMenuRef.current) {
@@ -212,17 +218,8 @@ const IssueDetailPage = () => {
                   { 
                     value: '저장',
                     onClick: () => {  // issue 추가
-                      const issueData = {
-                        project_id: projectId,
-                        title: issueTitle,
-                        body: issueContent,
-                        assignees: assignees,
-                        priority: priority,
-                        iteration: iteration,
-                        labels: selectedLabels,
-                      }
-                      createIssue(issueData)
-                      window.history.back()
+                      setModalText('저장하시겠습니까?')
+                      setShowModal(true)
                     }, 
                     isHighlighted: true 
                   },
@@ -232,30 +229,18 @@ const IssueDetailPage = () => {
                   { 
                     value: '저장', 
                     onClick: () => { // issue 수정
-                      const issueData = {
-                        project_id: projectId,
-                        issue_number: issueId,
-                        title: issueTitle,
-                        body: issueContent,
-                        assignees: assignees,
-                        priority: priority,
-                        iteration: iteration,
-                        labels: selectedLabels,
-                      }
-                      updateIssue(issueData)
-                      window.history.back()
+                      setModalText('저장하시겠습니까?')
+                      setShowModal(true)
+                      setIsEdit(true)
                     }, 
                     isHighlighted: true 
                   },
                   { 
                     value: '삭제', 
                     onClick: () => {  // issue 삭제
-                      const issueData = {
-                        project_id: projectId,
-                        issue_number: issueId
-                      }
-                      deleteIssue(issueData)
-                      window.history.back()
+                      setModalText('삭제하시겠습니까?')
+                      setShowModal(true)
+                      setIsEdit(false)
                     }, 
                     isHighlighted: true 
                   },
@@ -391,6 +376,48 @@ const IssueDetailPage = () => {
           )}
         </Row>
       </ContainerBox>
+      {showModal && createPortal(
+        <Modal
+          text={modalText}
+          setShowModal={setShowModal}
+          handleConfirm={() => {
+            if (issueId === 'new') {
+              const issueData = {
+                project_id: projectId,
+                title: issueTitle,
+                body: issueContent,
+                assignees: assignees,
+                priority: priority,
+                iteration: iteration,
+                labels: selectedLabels,
+              }
+              createIssue(issueData)
+            } else {
+              if (isEdit) {
+                const issueData = {
+                  project_id: projectId,
+                  issue_number: issueId,
+                  title: issueTitle,
+                  body: issueContent,
+                  assignees: assignees,
+                  priority: priority,
+                  iteration: iteration,
+                  labels: selectedLabels,
+                }
+                updateIssue(issueData)
+              } else {
+                const issueData = {
+                  project_id: projectId,
+                  issue_number: issueId
+                }
+                deleteIssue(issueData)
+              }
+            }
+            // window.history.back()
+          }}
+        />,
+        document.body
+      )}
     </MainBox>
   )
 }
