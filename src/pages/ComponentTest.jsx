@@ -2,13 +2,13 @@ import { useState } from 'react'
 import FormTextarea from '@components/FormTextArea'
 import Header from '@components/Header'
 import SideBar from '@components/SideBar'
+import Modal from '@components/Modal'
 import {
   showSuccessToastMsg,
   showWarningToastMsg,
   showErrorToastMsg
 } from '@utils/showToastMsg'
 
-import brandIcon from '@assets/CoordiPAILogo.png'
 import { MainBox } from '@styles/globalStyle'
 
 const FormTextAreaTest = () => {
@@ -62,61 +62,16 @@ const HeaderTest = () => {
   )
 }
 
-const SidebarTest = () => {
-  const mockProject = {
-    projectName: 'MockProjectX',
-    iteration: {
-      week: '3',
-      period: '2025-05-01 ~ 2025-05-07'
-    },
-    issues: 42,
-    categories: [
-      {
-        categoryName: 'Frontend',
-        people: [
-          {
-            image: brandIcon,
-            userName: 'Alice',
-            githubId: 'alice-dev'
-          },
-          {
-            image: brandIcon,
-            userName: 'Bob',
-            githubId: 'bob-dev'
-          }
-        ]
-      },
-      {
-        categoryName: 'Backend',
-        people: [
-          {
-            image: brandIcon,
-            userName: 'Charlie',
-            githubId: 'charlie-dev'
-          }
-        ]
-      }
-    ]
-  }
-
-  const mockUserInfo = {
-    image: brandIcon,
-    userName: 'TestUser',
-    githubId: 'testuser123'
-  }
-
-  const logout = () => {
-    console.log('Logout clicked')
-  }
+const ModalTest = () => {
+  const [showModal, setShowModal] = useState(false)
 
   return (
-    <SideBar
-      brandIcon={brandIcon}
-      brandTitle='CoordiPai'
-      project={mockProject}
-      userInfo={mockUserInfo}
-      logout={logout}
-    />
+    <div>
+      <button onClick={() => setShowModal(true)}>Open Modal</button>
+      {showModal && (
+        <Modal text="정말 삭제하시겠습니까?" setShowModal={setShowModal} handleConfirm={() => console.log("삭제 완료")}/>
+      )}
+    </div>
   )
 }
 
@@ -126,6 +81,7 @@ const ComponentTest = () => {
       {/* <div> Component Test </div> */}
       <HeaderTest />
       <FormTextAreaTest />
+      <ModalTest />
     </MainBox>
   )
 }

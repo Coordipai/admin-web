@@ -59,6 +59,7 @@ const LabelBadge = styled.div`
 const IssueDetailPage = () => {
   const { projectId, issueId } = useParams()
 
+  // project 정보
   const [priorityOptions] = useState([
     { value: 'M', label: '[M] Must Have' },
     { value: 'S', label: '[S] Should Have' },
@@ -95,6 +96,7 @@ const IssueDetailPage = () => {
     }
   }, [projectId, issueId])
 
+  // issue 정보
   const [issueTitle, setIssueTitle] = useState('')
   const [issueContent, setIssueContent] = useState('')
   const [priority, setPriority] = useState(priorityOptions[0].value)
