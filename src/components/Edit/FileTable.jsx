@@ -205,7 +205,7 @@ const FileTable = ({ files, setFiles }) => {
       />
       <TableWrapper>
         <TableHeader>
-          <Typography variant='displayMD' weight='medium' value='프로젝트 자료' />
+          <Typography variant='displaySM' weight='medium' value='프로젝트 자료' />
           <Button
             text='Upload'
             icon={<img src='/src/assets/icons/upload-icon.svg' alt='Upload' />}
