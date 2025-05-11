@@ -5,7 +5,7 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 
 const PageContainer = styled.div`
@@ -95,11 +95,11 @@ const TextButton = styled(ButtonBase)`
 `
 
 export default function UserPage () {
-  const navigate = useNavigate(); // 추가 필요!
+  const navigate = useNavigate()
+  const { githubId } = useParams() // 여기서 param으로 받아오기
 
   const [repoList, setRepoList] = useState([])
   const [username, setUsername] = useState('')
-  const [githubId, setGithubId] = useState('')
   const [discordId, setDiscordId] = useState('')
   const [career, setCareer] = useState('')
   const [selectedRepos, setSelectedRepos] = useState([])
@@ -114,7 +114,18 @@ export default function UserPage () {
           navigate('/login')
           return
         }
-        const userData = JSON.parse(localStorage.getItem('user'))
+        const userRes = await axios.get(
+          `https://coordipai-web-server.knuassignx.site/auth/user/${githubId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
+        )
+
+        const userData = userRes.data.content.data
+
 
         const repoRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
           headers: {
@@ -125,10 +136,13 @@ export default function UserPage () {
         const repos = repoRes.data.content.data.map((r) => r.repo_fullname)
 
         setUsername(userData.name || '')
-        setGithubId(userData.github_id || '')
         setDiscordId(userData.discord_id || '')
         setCareer(userData.career || '')
-        setField(fieldOptions.findIndex(f => f.title === userData.category))
+        setField(
+        ['프론트엔드', '백엔드', '기획', '디자인', '기타'].findIndex(
+            (f) => f === userData.category
+          )
+        )
         setSelectedRepos(repos)
         setRepoList(repos)
       } catch (error) {
@@ -139,7 +153,7 @@ export default function UserPage () {
     }
 
     fetchUser()
-  }, [])
+  }, [githubId, navigate])
 
   const fieldOptions = [
     { title: '프론트엔드' },
@@ -148,9 +162,6 @@ export default function UserPage () {
     { title: '디자인' },
     { title: '기타' }
   ]
-
-  const getFieldIndex = (fieldTitle) =>
-    fieldOptions.findIndex((option) => option.title === fieldTitle)
 
   const [field, setField] = useState(-1)
 
@@ -206,7 +217,6 @@ export default function UserPage () {
             <FormInput
               placeholder='깃허브 계정'
               value={githubId}
-              handleChange={setGithubId}
               readOnly
             />
           </FieldWrapper>

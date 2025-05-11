@@ -76,7 +76,7 @@ export default function AccountSetupPage () {
       if (Object.keys(newError).length === 0) {
         const payload = {
           name: username,
-          discord_id: discordId,
+          discord_id: Number(discordId),
           category: fieldOptions[selectedField].title || '',
           career,
         }

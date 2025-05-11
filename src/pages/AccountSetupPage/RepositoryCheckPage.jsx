@@ -5,7 +5,7 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 
 const FormWrapper = styled.div`
@@ -66,11 +66,11 @@ const Button = styled(ButtonBase)`
 `
 
 export default function AccountSetupPage () {
+  // 추가
+  const { githubId } = useParams()
   const [selectedRepos, setSelectedRepos] = useState([])
   const [repoList, setRepoList] = useState([])
-  const location = useLocation()
   const navigate = useNavigate()
-  const formData = location.state // 이전 페이지에서 전달된 데이터
 
   useEffect(() => {
     const fetchRepos = async () => {
@@ -106,13 +106,17 @@ export default function AccountSetupPage () {
       })
 
       console.log('레포 등록 성공: ', res.data)
-      const combinedData = {...formData, repositories: selectedRepos }
-      navigate('/userform', { state: combinedData }) // 다음 페이지로 이동하면서 데이터 전달달
+      const combinedData = {
+        name: '', // 필요 시 localStorage 등에서 복구
+        githubId, // ← param으로 받은 githubId 사용
+        repositories: selectedRepos
+      }
+      navigate(`/userform/${githubId}`, { state: combinedData })
     } catch (error) {
-      console.error('레포 등록 실패: ', error.response?.data || error.message)
-      alert('레포 등록 중 오류가 발생했습니다.')
+        console.error('레포 등록 실패: ', error.response?.data || error.message)
+        alert('레포 등록 중 오류가 발생했습니다.')
+        }
     }
-  }
 
 
   return (
