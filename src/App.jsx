@@ -83,48 +83,6 @@ const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
   //   return <Navigate to='/login' />;
   // }
 
-  // dummy data
-  const project = {
-    projectName: 'MockProjectX',
-    iteration: {
-      week: '3',
-      period: '2025-05-01 ~ 2025-05-07'
-    },
-    issues: 42,
-    categories: [
-      {
-        categoryName: 'Frontend',
-        people: [
-          {
-            image: brandIcon,
-            userName: 'Alice',
-            githubId: 'alice-dev'
-          },
-          {
-            image: brandIcon,
-            userName: 'Bob',
-            githubId: 'bob-dev'
-          }
-        ]
-      },
-      {
-        categoryName: 'Backend',
-        people: [
-          {
-            image: brandIcon,
-            userName: 'Charlie',
-            githubId: 'charlie-dev'
-          }
-        ]
-      }
-    ]
-  }
-  const userInfo = {
-    image: brandIcon,
-    userName: 'TestUser',
-    githubId: 'testuser123'
-  }
-
   const logout = () => {
     // Handle logout event
     console.log('Logout clicked!')
@@ -139,8 +97,6 @@ const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
             brandIcon={brandIcon}
             brandTitle='CoordiPai'
             titleOnClick={() => navigate('/')}
-            project={project}
-            userInfo={userInfo}
             userOnClick={() => navigate('/user')}
             logout={logout}
           />

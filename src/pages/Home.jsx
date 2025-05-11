@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import InputField from '@components/Edit/InputField'
 import styled, { useTheme } from 'styled-components'
 import Typography from '@components/Edit/Typography'
@@ -7,9 +7,14 @@ import FileTable from '@components/Edit/FileTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import Button from '@components/Common/Button'
 import { HorizontalDivider, MainBox } from '@styles/globalStyle'
+import { useProjectStore } from '@store/useProjectStore'
+import { extractDate } from '@utils/dateUtils'
 
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
+import { projectData } from '../mocks/project'
+import { useUserStore } from '@store/useUserStore'
+import { userData } from '../mocks/user'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -74,11 +79,16 @@ const CardDesc = styled.div`
 	width: fit-content;
 `
 
-function ProjectCard ({ name, createdAt, updatedAt, onClick, selected }) {
+function ProjectCard ({ name, start_date, end_date, onClick, selected }) {
   return (
     <Card onClick={onClick} selected={selected}>
       <Typography variant='displayXS' weight='semiBold' value={name} />
-      <Typography variant='textMD' weight='medium' color='gray500' value={`${createdAt} ~ ${updatedAt}`} />
+      <Typography 
+        variant='textMD' 
+        weight='medium' 
+        color='gray500' 
+        value={`${extractDate(start_date)} ~ ${extractDate(end_date)}`} 
+      />
     </Card>
   )
 }
@@ -86,11 +96,35 @@ function ProjectCard ({ name, createdAt, updatedAt, onClick, selected }) {
 export const Home = () => {
   const theme = useTheme()
   const navigate = useNavigate()
-  const [projects] = useState([
-    { id: 1, name: '프로젝트1', createdAt: '2021-01-01', updatedAt: '2021-01-01' },
-    { id: 2, name: '프로젝트2', createdAt: '2021-01-01', updatedAt: '2021-01-01' },
-    { id: 3, name: '프로젝트3', createdAt: '2021-01-01', updatedAt: '2021-01-01' }
-  ])
+  const { setProject, clearProject } = useProjectStore();
+
+  const setUser = useUserStore((state) => state.setUser)
+
+  // const [projects] = useState([
+  //   { id: 1, name: '프로젝트1', start_date: '2021-01-01', end_date: '2021-01-01' },
+  //   { id: 2, name: '프로젝트2', start_date: '2021-01-01', end_date: '2021-01-01' },
+  //   { id: 3, name: '프로젝트3', start_date: '2021-01-01', end_date: '2021-01-01' }
+  // ])
+
+  const [projects, setProjects] = useState([])  // 프로젝트 목록 
+
+  // useCallback을 사용하는 게 좋은가?
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const response = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(projectData) // projectData는 dummy data
+        }, 1000)
+      })
+
+      // content.data만 추출하여 projects로 설정
+      const extractedProjects = response.map(res => res.content.data)
+      setProjects(extractedProjects)
+    }
+
+    fetchProjects()
+  }, [])
+  
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState(null)
 
@@ -99,6 +133,27 @@ export const Home = () => {
       project.name.includes(search)
     )
     : projects
+
+  useEffect(() => {
+    clearProject()  
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
+
+  // 로그인 과정으로 옮겨야 함
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(userData) // userData는 dummy data
+        }, 1000)
+      })
+
+      setUser(response)
+      // console.log(response)
+    }
+    fetchUser()
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
 
   return (
     <MainBox>
@@ -124,6 +179,7 @@ export const Home = () => {
                 selected={selectedId === project.id}
                 onClick={() => {
                   setSelectedId(project.id)
+                  setProject(project)
                   navigate(`/project/${project.id}#issue`)
                 }}
               />

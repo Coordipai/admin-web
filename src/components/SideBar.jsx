@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import { Calendar, List, LogOut01 } from '@untitled-ui/icons-react'
+import { useProjectStore } from '@store/useProjectStore'
 
 import {
   HorizontalDivider,
   VerticalDivider,
   styledIcon
 } from '@styles/globalStyle'
+import { useUserStore } from '@store/useUserStore'
+
 
 const LogOutIcon = styledIcon({ icon: LogOut01, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' } })
 const CalendarIcon = styledIcon({ icon: Calendar, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' } })
@@ -191,7 +194,7 @@ FormAccount.propTypes = {
   supportingText: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   logout: PropTypes.func,
-  image: PropTypes.elementType
+  image: PropTypes.string
 }
 
 const NavBodySection = ({ projectName, iteration, issues, categories }) => {
@@ -201,7 +204,7 @@ const NavBodySection = ({ projectName, iteration, issues, categories }) => {
       <NavProjectItemBox>
         <CalendarIcon />
         <NavProjectItemTextContainer>
-          <NavProjectItemHeaderText>Iteration {iteration.week}</NavProjectItemHeaderText>
+          <NavProjectItemHeaderText>Iteration {iteration.sprint}</NavProjectItemHeaderText>
           <NavProjectItemSubText>기간 {iteration.period}</NavProjectItemSubText>
         </NavProjectItemTextContainer>
       </NavProjectItemBox>
@@ -235,7 +238,7 @@ const NavBodySection = ({ projectName, iteration, issues, categories }) => {
 NavBodySection.propTypes = {
   projectName: PropTypes.string.isRequired,
   iteration: PropTypes.shape({
-    week: PropTypes.string.isRequired,
+    sprint: PropTypes.string.isRequired,
     period: PropTypes.string.isRequired
   }).isRequired,
   issues: PropTypes.number.isRequired,
@@ -257,22 +260,11 @@ const SideBar = ({
   brandIcon,
   brandTitle,
   titleOnClick,
-  project,
-  userInfo,
   userOnClick,
   logout
 }) => {
-  const [currentProject, setCurrentProject] = useState(null)
-
-  useEffect(() => {
-    const _updateSideBar = () => {
-      if (project) {
-        setCurrentProject(project)
-      }
-    }
-
-    _updateSideBar()
-  }, [project])
+  const currentProject = useProjectStore((state) => state.project)
+  const userInfo = useUserStore((state) => state.user)
 
   return (
     <SidebarLayout>
@@ -287,7 +279,7 @@ const SideBar = ({
 
         {currentProject && (
           <NavBodySection
-            projectName={currentProject.projectName}
+            projectName={currentProject.repo_fullname}
             iteration={currentProject.iteration}
             issues={currentProject.issues}
             categories={currentProject.categories}
@@ -296,13 +288,15 @@ const SideBar = ({
 
         <NavFooterSection>
           <HorizontalDivider />
+        {userInfo && (
           <FormAccount
-            image={userInfo.image}
-            text={userInfo.userName}
-            supportingText={userInfo.githubId}
+            image={userInfo.profile_img}
+            text={userInfo.name}
+            supportingText={userInfo.github_name}
             logout={logout}
             onClick={userOnClick}
           />
+        )}
         </NavFooterSection>
       </ContentWrapper>
       <VerticalDivider />
@@ -314,31 +308,6 @@ SideBar.propTypes = {
   brandIcon: PropTypes.elementType.isRequired,
   brandTitle: PropTypes.string.isRequired,
   titleOnClick: PropTypes.func.isRequired,
-  project: PropTypes.shape({
-    projectName: PropTypes.string.isRequired,
-    iteration: PropTypes.shape({
-      week: PropTypes.string.isRequired,
-      period: PropTypes.string.isRequired
-    }).isRequired,
-    issues: PropTypes.number.isRequired,
-    categories: PropTypes.arrayOf(
-      PropTypes.shape({
-        categoryName: PropTypes.string.isRequired,
-        people: PropTypes.arrayOf(
-          PropTypes.shape({
-            image: PropTypes.elementType.isRequired,
-            userName: PropTypes.string.isRequired,
-            githubId: PropTypes.string.isRequired
-          })
-        ).isRequired
-      })
-    ).isRequired
-  }),
-  userInfo: PropTypes.shape({
-    image: PropTypes.elementType.isRequired,
-    userName: PropTypes.string.isRequired,
-    githubId: PropTypes.string.isRequired
-  }).isRequired,
   userOnClick: PropTypes.func,
   logout: PropTypes.func.isRequired
 }
