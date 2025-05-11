@@ -6,6 +6,7 @@ import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -63,7 +64,7 @@ export default function AccountSetupPage () {
     { title: '기타' }
   ]
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const newError = {}
     if (!username.trim()) newError.username = true
     if (!discordId.trim()) newError.discordId = true
@@ -72,15 +73,29 @@ export default function AccountSetupPage () {
 
     setError(newError)
 
-    if (Object.keys(newError).length === 0) {
-      const formData = {
-        username,
-        githubId,
-        discordId,
-        career,
-        field: fieldOptions[selectedField]?.title || ''
+      if (Object.keys(newError).length === 0) {
+        const payload = {
+          name: username,
+          discord_id: discordId,
+          category: fieldOptions[selectedField].title || '',
+          career,
+        }
+        try {
+          const response = await axios.post(
+            'https://coordipai-web-server.knuassignx.site/auth/register',
+            payload,
+            {
+              withCredentials: true, // access_token 쿠키 포함
+            }
+          )
+
+          console.log('회원가입 성공:', response.data)
+          navigate('/repositorycheckpage', { state: payload })
+
+        } catch (error) {
+            console.error('회원가입 실패:', error.response?.data || error.message)
+            alert('회원가입 중 오류가 발생했습니다.')
       }
-      navigate('/repositorycheckpage', { state: formData })
     }
   }
 
