@@ -7,6 +7,7 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
+import { useUserStore } from '@store/useUserStore'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -75,16 +76,12 @@ export default function AccountSetupPage () {
             withCredentials: true
           }
         )
-        const token = res.data?.content?.data?.access_token
-        if (token) {
-          localStorage.setItem('accessToken', token)
-          console.log('🔐 Access token 저장됨!')
-        }
+        
+        useUserStore.getState().setUser(res)
       } catch (err) {
         console.error('access token 요청 실패', err)
       }
     }
-
     login()
   }, [])
 
@@ -113,9 +110,8 @@ export default function AccountSetupPage () {
             }
           )
 
-          console.log('회원가입 성공:', response.data)
+          useUserStore.getState().setUser(response)
           navigate('/repositorycheckpage', { state: payload })
-
         } catch (error) {
             console.error('회원가입 실패:', error.response?.data || error.message)
             alert('회원가입 중 오류가 발생했습니다.')

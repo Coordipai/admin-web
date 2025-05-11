@@ -7,6 +7,7 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
+import { useUserStore } from '@store/useUserStore'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -75,7 +76,13 @@ export default function AccountSetupPage () {
   useEffect(() => {
     const fetchRepos = async () => {
       try {
+        // zustand에서 access_token 꺼내기
+        const userResponse = useUserStore.getState().user || JSON.parse(window.localStorage.getItem('user-storage'))?.state?.user
+        const token = userResponse?.content?.data?.access_token
         const res = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           withCredentials: true,
         })
         const repos = res.data.content.data.map((item) => item.repo_fullname).filter(Boolean)
