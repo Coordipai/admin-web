@@ -5,7 +5,7 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 
 const FormWrapper = styled.div`
@@ -48,8 +48,8 @@ const Button = styled(ButtonBase)`
 `
 
 export default function AccountSetupPage () {
+  const { githubId } = useParams() // ← 여기에서 추출
   const [username, setUsername] = useState('')
-  const [githubId, setGithubId] = useState('my-github-id')
   const [discordId, setDiscordId] = useState('')
   const [career, setCareer] = useState('')
   const [selectedField, setSelectedField] = useState(-1)
@@ -117,7 +117,11 @@ export default function AccountSetupPage () {
 
       <FieldWrapper>
         <LabelText>GitHub 계정이름</LabelText>
-        <FormInput placeholder='깃허브 계정' value={githubId} handleChange={setGithubId} readOnly />
+        <FormInput
+          placeholder='깃허브 계정'
+          value={githubId}
+          readOnly
+        />
       </FieldWrapper>
 
       <FieldWrapper>

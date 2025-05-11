@@ -41,6 +41,7 @@ function App () {
 
         <Route path='/login' element={<LoginPage />} />
         <Route path='/firstaccount' element={<FirstAccountPage />} />
+        <Route path="/register/:githubId" element={<FirstAccountPage />} />
 
         <Route path='/repositorycheckpage' element={<RepositoryCheckPage />} />
 
