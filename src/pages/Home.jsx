@@ -13,6 +13,8 @@ import { extractDate } from '@utils/dateUtils'
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
 import { projectData } from '../mocks/project'
+import { useUserStore } from '@store/useUserStore'
+import { userData } from '../mocks/user'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -95,6 +97,7 @@ export const Home = () => {
   const theme = useTheme()
   const navigate = useNavigate()
   const setProject = useProjectStore((state) => state.setProject)
+  const setUser = useUserStore((state) => state.setUser)
 
   // const [projects] = useState([
   //   { id: 1, name: '프로젝트1', start_date: '2021-01-01', end_date: '2021-01-01' },
@@ -102,7 +105,7 @@ export const Home = () => {
   //   { id: 3, name: '프로젝트3', start_date: '2021-01-01', end_date: '2021-01-01' }
   // ])
 
-  const [projects, setProjects] = useState([])
+  const [projects, setProjects] = useState([])  // 프로젝트 목록 
 
   // useCallback을 사용하는 게 좋은가?
   useEffect(() => {
@@ -129,6 +132,22 @@ export const Home = () => {
       project.name.includes(search)
     )
     : projects
+
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(userData) // userData는 dummy data
+        }, 1000)
+      })
+
+      setUser(response)
+      console.log(response)
+    }
+    fetchUser()
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
 
   return (
     <MainBox>
