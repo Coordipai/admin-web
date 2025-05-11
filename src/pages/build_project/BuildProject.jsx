@@ -175,7 +175,10 @@ const BuildProject = () => {
 			<Header text='프로젝트 생성' />
 			<Section>
 				<Fieldset>
-					<FileTable files={form.files} setFiles={files => setForm(f => ({ ...f, files }))} />
+					<FileTable
+						files={form.files}
+						setFiles={newFiles => setForm(f => ({ ...f, files: newFiles }))}
+					/>
 				</Fieldset>
 				<ButtonGroup>
 					<Button text='취소' type='button' onClick={() => (window.location.hash = '#step1')} />
@@ -266,11 +269,21 @@ const BuildProject = () => {
 							end_date: endDate,
 							sprint_unit,
 							discord_chnnel_id: form.discord,
-							members,
-							files: form.files
+							members
 						}
+						const formData = new FormData()
+						formData.append('project_req', JSON.stringify(body))
+						form.files.forEach(file => {
+							formData.append('files', file)
+						})
+						const accessToken = window.localStorage.getItem('accessToken')
 						try {
-							await api.post('/project', body)
+							const res = await fetch(`${import.meta.env.VITE_BASE_URL}/project`, {
+								method: 'POST',
+								body: formData,
+								headers: { Authorization: `Bearer ${accessToken}` }
+							})
+							if (!res.ok) throw new Error('프로젝트 생성 실패')
 							window.location.href = '/'
 						} catch {
 							alert('프로젝트 생성 실패')
