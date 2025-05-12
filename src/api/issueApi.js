@@ -8,7 +8,6 @@ import { showSuccessToastMsg, showErrorToastMsg } from '@utils/showToastMsg';
 export const fetchAllIssues = async (projectId) => {
   try {
     const response = await api.get('/issue/', { params: { project_id: projectId } });
-    console.log('[getAllIssues] Response:', response.data);
     return response.data;
   } catch (error) {
     console.error('[getAllIssues] Error:', error);
@@ -30,7 +29,6 @@ export const fetchIssueDetail = async (projectId, issueNumber) => {
         issue_number: issueNumber
       }
     })
-    console.log('[getIssueDetail] Response:', response.data);
     return response.data;
   } catch (error) {
     console.error('[getIssueDetail] Error:', error);

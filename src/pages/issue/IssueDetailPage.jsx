@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useParams } from 'react-router-dom'
 import Badge from '@components/Edit/Badge'
@@ -17,6 +17,7 @@ import FormTextarea from '@components/FormTextarea'
 import { Plus, X } from '@untitled-ui/icons-react'
 
 import { createIssue, updateIssue, deleteIssue, fetchIssueDetail } from '@api/issueAPI'
+import useLoadingStore from '@store/useLoadingStore'
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -59,6 +60,7 @@ const LabelBadge = styled.div`
 
 const IssueDetailPage = () => {
   const { projectId, issueId } = useParams()
+  const { isLoading, setLoading } = useLoadingStore()
 
   // project 정보
   const [priorityOptions] = useState([
@@ -67,36 +69,10 @@ const IssueDetailPage = () => {
     { value: 'C', label: '[C] Could Have' },
     { value: 'W', label: '[W] Won\'t Have' }
   ])
-  const [iterationOptions, setIterationOptions] = useState([
-    { title: 'Iteration 1', period: '2023-10-01 ~ 2023-10-15' },
-    { title: 'Iteration 2', period: '2023-10-16 ~ 2023-10-31' },
-    { title: 'Iteration 3', period: '2023-11-01 ~ 2023-11-15' }
-  ])
+  const [iterationOptions, setIterationOptions] = useState([ { title: 'iteration 선택', period: ''}])
   const [labelOptions] = useState(['기능', '설정', '테스트', '배포', '버그 수정', '문서', '리팩토링', '질문', '정리'])
   const [assigneeOptions, setAssigneeOptions] = useState([])
-
-  useEffect(() => {
-    if (issueId !== 'new') {
-      const response = fetchIssueDetail(projectId, issueId)
-      response.then((res) => {
-        // projectId에서 가져옴
-        // setIterationOptions(res.data.iteration)
-        // setAssigneeOptions(res.data.assignees)
-
-        console.log('res.data:', res.data)
-        setIssueTitle(res.data.title)
-        setIssueContent(res.data.body)
-        setPriority(res.data.priority)
-        setIteration(res.data.iteration)
-        setSelectedLabels(res.data.labels)
-        setAssignees(res.data.assignees)
-      }
-      ).catch((error) => {
-        console.error('Error fetching issue detail:', error) 
-      })
-    }
-  }, [projectId, issueId])
-
+  
   // issue 정보
   const [issueTitle, setIssueTitle] = useState('')
   const [issueContent, setIssueContent] = useState('')
@@ -105,7 +81,82 @@ const IssueDetailPage = () => {
   const [selectedLabels, setSelectedLabels] = useState([])
   const [assignees, setAssignees] = useState([])
 
-  // UI
+
+  const fetchProject = useCallback(async () => {
+    try {
+      // Fetch project data here
+
+      console.log("fetched")
+
+      // dummy
+      const iterations = [    
+        { title: 'Iteration 1', period: '2023-10-01 ~ 2023-10-15' },
+        { title: 'Iteration 2', period: '2023-10-16 ~ 2023-10-31' },
+        { title: 'Iteration 3', period: '2023-11-01 ~ 2023-11-15' }
+      ]
+      const assignees = [
+        'Alice', 'Bob', 'Charlie', 'David'
+      ]
+      setIterationOptions(iterations)
+      setIteration(iterations[0])
+      setAssigneeOptions(assignees)
+    } catch (error) {
+      console.error('Failed to fetch project:', error)
+      // 기본값 설정
+      setIterationOptions([{ title: '선택해주세요', period: '' }])
+      setIteration({ title: '선택해주세요', period: '' })
+      setAssigneeOptions([])
+    }
+  }, [])
+
+  const fetchIssue = useCallback(async () => {
+    if (issueId !== 'new') {
+      try {
+        const res = await fetchIssueDetail(projectId, issueId)
+        setIssueTitle(res?.title || '')
+        setIssueContent(res?.body || '')
+        setPriority(res?.priority || priorityOptions[0].value)
+        setIteration(res?.iteration || iterationOptions[0])
+        setSelectedLabels(res?.labels || [])
+        setAssignees(res?.assignees || [])
+
+        console.log("issue fetched")
+      } catch (error) {
+        console.error('Failed to fetch issue:', error)
+        // 기본값 설정
+        setIssueTitle('')
+        setIssueContent('')
+        setPriority(priorityOptions[0].value)
+        setIteration(iterationOptions[0] || { title: '선택해주세요', period: '' })
+        setSelectedLabels([])
+        setAssignees([])
+      }
+    }
+    else {
+      setPriority(priorityOptions[0].value)
+      setIteration(iterationOptions[0] || { title: '선택해주세요', period: '' })
+    }
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
+useEffect(() => {
+  const init = async () => {
+    setLoading(true)
+    try {
+      await fetchProject()
+      await fetchIssue()
+    } finally {
+      setLoading(false)
+    }
+  }
+  init()
+}, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 모달 관련
+  const [showModal, setShowModal] = useState(false)
+  const [modalText, setModalText] = useState('Modal Text')
+  const [isEdit, setIsEdit] = useState(false)
+
+  // render 부분
   const [badgeDropdownOpen, setBadgeDropdownOpen] = useState(false)
   const [iterationDropdownOpen, setIterationDropdownOpen] = useState(false)
   const [labelDropdownOpen, setLabelDropdownOpen] = useState(false)
@@ -124,10 +175,6 @@ const IssueDetailPage = () => {
   const [iterationMenuStyle, setIterationMenuStyle] = useState({})
   const [labelMenuStyle, setLabelMenuStyle] = useState({})
   const [assigneeMenuStyle, setAssigneeMenuStyle] = useState({})
-
-  const [showModal, setShowModal] = useState(false)
-  const [modalText, setModalText] = useState('Modal Text')
-  const [isEdit, setIsEdit] = useState(false)
 
   useEffect(() => {
     if (badgeDropdownOpen && badgeMenuRef.current) {
@@ -248,134 +295,145 @@ const IssueDetailPage = () => {
                 ]
           }
       />
-      <ContainerBox>
-        <InputField label='이슈 타이틀' placeholder='이슈 제목을 입력해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
-        <FormTextarea label='이슈 내용' placeholder='이슈 내용을 입력해주세요.' value={issueContent} onChange={setIssueContent} />
-        <Row>
-          <Typography value='Priority' variant='textSM' weight='medium' color='gray900' />
-          <div ref={badgeRef} onClick={() => setBadgeDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
-            <Badge priority={priority} />
-          </div>
-          {badgeDropdownOpen && createPortal(
-            <DropDownMenu ref={badgeMenuRef} style={badgeMenuStyle}>
-              {priorityOptions.map((opt) => {
-                const isSelected = priority === opt.value
-                return (
-                  <DropDownItem
-                    key={opt.value}
-                    selected={isSelected}
-                    onClick={() => {
-                      setPriority(opt.value)
-                      setBadgeDropdownOpen(false)
-                    }}
-                    role='option'
-                  >
-                    {opt.label}
-                  </DropDownItem>
-                )
-              })}
-            </DropDownMenu>,
-            document.body
-          )}
-        </Row>
-        <Row>
-          <Typography value='Iteration' variant='textSM' weight='medium' color='gray900' />
-          <div ref={iterationRef} onClick={() => setIterationDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
-            <IterationBox>
-              <Typography value={iteration.title} variant='textSM' weight='regular' color='gray900' />
-              <Typography value={iteration.period} variant='textXS' weight='regular' color='gray500' />
-            </IterationBox>
-          </div>
-          {iterationDropdownOpen && createPortal(
-            <DropDownMenu ref={iterationMenuRef} style={iterationMenuStyle}>
-              {iterationOptions.map((opt, index) => {
-                const isSelected = iteration.title === opt.title
-                return (
-                  <DropDownItem
-                    key={index}
-                    selected={isSelected}
-                    onClick={() => {
-                      setIteration(opt)
-                      setIterationDropdownOpen(false)
-                    }}
-                    role='option'
-                  >
-                    {opt.title} / {opt.period}
-                  </DropDownItem>
-                )
-              })}
-            </DropDownMenu>,
-            document.body
-          )}
-        </Row>
-        <Row>
-          <Typography value='Label' variant='textSM' weight='medium' color='gray900' />
-          <LabelContainer>
-            {selectedLabels.map((label) => (
-              <LabelBadge key={label} onClick={() => handleLabelClick(label)}>
-                <Typography value={label} variant='textXS' weight='medium' color='brand700' />
-                <CancelIcon />
-              </LabelBadge>
-            ))}
-            <LabelBadge ref={labelRef} onClick={() => setLabelDropdownOpen(prev => !prev)}>
-              <PlusIcon />
-            </LabelBadge>
-            {labelDropdownOpen && createPortal(
-              <DropDownMenu ref={labelMenuRef} style={labelMenuStyle}>
-                {labelOptions.map((label) => {
-                  const isSelected = selectedLabels.includes(label)
+      { 
+      !isLoading && (
+        <ContainerBox>
+          <InputField label='이슈 타이틀' placeholder='이슈 제목을 입력해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
+          <FormTextarea label='이슈 내용' placeholder='이슈 내용을 입력해주세요.' value={issueContent} onChange={setIssueContent} />
+          <Row>
+            <Typography value='Priority' variant='textSM' weight='medium' color='gray900' />
+            <div ref={badgeRef} onClick={() => setBadgeDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
+              <Badge priority={priority} />
+            </div>
+            {badgeDropdownOpen && createPortal(
+              <DropDownMenu ref={badgeMenuRef} style={badgeMenuStyle}>
+                {priorityOptions.map((opt) => {
+                  const isSelected = priority === opt.value
                   return (
                     <DropDownItem
-                      key={label}
+                      key={opt.value}
                       selected={isSelected}
-                      onClick={() => handleLabelClick(label)}
+                      onClick={() => {
+                        setPriority(opt.value)
+                        setBadgeDropdownOpen(false)
+                      }}
                       role='option'
                     >
-                      {label}
+                      {opt.label}
                     </DropDownItem>
                   )
                 })}
               </DropDownMenu>,
               document.body
             )}
-          </LabelContainer>
-        </Row>
-        <Row>
-          <Typography value='Assignee' variant='textSM' weight='medium' color='gray900' />
-          <div ref={assigneeRef} onClick={() => setAssigneeDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
-            <Typography
-              value={renderAssigneeText()}
-              variant='textSM'
-              weight='regular'
-              color={assignees.length > 0 ? 'gray900' : 'gray400'}
-            />
-          </div>
-          {assigneeDropdownOpen && createPortal(
-            <DropDownMenu ref={assigneeMenuRef} style={assigneeMenuStyle}>
-              {assigneeOptions.map((name, index) => {
-                const isSelected = assignees.includes(name)
-                return (
-                  <DropDownItem
-                    key={index}
-                    selected={isSelected}
-                    onClick={() => {
-                      if (isSelected) {
-                        setAssignees(prev => prev.filter(a => a !== name))
-                      } else {
-                        setAssignees(prev => [...prev, name])
-                      }
-                    }}
-                    role='option'
-                  >
-                    {name}
-                  </DropDownItem>
-                )
-              })}
-            </DropDownMenu>,
-            document.body
-          )}
-        </Row>
-      </ContainerBox>
+          </Row>
+
+          <Row>
+            <Typography value='Iteration' variant='textSM' weight='medium' color='gray900' />
+            {iteration && (
+              <>
+                <div ref={iterationRef} onClick={() => setIterationDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
+                  <IterationBox>
+                    <Typography value={iteration.title} variant='textSM' weight='regular' color='gray900' />
+                    <Typography value={iteration.period} variant='textXS' weight='regular' color='gray500' />
+                  </IterationBox>
+                </div>
+                {iterationDropdownOpen && createPortal(
+                  <DropDownMenu ref={iterationMenuRef} style={iterationMenuStyle}>
+                    {iterationOptions.map((opt, index) => {
+                      const isSelected = iteration.title === opt.title
+                      return (
+                        <DropDownItem
+                          key={index}
+                          selected={isSelected}
+                          onClick={() => {
+                            setIteration(opt)
+                            setIterationDropdownOpen(false)
+                          }}
+                          role='option'
+                        >
+                          {opt.title} / {opt.period}
+                        </DropDownItem>
+                      )
+                    })}
+                  </DropDownMenu>,
+                  document.body
+                )}
+              </>
+            )}
+          </Row>
+
+          <Row>
+            <Typography value='Label' variant='textSM' weight='medium' color='gray900' />
+            <LabelContainer>
+              {selectedLabels.map((label) => (
+                <LabelBadge key={label} onClick={() => handleLabelClick(label)}>
+                  <Typography value={label} variant='textXS' weight='medium' color='brand700' />
+                  <CancelIcon />
+                </LabelBadge>
+              ))}
+              <LabelBadge ref={labelRef} onClick={() => setLabelDropdownOpen(prev => !prev)}>
+                <PlusIcon />
+              </LabelBadge>
+              {labelDropdownOpen && createPortal(
+                <DropDownMenu ref={labelMenuRef} style={labelMenuStyle}>
+                  {labelOptions.map((label) => {
+                    const isSelected = selectedLabels.includes(label)
+                    return (
+                      <DropDownItem
+                        key={label}
+                        selected={isSelected}
+                        onClick={() => handleLabelClick(label)}
+                        role='option'
+                      >
+                        {label}
+                      </DropDownItem>
+                    )
+                  })}
+                </DropDownMenu>,
+                document.body
+              )}
+            </LabelContainer>
+          </Row>
+          
+          <Row>
+            <Typography value='Assignee' variant='textSM' weight='medium' color='gray900' />
+            <div ref={assigneeRef} onClick={() => setAssigneeDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
+              <Typography
+                value={renderAssigneeText()}
+                variant='textSM'
+                weight='regular'
+                color={assignees.length > 0 ? 'gray900' : 'gray400'}
+              />
+            </div>
+            {assigneeDropdownOpen && createPortal(
+              <DropDownMenu ref={assigneeMenuRef} style={assigneeMenuStyle}>
+                {assigneeOptions.map((name, index) => {
+                  const isSelected = assignees.includes(name)
+                  return (
+                    <DropDownItem
+                      key={index}
+                      selected={isSelected}
+                      onClick={() => {
+                        if (isSelected) {
+                          setAssignees(prev => prev.filter(a => a !== name))
+                        } else {
+                          setAssignees(prev => [...prev, name])
+                        }
+                      }}
+                      role='option'
+                    >
+                      {name}
+                    </DropDownItem>
+                  )
+                })}
+              </DropDownMenu>,
+              document.body
+            )}
+          </Row>
+        </ContainerBox>
+      )}
+
       {showModal && createPortal(
         <Modal
           text={modalText}
