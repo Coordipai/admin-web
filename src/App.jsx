@@ -49,7 +49,7 @@ function App () {
         <Route path='/repositorycheckpage' element={<RepositoryCheckPage />} />
 
         {/* Sidebar */}
-        <Route path='/user' element={<UserForm />} />
+        <Route path='/user' element={<PrivateRoute element={UserForm} />} />
 
         {/* Test Page */}
         <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />

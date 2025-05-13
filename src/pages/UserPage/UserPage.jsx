@@ -9,11 +9,13 @@ import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import axios from 'axios'
+import { set } from 'date-fns'
 
 const PageContainer = styled.div`
   display: flex;
   width: 100%;
   min-height: 100vh;
+  overflow-y: auto;
 `
 
 const ContentArea = styled.div`
@@ -98,8 +100,9 @@ const TextButton = styled(ButtonBase)`
 
 export default function UserPage () {
   const navigate = useNavigate()
-  const { githubId } = useParams() // 여기서 param으로 받아오기
-
+  //const { githubId } = useParams() // 여기서 param으로 받아오기
+  const [githubId, setGithubId] = useState('') // 초기값으로 사용
+  const [githubName, setGithubName] = useState('')
   const [repoList, setRepoList] = useState([])
   const [username, setUsername] = useState('')
   const [discordId, setDiscordId] = useState('')
@@ -124,6 +127,8 @@ useEffect(() => {
     return
   }
 
+  setGithubName(user.github_name|| '')
+  setGithubId(user.github_id || '')
   setUsername(user.name || '')
   setDiscordId(user.discord_id || '')
   setCareer(user.career || '')
@@ -174,6 +179,7 @@ useEffect(() => {
     const payload = {
       username,
       githubId,
+      githubName,
       discordId,
       career,
       field: fieldOptions[field]?.title || '',
@@ -221,7 +227,7 @@ useEffect(() => {
             <LabelText>GitHub 계정이름</LabelText>
             <FormInput
               placeholder='깃허브 계정'
-              value={githubId}
+              value={githubName}
               readOnly
             />
           </FieldWrapper>
