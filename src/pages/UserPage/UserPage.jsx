@@ -5,7 +5,9 @@ import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
+import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate, useParams } from 'react-router-dom'
+
 import axios from 'axios'
 
 const PageContainer = styled.div`
@@ -103,57 +105,60 @@ export default function UserPage () {
   const [discordId, setDiscordId] = useState('')
   const [career, setCareer] = useState('')
   const [selectedRepos, setSelectedRepos] = useState([])
+  const accessToken = useAccessTokenStore((state) => state.accessToken)
 
+ const user = useUserStore((state) => state.user)
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem('accessToken')
-        if (!token) {
-          alert('로그인이 필요합니다.')
-          navigate('/login')
-          return
-        }
-        const userRes = await axios.get(
-          `https://coordipai-web-server.knuassignx.site/auth/user/${githubId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            withCredentials: true,
-          }
-        )
+ useEffect(() => {
+  if (!user || !accessToken) return
 
-        const userData = userRes.data.content.data
+  console.log("accessToken before fetch:", accessToken) // 🔍 이게 undefined면 문제
 
+  // fetchRepos 실행
+}, [user, accessToken])
 
-        const repoRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        })
-        const repos = repoRes.data.content.data.map((r) => r.repo_fullname)
+useEffect(() => {
+  if (!user || !accessToken) {
+    alert('로그인이 필요합니다.')
+    navigate('/login')
+    return
+  }
 
-        setUsername(userData.name || '')
-        setDiscordId(userData.discord_id || '')
-        setCareer(userData.career || '')
-        setField(
-        ['프론트엔드', '백엔드', '기획', '디자인', '기타'].findIndex(
-            (f) => f === userData.category
-          )
-        )
-        setSelectedRepos(repos)
-        setRepoList(repos)
-      } catch (error) {
-        console.error('유저 정보 불러오기 실패:', error)
-        alert('로그인이 필요합니다.')
-        navigate('/login')
-      }
+  setUsername(user.name || '')
+  setDiscordId(user.discord_id || '')
+  setCareer(user.career || '')
+  setField(
+    ['프론트엔드', '백엔드', '기획', '디자인', '기타'].findIndex(
+      (f) => f === user.category
+    )
+  )
+
+  const fetchRepos = async () => {
+    try {
+      // 🔹 선택된 레포 불러오기
+      const selectedRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        withCredentials: true,
+      })
+      const selected = selectedRes.data.content.data.map((r) => r.repo_fullname)
+
+      // 🔹 GitHub의 전체 레포 불러오기
+      const allRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        withCredentials: true,
+      })
+      const all = allRes.data.content.data.map((r) => r.repo_fullname)
+
+      // 상태에 반영
+      setRepoList(all)
+      setSelectedRepos(selected)
+    } catch (error) {
+      console.error('레포지토리 불러오기 실패:', error)
     }
+  }
 
-    fetchUser()
-  }, [githubId, navigate])
+  fetchRepos()
+}, [user, accessToken, navigate])
 
   const fieldOptions = [
     { title: '프론트엔드' },
@@ -209,7 +214,7 @@ export default function UserPage () {
           <Header text='계정 정보' />
           <FieldWrapper>
             <LabelText>사용자 이름</LabelText>
-            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={setUsername} />
+            <FormInput placeholder='이름을 입력해주세요' value={username} onChange={setUsername} />
           </FieldWrapper>
 
           <FieldWrapper>
@@ -223,7 +228,7 @@ export default function UserPage () {
 
           <FieldWrapper>
             <LabelText>Discord ID</LabelText>
-            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={setDiscordId} />
+            <FormInput placeholder='디스코드 ID' value={discordId} onChange={setDiscordId} />
           </FieldWrapper>
 
           <FieldWrapper>
@@ -232,13 +237,13 @@ export default function UserPage () {
               placeholder='분야 선택'
               menus={fieldOptions}
               selectedMenu={field}
-              handleChange={setField}
+              onChange={setField}
             />
           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>간단한 경력을 입력해주세요.</LabelText>
-            <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} handleChange={setCareer} />
+            <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} onChange={setCareer} />
           </FieldWrapper>
 
           <FieldWrapper>
