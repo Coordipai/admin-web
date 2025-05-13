@@ -72,20 +72,27 @@ export default function AccountSetupPage () {
         const res = await axios.post(
           'https://coordipai-web-server.knuassignx.site/auth/login',
           {},
-          {
-            withCredentials: true
-          }
+          { withCredentials: true }
         )
-        
+
         console.log('access token 요청 성공', res)
-        
-        useUserStore.getState().setUser(res)
+
+        // 유저 정보에 따라 분기 처리
+        const userData = res.data?.content?.data?.user
+        if (userData) {
+          useUserStore.getState().setUser(userData)
+
+          // 이미 회원가입된 경우 홈으로 이동
+          navigate('/')
+        }
+
       } catch (err) {
         console.error('access token 요청 실패', err)
       }
     }
     login()
   }, [])
+
 
   const handleNext = async () => {
     const newError = {}
