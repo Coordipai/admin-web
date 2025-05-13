@@ -79,7 +79,7 @@ export default function AccountSetupPage () {
         // zustand에서 access_token 꺼내기
         // const userResponse = useAccessTokenStore.getState().user || JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.user
         const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
-        const res = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
+        const res = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
