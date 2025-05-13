@@ -9,6 +9,7 @@ import Header from '@components/Header'
 import { EditContentHeader } from '@components/Edit/EditContentHeader'
 import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
+import axios from 'axios'
 
 const FormWrapper = styled.div`
   max-width: 1120px;
@@ -79,10 +80,32 @@ const Button = styled(ButtonBase)`
 `
 
 export default function IssueRequestPage () {
-  const { requestId } = useParams()
+  const { projectId, requestId } = useParams()
   const [issueData, setIssueData] = useState(null)
   const [aiFeedback, setAiFeedback] = useState('')
   const [aiFeedbackReason, setAiFeedbackReason] = useState('')
+
+  const handleApproveChange = async () => {
+    if (!issueData || selectedSprint === -1 || selectedAssignee === -1) {
+      alert('변경할 스프린트와 담당자를 모두 선택해주세요.');
+      return;
+    }
+
+    try {
+      const payload = {
+        project_id: Number(projectId),
+        issue_number: Number(requestId),
+        reason: issueData.reason,
+        new_iteration: sprintOptions[selectedSprint]?.title,
+        new_assignees: [assigneeOptions[selectedAssignee]?.title],
+      };
+
+      const res = await axios.post('/issue-reschedule/', payload);
+      console.log('요청 성공:', res.data);
+    } catch (error) {
+      console.error('요청 실패:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchIssueData = async () => {
@@ -161,15 +184,28 @@ export default function IssueRequestPage () {
 
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
-  const handleRejectChange = () => {
-    console.log('변경 반려 요청 처리')
-    // TODO: axios.post('/api/issue/reject', { issueId })
-  }
+  const handleRejectChange = async () => {
+    if (!issueData || selectedSprint === -1 || selectedAssignee === -1) {
+      alert('변경할 스프린트와 담당자를 모두 선택해주세요.');
+      return;
+    }
 
-  const handleApproveChange = () => {
-    console.log('변경 승인 요청 처리')
-    // TODO: axios.post('/api/issue/approve', { issueId })
-  }
+    try {
+      const payload = {
+        project_id: Number(projectId),
+        issue_number: Number(requestId),
+        reason: issueData.reason + ' (반려)', // 혹은 별도 reason 전달
+        new_iteration: sprintOptions[selectedSprint]?.title,
+        new_assignees: [assigneeOptions[selectedAssignee]?.title],
+      };
+
+      const res = await axios.put('/issue-reschedule/', payload);
+      console.log('반려 처리 완료:', res.data);
+    } catch (error) {
+      console.error('반려 요청 실패:', error);
+    }
+  };
+
 
   const handleRequestFeedbackAgain = () => {
     console.log('AI 피드백 재요청 처리')
