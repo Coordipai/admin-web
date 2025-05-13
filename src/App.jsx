@@ -22,6 +22,7 @@ import IssueDetailPage from '@pages/issue/IssueDetailPage'
 import { SettingProject } from '@pages/build_project/SettingProject'
 import IssueRequestPage from '@pages/issue/IssueRequestPage'
 import NotFoundPage from '@pages/NotFoundPage'
+import IssueSuggestPage from '@pages/issue/IssueSuggestPage'
 
 /*
   route 설정 시, PrivateRoute를 사용하여,
@@ -59,6 +60,7 @@ function App () {
         {/* Project Page */}
         <Route path='/project/:projectId' element={<PrivateRoute element={Project} />} />
         <Route path='/project/:projectId/issue/:issueId' element={<PrivateRoute element={IssueDetailPage} />} />
+        <Route path='/project/:projectId/issuesuggest/' element={<PrivateRoute element={IssueSuggestPage} />} />
         <Route path='/project/:projectId/edit' element={<PrivateRoute element={SettingProject} />} />
         <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={IssueRequestPage} />} />
 
