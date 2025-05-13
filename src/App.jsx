@@ -23,6 +23,8 @@ import { SettingProject } from '@pages/build_project/SettingProject'
 import IssueRequestPage from '@pages/issue/IssueRequestPage'
 import NotFoundPage from '@pages/NotFoundPage'
 
+import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
+
 /*
   route 설정 시, PrivateRoute를 사용하여,
   <Route
@@ -86,8 +88,10 @@ const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
   // }
 
   const logout = () => {
-    // Handle logout event
-    console.log('Logout clicked!')
+    useUserStore.getState().clearUser()
+    useAccessTokenStore.getState().clearAccessToken()
+    useRefreshTokenStore.getState().clearRefreshToken()
+    navigate('/login')
   }
 
   return hasSideBar ? (

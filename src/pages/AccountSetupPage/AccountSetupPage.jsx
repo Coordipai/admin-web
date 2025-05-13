@@ -7,7 +7,7 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
-import { useUserStore } from '@store/useUserStore'
+import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -77,6 +77,8 @@ export default function AccountSetupPage () {
           }
         )
         
+        console.log('access token 요청 성공', res)
+        
         useUserStore.getState().setUser(res)
       } catch (err) {
         console.error('access token 요청 실패', err)
@@ -99,7 +101,7 @@ export default function AccountSetupPage () {
           name: username,
           discord_id: discordId,
           category: fieldOptions[selectedField].title || '',
-          career,
+          career: career,
         }
         try {
           const response = await axios.post(
@@ -110,8 +112,11 @@ export default function AccountSetupPage () {
             }
           )
 
-          useUserStore.getState().setUser(response)
-          navigate('/repositorycheckpage', { state: payload })
+          console.log('회원가입 성공:', response.data.content.data)
+          useUserStore.getState().setUser(response.data.content.data.user)
+          useAccessTokenStore.getState().setAccessToken(response.data.content.data.access_token)
+          useRefreshTokenStore.getState().setRefreshToken(response.data.content.data.refresh_token)
+          navigate(`/repositorycheckpage/${githubId}`, { state: payload })
         } catch (error) {
             console.error('회원가입 실패:', error.response?.data || error.message)
             alert('회원가입 중 오류가 발생했습니다.')

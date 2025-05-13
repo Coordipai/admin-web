@@ -7,7 +7,7 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
-import { useUserStore } from '@store/useUserStore'
+import { useUserStore, useAccessTokenStore } from '@store/useUserStore'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -77,9 +77,9 @@ export default function AccountSetupPage () {
     const fetchRepos = async () => {
       try {
         // zustand에서 access_token 꺼내기
-        const userResponse = useUserStore.getState().user || JSON.parse(window.localStorage.getItem('user-storage'))?.state?.user
-        const token = userResponse?.content?.data?.access_token
-        const res = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
+        // const userResponse = useAccessTokenStore.getState().user || JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.user
+        const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
+        const res = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -108,8 +108,7 @@ export default function AccountSetupPage () {
     const payload = selectedRepos.map((repo) => ({repo_fullname: repo}))
 
     try{
-      const token = localStorage.getItem('accessToken')
-
+      const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
       const res = await axios.post(
         'https://coordipai-web-server.knuassignx.site/user-repo',
         payload,

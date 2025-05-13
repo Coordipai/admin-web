@@ -140,19 +140,19 @@ export const Home = () => {
 
 
   // 로그인 과정으로 옮겨야 함
-  useEffect(() => {
-    const fetchUser = async () => {
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(userData) // userData는 dummy data
-        }, 1000)
-      })
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     const response = await new Promise((resolve) => {
+  //       setTimeout(() => {
+  //         resolve(userData) // userData는 dummy data
+  //       }, 1000)
+  //     })
 
-      setUser(response)
-      // console.log(response)
-    }
-    fetchUser()
-  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+  //     setUser(response)
+  //     // console.log(response)
+  //   }
+  //   fetchUser()
+  // }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
 
   return (
