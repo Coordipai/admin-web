@@ -175,30 +175,71 @@ useEffect(() => {
 
   const [field, setField] = useState(-1)
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const payload = {
-      username,
-      githubId,
-      githubName,
-      discordId,
+      name: username,
+      github_id: githubId,
+      github_name: githubName,
+      discord_id: discordId,
       career,
-      field: fieldOptions[field]?.title || '',
+      category: fieldOptions[field]?.title || '',
       repositories: selectedRepos
     }
 
     console.log('보낼 데이터:', payload)
 
-    // axios.post('/api/endpoint', payload) 등으로 연결 가능
-  }
+    try {
+      const response = await axios.patch(
+        'https://coordipai-web-server.knuassignx.site/auth/user/update', // ⚠️ 임의의 엔드포인트
+        //TODO: 실제 엔드포인트로 교체
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      )
 
-  const handleWithdraw = () => {
-    // 추후 API 연결을 위한 준비 작업
-    const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
-    if (confirmed) {
-      console.log('탈퇴 처리 진행')
-      // 예: axios.post('/api/user/delete', { githubId })
+      console.log('✅ 저장 성공:', response.data)
+      alert('정보가 성공적으로 저장되었습니다!')
+    } catch (error) {
+      console.error('❌ 저장 실패:', error)
+      alert('저장 중 오류가 발생했습니다.')
     }
   }
+
+  const handleWithdraw = async () => {
+    const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
+    if (!confirmed) return
+
+    try {
+      const response = await axios.delete(
+        'https://coordipai-web-server.knuassignx.site/auth/user/delete', // ❗ 임시 엔드포인트
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+          data: {
+            github_id: githubId, // 서버에서 식별자 요구 시
+          },
+        }
+      )
+
+      console.log('✅ 탈퇴 성공:', response.data)
+      alert('탈퇴가 완료되었습니다.')
+
+      // 상태 초기화 후 로그인 페이지로 이동
+      useUserStore.getState().clearUser()
+      useAccessTokenStore.getState().clearAccessToken()
+      navigate('/login')
+    } catch (error) {
+      console.error('❌ 탈퇴 실패:', error)
+      alert('탈퇴 중 오류가 발생했습니다.')
+    }
+  }
+
 
   const handleEvaluationRequest = () => {
     console.log('평가 요청 처리 진행')
@@ -220,7 +261,9 @@ useEffect(() => {
           <Header text='계정 정보' />
           <FieldWrapper>
             <LabelText>사용자 이름</LabelText>
-            <FormInput placeholder='이름을 입력해주세요' value={username} onChange={setUsername} />
+            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
+              setUsername(v)
+            }} />
           </FieldWrapper>
 
           <FieldWrapper>
@@ -234,7 +277,9 @@ useEffect(() => {
 
           <FieldWrapper>
             <LabelText>Discord ID</LabelText>
-            <FormInput placeholder='디스코드 ID' value={discordId} onChange={setDiscordId} />
+            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
+              setDiscordId(v)
+            }} />
           </FieldWrapper>
 
           <FieldWrapper>
@@ -243,7 +288,9 @@ useEffect(() => {
               placeholder='분야 선택'
               menus={fieldOptions}
               selectedMenu={field}
-              onChange={setField}
+              handleChange={(v) => {
+                setField(v)
+            }}
             />
           </FieldWrapper>
 
