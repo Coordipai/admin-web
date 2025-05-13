@@ -107,28 +107,37 @@ export default function IssueRequestPage () {
     }
   };
 
-  useEffect(() => {
-    const fetchIssueData = async () => {
-      try {
-        console.log('Request ID:', requestId) // Log the requestId for debugging
-        // const response = await axios.get(`/api/issue/${requestId}`)
-        const mockIssue = {
-          username: 'Oliva',
-          userPart: '프론트엔드',
-          reason: '변경 사유 내용',
-          currentSprint: 'sprint 1',
-          targetSprint: 'sprint 3',
-          oldAssignee: 'Oliva',
-          newAssignee: 'Lucas'
-        }
-        setIssueData(mockIssue)
-      } catch (error) {
-        console.error('이슈 데이터 가져오기 실패:', error)
-      }
-    }
+useEffect(() => {
+  const fetchIssueData = async () => {
+    try {
+      const res = await axios.get(`/issue-reschedule/${projectId}`);
+      const issues = res.data?.content?.data || [];
 
-    fetchIssueData()
-  }, [requestId]) // Add requestId as a dependency
+      const matched = issues.find(issue => issue.issue_number === Number(requestId));
+
+      if (!matched) {
+        alert('해당 요청을 찾을 수 없습니다.');
+        return;
+      }
+
+      const transformed = {
+        username: matched.old_assignees?.[0] || '', // 실제로는 백엔드에서 사용자 정보도 줘야 함
+        userPart: '프론트엔드', // 마찬가지로 추가 필요
+        reason: matched.reason,
+        currentSprint: matched.old_iteration,
+        targetSprint: matched.new_iteration,
+        oldAssignee: matched.old_assignees?.[0] || '',
+        newAssignee: matched.new_assignees?.[0] || ''
+      };
+
+      setIssueData(transformed);
+    } catch (error) {
+      console.error('이슈 데이터 가져오기 실패:', error);
+    }
+  };
+
+  fetchIssueData();
+}, [projectId, requestId]);
 
   useEffect(() => {
     const fetchAiFeedback = async () => {
