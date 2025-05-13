@@ -240,11 +240,30 @@ useEffect(() => {
     }
   }
 
+const handleEvaluationRequest = async () => {
+  const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
+  if (!confirmed) return
 
-  const handleEvaluationRequest = () => {
-    console.log('평가 요청 처리 진행')
-    // 예: axios.post('/api/evaluation/request', { githubId, field })
+  try {
+    const response = await axios.post(
+      'https://coordipai-web-server.knuassignx.site/evaluation/request', // ⚠️ 임시 평가 요청 엔드포인트
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      }
+    )
+
+    console.log('✅ 평가요청 성공:', response.data)
+    alert('평가 요청이 완료되었습니다.')
+    } catch (error) {
+      console.error('❌ 평가요청 실패:', error)
+      alert('평가 요청 중 오류가 발생했습니다.')
+    }
   }
+
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
