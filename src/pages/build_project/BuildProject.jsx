@@ -10,7 +10,7 @@ import Header from '@components/Header'
 import UserTable from '@components/Edit/UserTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox } from '@styles/globalStyle'
-import { api } from '@hooks/useAxios'
+import { api } from '../../hooks/useAxios'
 import dayjs from 'dayjs'
 
 const Fieldset = styled.div`
@@ -276,14 +276,12 @@ const BuildProject = () => {
 						form.files.forEach(file => {
 							formData.append('files', file)
 						})
-						const accessToken = window.localStorage.getItem('accessToken')
+						const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
 						try {
-							const res = await fetch(`${import.meta.env.VITE_BASE_URL}/project`, {
-								method: 'POST',
-								body: formData,
-								headers: { Authorization: `Bearer ${accessToken}` }
+							const res = await api.post('/project', formData, {
+								headers: { Authorization: `Bearer ${token}` }
 							})
-							if (!res.ok) throw new Error('프로젝트 생성 실패')
+							if (res.status !== 200 && res.status !== 201) throw new Error('프로젝트 생성 실패')
 							window.location.href = '/'
 						} catch {
 							alert('프로젝트 생성 실패')
