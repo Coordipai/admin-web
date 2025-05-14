@@ -207,36 +207,33 @@ useEffect(() => {
   }
 
 
-  const handleWithdraw = async () => {
-    const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
-    if (!confirmed) return
+ const handleWithdraw = async () => {
+  const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
+  if (!confirmed) return
 
-    try {
-      const response = await axios.delete(
-        'https://coordipai-web-server.knuassignx.site/auth/user/delete', // ❗ 임시 엔드포인트
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-          data: {
-            github_id: githubId, // 서버에서 식별자 요구 시
-          },
-        }
-      )
+  try {
+    const response = await axios.delete(
+      'https://coordipai-web-server.knuassignx.site/auth/unregister',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      }
+    )
 
-      console.log('✅ 탈퇴 성공:', response.data)
-      alert('탈퇴가 완료되었습니다.')
+    console.log('✅ 탈퇴 성공:', response.data)
+    alert('탈퇴가 완료되었습니다.')
 
-      // 상태 초기화 후 로그인 페이지로 이동
-      useUserStore.getState().clearUser()
-      useAccessTokenStore.getState().clearAccessToken()
-      navigate('/login')
-    } catch (error) {
-      console.error('❌ 탈퇴 실패:', error)
-      alert('탈퇴 중 오류가 발생했습니다.')
-    }
+    useUserStore.getState().clearUser()
+    useAccessTokenStore.getState().clearAccessToken()
+    navigate('/login')
+  } catch (error) {
+    console.error('❌ 탈퇴 실패:', error)
+    alert('탈퇴 중 오류가 발생했습니다.')
   }
+}
+
 
 const handleEvaluationRequest = async () => {
   const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
