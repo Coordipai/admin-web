@@ -12,9 +12,7 @@ import { extractDate } from '@utils/dateUtils'
 
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
-import { projectData } from '../mocks/project'
-import { useUserStore } from '@store/useUserStore'
-import { userData } from '../mocks/user'
+import { api } from '../hooks/useAxios'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -98,30 +96,25 @@ export const Home = () => {
   const navigate = useNavigate()
   const { setProject, clearProject } = useProjectStore();
 
-  const setUser = useUserStore((state) => state.setUser)
-
-  // const [projects] = useState([
-  //   { id: 1, name: '프로젝트1', start_date: '2021-01-01', end_date: '2021-01-01' },
-  //   { id: 2, name: '프로젝트2', start_date: '2021-01-01', end_date: '2021-01-01' },
-  //   { id: 3, name: '프로젝트3', start_date: '2021-01-01', end_date: '2021-01-01' }
-  // ])
-
   const [projects, setProjects] = useState([])  // 프로젝트 목록 
 
-  // useCallback을 사용하는 게 좋은가?
   useEffect(() => {
     const fetchProjects = async () => {
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(projectData) // projectData는 dummy data
-        }, 1000)
-      })
-
-      // content.data만 추출하여 projects로 설정
-      const extractedProjects = response.map(res => res.content.data)
-      setProjects(extractedProjects)
+      try {
+        const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
+        const res = await api.get('/project', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          withCredentials: true
+        })
+        // 응답 구조: { status_code, content: { message, data: [...] }, timestamp }
+        const data = res.data?.content?.data || []
+        setProjects(data)
+      } catch {
+        setProjects([])
+      }
     }
-
     fetchProjects()
   }, [])
   
@@ -137,23 +130,6 @@ export const Home = () => {
   useEffect(() => {
     clearProject()  
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
-
-
-  // 로그인 과정으로 옮겨야 함
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     const response = await new Promise((resolve) => {
-  //       setTimeout(() => {
-  //         resolve(userData) // userData는 dummy data
-  //       }, 1000)
-  //     })
-
-  //     setUser(response)
-  //     // console.log(response)
-  //   }
-  //   fetchUser()
-  // }, [])  // eslint-disable-line react-hooks/exhaustive-deps
-
 
   return (
     <MainBox>
@@ -175,7 +151,9 @@ export const Home = () => {
             {filteredProjects.map((project) => (
               <ProjectCard
                 key={project.id}
-                {...project}
+                name={project.name}
+                start_date={project.start_date}
+                end_date={project.end_date}
                 selected={selectedId === project.id}
                 onClick={() => {
                   setSelectedId(project.id)
