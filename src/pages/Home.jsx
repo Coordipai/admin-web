@@ -105,8 +105,7 @@ export const Home = () => {
         const res = await api.get('/project', {
           headers: {
             Authorization: `Bearer ${token}`
-          },
-          withCredentials: true
+          }
         })
         // 응답 구조: { status_code, content: { message, data: [...] }, timestamp }
         const data = res.data?.content?.data || []
