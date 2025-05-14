@@ -1,16 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import { useLocation } from 'react-router-dom'
+import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
+import { useNavigate, useParams } from 'react-router-dom'
+
+import axios from 'axios'
+import { set } from 'date-fns'
 
 const PageContainer = styled.div`
   display: flex;
   width: 100%;
   min-height: 100vh;
+  overflow-y: auto;
 `
 
 const ContentArea = styled.div`
@@ -94,14 +99,71 @@ const TextButton = styled(ButtonBase)`
 `
 
 export default function UserPage () {
-  const location = useLocation()
-  const userdata = location.state
+  const navigate = useNavigate()
+  //const { githubId } = useParams() // 여기서 param으로 받아오기
+  const [githubId, setGithubId] = useState('') // 초기값으로 사용
+  const [githubName, setGithubName] = useState('')
+  const [repoList, setRepoList] = useState([])
+  const [username, setUsername] = useState('')
+  const [discordId, setDiscordId] = useState('')
+  const [career, setCareer] = useState('')
+  const [selectedRepos, setSelectedRepos] = useState([])
+  const accessToken = useAccessTokenStore((state) => state.accessToken)
 
-  const [username, setUsername] = useState(userdata?.username || '')
-  const [githubId, setGithubId] = useState(userdata?.githubId || '') // OAuth 결과로 들어온 값
-  const [discordId, setDiscordId] = useState(userdata?.discordId || '')
-  const [career, setCareer] = useState(userdata?.career || '')
-  const [selectedRepos, setSelectedRepos] = useState(userdata?.repositories || [])
+ const user = useUserStore((state) => state.user)
+
+ useEffect(() => {
+  if (!user || !accessToken) return
+
+  console.log("accessToken before fetch:", accessToken) // 🔍 이게 undefined면 문제
+
+  // fetchRepos 실행
+}, [user, accessToken])
+
+useEffect(() => {
+  if (!user || !accessToken) {
+    alert('로그인이 필요합니다.')
+    navigate('/login')
+    return
+  }
+
+  setGithubName(user.github_name|| '')
+  setGithubId(user.github_id || '')
+  setUsername(user.name || '')
+  setDiscordId(user.discord_id || '')
+  setCareer(user.career || '')
+  setField(
+    ['프론트엔드', '백엔드', '기획', '디자인', '기타'].findIndex(
+      (f) => f === user.category
+    )
+  )
+
+  const fetchRepos = async () => {
+    try {
+      // 🔹 선택된 레포 불러오기
+      const selectedRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        withCredentials: true,
+      })
+      const selected = selectedRes.data.content.data.map((r) => r.repo_fullname)
+
+      // 🔹 GitHub의 전체 레포 불러오기
+      const allRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        withCredentials: true,
+      })
+      const all = allRes.data.content.data.map((r) => r.repo_fullname)
+
+      // 상태에 반영
+      setRepoList(all)
+      setSelectedRepos(selected)
+    } catch (error) {
+      console.error('레포지토리 불러오기 실패:', error)
+    }
+  }
+
+  fetchRepos()
+}, [user, accessToken, navigate])
 
   const fieldOptions = [
     { title: '프론트엔드' },
@@ -111,41 +173,97 @@ export default function UserPage () {
     { title: '기타' }
   ]
 
-  const getFieldIndex = (fieldTitle) =>
-    fieldOptions.findIndex((option) => option.title === fieldTitle)
+  const [field, setField] = useState(-1)
 
-  const [field, setField] = useState(
-    getFieldIndex(userdata?.field)
-  )
-
-  const handleSave = () => {
+  const handleSave = async () => {
     const payload = {
-      username,
-      githubId,
-      discordId,
+      name: username,
+      github_id: githubId,
+      github_name: githubName,
+      discord_id: discordId,
       career,
-      field: fieldOptions[field]?.title || '',
+      category: fieldOptions[field]?.title || '',
       repositories: selectedRepos
     }
 
     console.log('보낼 데이터:', payload)
 
-    // axios.post('/api/endpoint', payload) 등으로 연결 가능
-  }
+    try {
+      const response = await axios.patch(
+        'https://coordipai-web-server.knuassignx.site/auth/user/update', // ⚠️ 임의의 엔드포인트
+        //TODO: 실제 엔드포인트로 교체
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      )
 
-  const handleWithdraw = () => {
-    // 추후 API 연결을 위한 준비 작업
-    const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
-    if (confirmed) {
-      console.log('탈퇴 처리 진행')
-      // 예: axios.post('/api/user/delete', { githubId })
+      console.log('✅ 저장 성공:', response.data)
+      alert('정보가 성공적으로 저장되었습니다!')
+    } catch (error) {
+      console.error('❌ 저장 실패:', error)
+      alert('저장 중 오류가 발생했습니다.')
     }
   }
 
-  const handleEvaluationRequest = () => {
-    console.log('평가 요청 처리 진행')
-    // 예: axios.post('/api/evaluation/request', { githubId, field })
+  const handleWithdraw = async () => {
+    const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
+    if (!confirmed) return
+
+    try {
+      const response = await axios.delete(
+        'https://coordipai-web-server.knuassignx.site/auth/user/delete', // ❗ 임시 엔드포인트
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+          data: {
+            github_id: githubId, // 서버에서 식별자 요구 시
+          },
+        }
+      )
+
+      console.log('✅ 탈퇴 성공:', response.data)
+      alert('탈퇴가 완료되었습니다.')
+
+      // 상태 초기화 후 로그인 페이지로 이동
+      useUserStore.getState().clearUser()
+      useAccessTokenStore.getState().clearAccessToken()
+      navigate('/login')
+    } catch (error) {
+      console.error('❌ 탈퇴 실패:', error)
+      alert('탈퇴 중 오류가 발생했습니다.')
+    }
   }
+
+const handleEvaluationRequest = async () => {
+  const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
+  if (!confirmed) return
+
+  try {
+    const response = await axios.post(
+      'https://coordipai-web-server.knuassignx.site/evaluation/request', // ⚠️ 임시 평가 요청 엔드포인트
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      }
+    )
+
+    console.log('✅ 평가요청 성공:', response.data)
+    alert('평가 요청이 완료되었습니다.')
+    } catch (error) {
+      console.error('❌ 평가요청 실패:', error)
+      alert('평가 요청 중 오류가 발생했습니다.')
+    }
+  }
+
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
@@ -155,17 +273,6 @@ export default function UserPage () {
     )
   }
 
-  const repoList = [
-    'coordipai/admin-web',
-    'coordipai/admin-api',
-    'coordipai/landing-page',
-    '레포1111',
-    '레포22',
-    '레포3333333',
-    '레포14231423342432',
-    '레포1234125253125'
-  ]
-
   return (
     <PageContainer>
       <ContentArea>
@@ -173,22 +280,25 @@ export default function UserPage () {
           <Header text='계정 정보' />
           <FieldWrapper>
             <LabelText>사용자 이름</LabelText>
-            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={setUsername} />
+            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
+              setUsername(v)
+            }} />
           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>GitHub 계정이름</LabelText>
             <FormInput
               placeholder='깃허브 계정'
-              value={githubId}
-              handleChange={setGithubId}
+              value={githubName}
               readOnly
             />
           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>Discord ID</LabelText>
-            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={setDiscordId} />
+            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
+              setDiscordId(v)
+            }} />
           </FieldWrapper>
 
           <FieldWrapper>
@@ -197,13 +307,15 @@ export default function UserPage () {
               placeholder='분야 선택'
               menus={fieldOptions}
               selectedMenu={field}
-              handleChange={setField}
+              handleChange={(v) => {
+                setField(v)
+            }}
             />
           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>간단한 경력을 입력해주세요.</LabelText>
-            <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} handleChange={setCareer} />
+            <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} onChange={setCareer} />
           </FieldWrapper>
 
           <FieldWrapper>
