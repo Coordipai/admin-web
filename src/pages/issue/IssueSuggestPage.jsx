@@ -17,7 +17,6 @@ import {
 import FormTextarea from '@components/FormTextarea'
 import { Plus, X } from '@untitled-ui/icons-react'
 
-import { createIssue, updateIssue, deleteIssue } from '@api/issueAPI'
 import useLoadingStore from '@store/useLoadingStore'
 import { mockIssueList } from '@mocks/issueList'
 
@@ -28,34 +27,54 @@ const Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: ${({ theme }) => theme.gap.lg};
+  gap: 1rem;
 `
 
 const SplitContainer = styled.div`
   display: flex;
   gap: 2rem;
   width: 100%;
-  height: calc(100vh - 80px); // 헤더 높이를 제외한 전체 높이
-  overflow: hidden; // 전체 컨테이너는 스크롤 방지
+  height: calc(100vh - 80px);
+  overflow: hidden;
 `
 
-const LeftContainer = styled(ContainerBox)`
+const LeftContainer = styled.div`
   flex: 1;
-  border: 1px solid ${({ theme }) => theme.colors.gray200};
-  border-radius: 1rem;
-  padding: 2rem;
-  overflow-y: auto;
-  height: 100%; // 부모 컨테이너 높이에 맞춤
-`
-
-const RightContainer = styled(ContainerBox)`
-  width: 320px;
-  border: 1px solid ${({ theme }) => theme.colors.gray200};
-  border-radius: 1rem;
-  padding: 2rem;
-  height: 100%; // 부모 컨테이너 높이에 맞춤
   display: flex;
   flex-direction: column;
+  border: 1px solid ${({ theme }) => theme.colors.gray200};
+  border-radius: 1rem;
+`
+
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 2rem;
+  gap: 1rem;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray200};
+`
+
+const Footer = styled.div`
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: 0 0 1rem 1rem;
+`
+
+
+const RightContainer = styled.div`
+  width: 360px;
+  border: 1px solid ${({ theme }) => theme.colors.gray200};
+  border-radius: 1rem;
+  padding: 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
 `
 
 const IssueBox = styled.label`
@@ -89,9 +108,12 @@ const IssueList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  overflow-y: auto; // 리스트만 스크롤 가능하도록
+  overflow-y: auto;
   flex: 1; // 남은 공간 채우기
-  padding-right: 0.5rem; // 스크롤바 공간 확보
+  padding: 0.5rem 0.5rem 2rem 0;
+  margin-top: 1rem;
+  margin-bottom: -1rem;
+  width: 100%;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -152,7 +174,7 @@ const IssueSuggestPage = () => {
     { value: 'C', label: '[C] Could Have' },
     { value: 'W', label: '[W] Won\'t Have' }
   ])
-  const [iterationOptions, setIterationOptions] = useState([{ title: 'iteration 선택', period: ''}])
+  const [iterationOptions, setIterationOptions] = useState([{ title: 'iteration 선택', period: 'iteration을 선택해주세요.'}])
   const [labelOptions] = useState(['기능', '설정', '테스트', '배포', '버그 수정', '문서', '리팩토링', '질문', '정리'])
   const [assigneeOptions, setAssigneeOptions] = useState([])
   
@@ -166,6 +188,8 @@ const IssueSuggestPage = () => {
   const [selectedIssue, setSelectedIssue] = useState(null)
   const [issueList, setIssueList] = useState([])
   const [isCompleted, setIsCompleted] = useState(false)
+  const isIssueSelected = !!selectedIssue
+
 
   const fetchProject = useCallback(async () => {
     try {
@@ -182,7 +206,6 @@ const IssueSuggestPage = () => {
         'Alice', 'Bob', 'Charlie', 'David'
       ]
       setIterationOptions(iterations)
-      setIteration(iterations[0])
       setAssigneeOptions(assignees)
     } catch (error) {
       console.error('Failed to fetch project:', error)
@@ -200,7 +223,10 @@ const IssueSuggestPage = () => {
       // const response = await fetchIssueListAPI(projectId)
       const response = mockIssueList.map(issue => ({
         ...issue,
-        isCompleted: false // 기본값으로 false 설정
+        isCompleted: false,
+        priority: 'M', // 기본 우선순위
+        iteration: iterationOptions[0],
+        assignees: []
       }))
       setIssueList(response)
 
@@ -210,7 +236,7 @@ const IssueSuggestPage = () => {
     } finally {
       setLoading(false)
     }
-  }, [setLoading])
+  }, [setLoading, iterationOptions])
 
   useEffect(() => {
     const init = async () => {
@@ -328,11 +354,11 @@ const IssueSuggestPage = () => {
     setSelectedIssue(issue)
     // Update form fields with selected issue data
     setIssueTitle(issue.title)
-    setIssueContent(issue.content)
-    setPriority(issue.priority)
-    setIteration(issue.iteration)
-    setSelectedLabels(issue.labels)
-    setAssignees(issue.assignees)
+    setIssueContent(issue.description)
+    setPriority(issue.priority || 'M')
+    setIteration(issue.iteration || iterationOptions[0])
+    setSelectedLabels(issue.labels || [])
+    setAssignees(issue.assignees || [])
     setIsCompleted(issue.isCompleted || false)
   }
 
@@ -341,7 +367,7 @@ const IssueSuggestPage = () => {
     if (selectedIssue) {
       setIssueList(prev => 
         prev.map(issue => 
-          issue.id === selectedIssue.id 
+          issue.name === selectedIssue.name 
             ? { ...issue, isCompleted: !isCompleted }
             : issue
         )
@@ -370,8 +396,9 @@ const IssueSuggestPage = () => {
       {!isLoading && (
         <SplitContainer>
           <LeftContainer>
-            <InputField label='이슈 타이틀' placeholder='이슈 제목을 입력해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
-            <FormTextarea label='이슈 내용' placeholder='이슈 내용을 입력해주세요.' value={issueContent} onChange={setIssueContent} />
+          <ContentWrapper>
+            <InputField disabled={isIssueSelected} label='이슈 타이틀' placeholder='이슈를 선택해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
+            <FormTextarea disabled={isIssueSelected} label='이슈 내용' placeholder='이슈를 선택해주세요.' value={issueContent} onChange={setIssueContent} />
             <Row>
               <Typography value='Priority' variant='textSM' weight='medium' color='gray900' />
               <div ref={badgeRef} onClick={() => setBadgeDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
@@ -510,18 +537,25 @@ const IssueSuggestPage = () => {
                 onClick={handleStateToggle}
                 style={{ marginLeft: 'auto' }}
               >
-                {isCompleted ? '완료됨' : '배정'}
+                {isCompleted ? '완료됨' : '완료하기'}
               </ButtonBase>
+
             </Row>
+            </ContentWrapper>
+            <Footer>
+              <ButtonBase>전체 이슈 확정</ButtonBase>
+              <ButtonBase $isHighlighted>전체 이슈 재요청</ButtonBase>
+            </Footer>
           </LeftContainer>
+
 
           <RightContainer>
             <Typography value='이슈 목록' variant='textLG' weight='medium' color='gray900' />
             <IssueList>
               {issueList.map((issue) => (
                 <IssueBox
-                  key={issue.id}
-                  $checked={selectedIssue?.id === issue.id}
+                  key={issue.name}
+                  $checked={selectedIssue?.name === issue.name}
                   onClick={() => handleIssueSelect(issue)}
                 >
                   <Typography value={issue.title} variant='textSM' weight='medium' color='gray900' />

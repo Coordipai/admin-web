@@ -1,182 +1,162 @@
 export const mockIssueList = [
   {
-    id: 1,
+    type: 'feature',
+    name: 'login',
+    description: '사용자 인증 시스템 구현 및 JWT 토큰 기반 인증 처리',
     title: '로그인 기능 구현',
-    content: '사용자 인증 시스템 구현 및 JWT 토큰 기반 인증 처리',
-    priority: 'M',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['기능', '설정'],
-    assignees: ['Alice', 'Bob']
+    body: ['사용자 인증', 'JWT 토큰', '보안']
   },
   {
-    id: 2,
+    type: 'design',
+    name: 'signup',
+    description: '회원가입 UI/UX 개선 및 반응형 디자인 적용',
     title: '회원가입 페이지 디자인',
-    content: '회원가입 UI/UX 개선 및 반응형 디자인 적용',
-    priority: 'S',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['설정', 'UI'],
-    assignees: ['Charlie']
+    body: ['UI/UX', '반응형', '디자인']
   },
   {
-    id: 3,
+    type: 'test',
+    name: 'api-test',
+    description: '모든 API 엔드포인트에 대한 단위 테스트 작성',
     title: 'API 엔드포인트 테스트',
-    content: '모든 API 엔드포인트에 대한 단위 테스트 작성',
-    priority: 'C',
-    iteration: { title: 'Iteration 2', period: '2024-03-18 ~ 2024-03-24' },
     labels: ['테스트'],
-    assignees: ['David']
+    body: ['단위 테스트', 'API', '엔드포인트']
   },
   {
-    id: 4,
+    type: 'feature',
+    name: 'db-schema',
+    description: '프로젝트에 필요한 데이터베이스 스키마 설계 및 문서화',
     title: '데이터베이스 스키마 설계',
-    content: '프로젝트에 필요한 데이터베이스 스키마 설계 및 문서화',
-    priority: 'M',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['설정', '문서'],
-    assignees: ['Alice']
+    body: ['데이터베이스', '스키마', '문서화']
   },
   {
-    id: 5,
+    type: 'feature',
+    name: 'cicd',
+    description: 'GitHub Actions를 사용한 CI/CD 파이프라인 구축',
     title: 'CI/CD 파이프라인 구축',
-    content: 'GitHub Actions를 사용한 CI/CD 파이프라인 구축',
-    priority: 'S',
-    iteration: { title: 'Iteration 2', period: '2024-03-18 ~ 2024-03-24' },
     labels: ['배포'],
-    assignees: ['Bob']
+    body: ['CI/CD', 'GitHub Actions', '자동화']
   },
   {
-    id: 6,
+    type: 'bug',
+    name: 'main-layout',
+    description: '메인 페이지에서 발생하는 레이아웃 깨짐 현상 수정',
     title: '메인 페이지 버그 수정',
-    content: '메인 페이지에서 발생하는 레이아웃 깨짐 현상 수정',
-    priority: 'M',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['버그 수정'],
-    assignees: ['Charlie']
+    body: ['레이아웃', '버그', '수정']
   },
   {
-    id: 7,
+    type: 'refactor',
+    name: 'code-refactor',
+    description: '중복 코드 제거 및 성능 최적화',
     title: '코드 리팩토링',
-    content: '중복 코드 제거 및 성능 최적화',
-    priority: 'C',
-    iteration: { title: 'Iteration 2', period: '2024-03-18 ~ 2024-03-24' },
     labels: ['리팩토링'],
-    assignees: ['David']
+    body: ['코드 개선', '성능', '최적화']
   },
   {
-    id: 8,
+    type: 'documentation',
+    name: 'api-docs',
+    description: 'Swagger를 사용한 API 문서 자동화',
     title: 'API 문서 작성',
-    content: 'Swagger를 사용한 API 문서 자동화',
-    priority: 'S',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['문서'],
-    assignees: ['Alice']
+    body: ['API 문서', 'Swagger', '자동화']
   },
   {
-    id: 9,
+    type: 'security',
+    name: 'security-check',
+    description: 'OWASP Top 10 기반 보안 취약점 점검 및 수정',
     title: '보안 취약점 점검',
-    content: 'OWASP Top 10 기반 보안 취약점 점검 및 수정',
-    priority: 'M',
-    iteration: { title: 'Iteration 2', period: '2024-03-18 ~ 2024-03-24' },
     labels: ['설정', '테스트'],
-    assignees: ['Bob']
+    body: ['보안', '취약점', 'OWASP']
   },
   {
-    id: 10,
+    type: 'feature',
+    name: 'feedback',
+    description: '사용자 피드백 수집 시스템 구축',
     title: '사용자 피드백 수집',
-    content: '사용자 피드백 수집 시스템 구축',
-    priority: 'C',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['기능'],
-    assignees: ['Charlie']
+    body: ['피드백', '수집', '시스템']
   },
   {
-    id: 11,
+    type: 'feature',
+    name: 'monitoring',
+    description: 'Prometheus와 Grafana를 활용한 시스템 모니터링 구축',
     title: '성능 모니터링 시스템 구축',
-    content: 'Prometheus와 Grafana를 활용한 시스템 모니터링 구축',
-    priority: 'S',
-    iteration: { title: 'Iteration 2', period: '2024-03-18 ~ 2024-03-24' },
     labels: ['설정', '배포'],
-    assignees: ['David']
+    body: ['모니터링', 'Prometheus', 'Grafana']
   },
   {
-    id: 12,
+    type: 'feature',
+    name: 'email-verify',
+    description: '회원가입 시 이메일 인증 기능 추가',
     title: '이메일 인증 기능 구현',
-    content: '회원가입 시 이메일 인증 기능 추가',
-    priority: 'M',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['기능', '설정'],
-    assignees: ['Alice', 'Bob']
+    body: ['이메일', '인증', '회원가입']
   },
   {
-    id: 13,
+    type: 'feature',
+    name: 'backup',
+    description: '자동화된 데이터 백업 시스템 구축',
     title: '데이터 백업 시스템 구축',
-    content: '자동화된 데이터 백업 시스템 구축',
-    priority: 'S',
-    iteration: { title: 'Iteration 2', period: '2024-03-18 ~ 2024-03-24' },
     labels: ['설정', '배포'],
-    assignees: ['Charlie']
+    body: ['백업', '자동화', '데이터']
   },
   {
-    id: 14,
+    type: 'documentation',
+    name: 'user-guide',
+    description: '시스템 사용자 가이드 및 매뉴얼 작성',
     title: '사용자 가이드 작성',
-    content: '시스템 사용자 가이드 및 매뉴얼 작성',
-    priority: 'C',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['문서'],
-    assignees: ['David']
+    body: ['가이드', '매뉴얼', '문서화']
   },
   {
-    id: 15,
+    type: 'feature',
+    name: 'logging',
+    description: 'ELK 스택을 활용한 로깅 시스템 구축',
     title: '로깅 시스템 개선',
-    content: 'ELK 스택을 활용한 로깅 시스템 구축',
-    priority: 'S',
-    iteration: { title: 'Iteration 2', period: '2024-03-18 ~ 2024-03-24' },
     labels: ['설정', '배포'],
-    assignees: ['Alice']
+    body: ['로깅', 'ELK', '시스템']
   },
   {
-    id: 16,
+    type: 'feature',
+    name: 'cache',
+    description: 'Redis를 활용한 캐시 시스템 구축',
     title: '캐시 시스템 도입',
-    content: 'Redis를 활용한 캐시 시스템 구축',
-    priority: 'M',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['기능', '설정'],
-    assignees: ['Bob']
+    body: ['캐시', 'Redis', '성능']
   },
   {
-    id: 17,
+    type: 'test',
+    name: 'test-automation',
+    description: 'Jest와 Cypress를 활용한 테스트 자동화 구축',
     title: '테스트 자동화 구축',
-    content: 'Jest와 Cypress를 활용한 테스트 자동화 구축',
-    priority: 'S',
-    iteration: { title: 'Iteration 2', period: '2024-03-18 ~ 2024-03-24' },
     labels: ['테스트'],
-    assignees: ['Charlie']
+    body: ['자동화', 'Jest', 'Cypress']
   },
   {
-    id: 18,
+    type: 'feature',
+    name: 'code-quality',
+    description: 'SonarQube를 활용한 코드 품질 관리 시스템 구축',
     title: '코드 품질 관리',
-    content: 'SonarQube를 활용한 코드 품질 관리 시스템 구축',
-    priority: 'C',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['설정', '테스트'],
-    assignees: ['David']
+    body: ['품질', 'SonarQube', '관리']
   },
   {
-    id: 19,
+    type: 'architecture',
+    name: 'microservice',
+    description: '시스템 마이크로서비스 아키텍처 설계 및 문서화',
     title: '마이크로서비스 아키텍처 설계',
-    content: '시스템 마이크로서비스 아키텍처 설계 및 문서화',
-    priority: 'M',
-    iteration: { title: 'Iteration 2', period: '2024-03-18 ~ 2024-03-24' },
     labels: ['설정', '문서'],
-    assignees: ['Alice', 'Bob']
+    body: ['아키텍처', '마이크로서비스', '설계']
   },
   {
-    id: 20,
+    type: 'test',
+    name: 'performance-test',
+    description: 'JMeter를 활용한 부하 테스트 및 성능 분석',
     title: '성능 테스트 수행',
-    content: 'JMeter를 활용한 부하 테스트 및 성능 분석',
-    priority: 'S',
-    iteration: { title: 'Iteration 1', period: '2024-03-11 ~ 2024-03-17' },
     labels: ['테스트'],
-    assignees: ['Charlie', 'David']
+    body: ['성능', 'JMeter', '테스트']
   }
 ] 
