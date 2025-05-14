@@ -187,9 +187,8 @@ useEffect(() => {
     console.log('보낼 데이터:', payload)
 
     try {
-      const response = await axios.patch(
-        'https://coordipai-web-server.knuassignx.site/auth/user/update', // ⚠️ 임의의 엔드포인트
-        //TODO: 실제 엔드포인트로 교체
+      const response = await axios.put(
+        'https://coordipai-web-server.knuassignx.site/auth/update',
         payload,
         {
           headers: {
@@ -206,6 +205,7 @@ useEffect(() => {
       alert('저장 중 오류가 발생했습니다.')
     }
   }
+
 
   const handleWithdraw = async () => {
     const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
