@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import axios from 'axios'
+import { useUserStore, useAccessTokenStore } from '@store/useUserStore'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -65,10 +67,34 @@ const Button = styled(ButtonBase)`
 `
 
 export default function AccountSetupPage () {
+  // 추가
+  const { githubId } = useParams()
   const [selectedRepos, setSelectedRepos] = useState([])
-  const location = useLocation()
+  const [repoList, setRepoList] = useState([])
   const navigate = useNavigate()
-  const formData = location.state // 이전 페이지에서 전달된 데이터
+
+  useEffect(() => {
+    const fetchRepos = async () => {
+      try {
+        // zustand에서 access_token 꺼내기
+        // const userResponse = useAccessTokenStore.getState().user || JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.user
+        const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
+        const res = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        })
+        const repos = res.data.content.data.map((item) => item.repo_fullname).filter(Boolean)
+        setRepoList(repos)
+      } catch (error) {
+        console.error('레포지토리 불러오기 실패: ', error)
+        alert('레포지토리 목록을 불러오는 데 실패했습니다.')
+      }
+    }
+
+    fetchRepos()
+  }, [])
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
@@ -78,35 +104,35 @@ export default function AccountSetupPage () {
     )
   }
 
-  const handleCreateAccount = () => {
-    const combinedData = {
-      ...formData,
-      repositories: selectedRepos
+  const handleCreateAccount = async () => {
+    const payload = selectedRepos.map((repo) => ({repo_fullname: repo}))
+
+    try{
+      const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
+      const res = await axios.post(
+        'https://coordipai-web-server.knuassignx.site/user-repo',
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      )
+
+      console.log('레포 등록 성공: ', res.data)
+      const combinedData = {
+        name: '', // 필요 시 localStorage 등에서 복구
+        githubId, // ← param으로 받은 githubId 사용
+        repositories: selectedRepos
+      }
+      navigate(`/userform/${githubId}`, { state: combinedData })
+    } catch (error) {
+        console.error('레포 등록 실패: ', error.response?.data || error.message)
+        alert('레포 등록 중 오류가 발생했습니다.')
+        }
     }
 
-    navigate('/userform', { state: combinedData }) // 다음 페이지로 이동하면서 데이터 전달
-    console.log('보낼 데이터:', combinedData)
-
-    // axios.post('/api/endpoint', payload) 등으로 연결 가능
-
-    console.log(combinedData)
-  }
-
-  const repoList = [
-    'coordipai/admin-web',
-    'coordipai/admin-api',
-    'coordipai/landing-page',
-    '레포1111',
-    '레포22',
-    '레포3333333',
-    '레포14231423342432',
-    '레포1234125253125',
-    'sdfadafaffdasdfsafsd',
-    'asdfasdfasdfasdfasdfas',
-    'asdfasdfasdfasdfasdfasdf',
-    'asdfasdfasdfasfddfasfsdafdsfd',
-    'assssssssbbbbbbbaaaaaaaaa'
-  ]
 
   return (
     <>

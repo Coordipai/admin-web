@@ -20,6 +20,8 @@ import { SettingProject } from '@pages/build_project/SettingProject'
 import IssueRequestPage from '@pages/issue/IssueRequestPage'
 import NotFoundPage from '@pages/NotFoundPage'
 
+import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
+
 /*
   route 설정 시, PrivateRoute를 사용하여,
   <Route
@@ -37,12 +39,14 @@ function App () {
         <Route path='/' element={<PrivateRoute element={<Home />} />} />
 
         <Route path='/login' element={<LoginPage />} />
-        <Route path='/firstaccount' element={<FirstAccountPage />} />
+        <Route path="/register/:githubId" element={<FirstAccountPage />} />
+        <Route path="/repositorycheckpage/:githubId" element={<RepositoryCheckPage />} />
+        <Route path="/userform/:githubId" element={<PrivateRoute element={UserForm} />} />
 
         <Route path='/repositorycheckpage' element={<RepositoryCheckPage />} />
 
         {/* Sidebar */}
-        <Route path='/user' element={<UserForm />} />
+        <Route path='/user' element={<PrivateRoute element={UserForm} />} />
 
         {/* Test Page */}
         <Route path='/components' element={<PrivateRoute element={<ComponentTest />} />} />
@@ -79,8 +83,10 @@ const PrivateRoute = ({ element, hasSideBar = true }) => {
   // }
 
   const logout = () => {
-    // Handle logout event
-    console.log('Logout clicked!')
+    useUserStore.getState().clearUser()
+    useAccessTokenStore.getState().clearAccessToken()
+    useRefreshTokenStore.getState().clearRefreshToken()
+    navigate('/login')
   }
 
   return hasSideBar ? (

@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import axios from 'axios'
+import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -47,8 +49,8 @@ const Button = styled(ButtonBase)`
 `
 
 export default function AccountSetupPage () {
+  const { githubId } = useParams() // ← 여기에서 추출
   const [username, setUsername] = useState('')
-  const [githubId, setGithubId] = useState('my-github-id')
   const [discordId, setDiscordId] = useState('')
   const [career, setCareer] = useState('')
   const [selectedField, setSelectedField] = useState(-1)
@@ -63,7 +65,8 @@ export default function AccountSetupPage () {
     { title: '기타' }
   ]
 
-  const handleNext = () => {
+
+  const handleNext = async () => {
     const newError = {}
     if (!username.trim()) newError.username = true
     if (!discordId.trim()) newError.discordId = true
@@ -72,15 +75,31 @@ export default function AccountSetupPage () {
 
     setError(newError)
 
-    if (Object.keys(newError).length === 0) {
-      const formData = {
-        username,
-        githubId,
-        discordId,
-        career,
-        field: fieldOptions[selectedField]?.title || ''
+      if (Object.keys(newError).length === 0) {
+        const payload = {
+          name: username,
+          discord_id: discordId,
+          category: fieldOptions[selectedField].title || '',
+          career: career,
+        }
+        try {
+          const response = await axios.post(
+            'https://coordipai-web-server.knuassignx.site/auth/register',
+            payload,
+            {
+              withCredentials: true, // access_token 쿠키 포함
+            }
+          )
+
+          console.log('회원가입 성공:', response.data.content.data)
+          useUserStore.getState().setUser(response.data.content.data.user)
+          useAccessTokenStore.getState().setAccessToken(response.data.content.data.access_token)
+          useRefreshTokenStore.getState().setRefreshToken(response.data.content.data.refresh_token)
+          navigate(`/repositorycheckpage/${githubId}`, { state: payload })
+        } catch (error) {
+            console.error('회원가입 실패:', error.response?.data || error.message)
+            alert('회원가입 중 오류가 발생했습니다.')
       }
-      navigate('/repositorycheckpage', { state: formData })
     }
   }
 
@@ -102,7 +121,11 @@ export default function AccountSetupPage () {
 
       <FieldWrapper>
         <LabelText>GitHub 계정이름</LabelText>
-        <FormInput placeholder='깃허브 계정' value={githubId} handleChange={setGithubId} readOnly />
+        <FormInput
+          placeholder='깃허브 계정'
+          value={githubId}
+          readOnly
+        />
       </FieldWrapper>
 
       <FieldWrapper>
