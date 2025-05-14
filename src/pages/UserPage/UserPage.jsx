@@ -143,14 +143,12 @@ useEffect(() => {
       // 🔹 선택된 레포 불러오기
       const selectedRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
         headers: { Authorization: `Bearer ${accessToken}` },
-        withCredentials: true,
       })
       const selected = selectedRes.data.content.data.map((r) => r.repo_fullname)
 
       // 🔹 GitHub의 전체 레포 불러오기
       const allRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
         headers: { Authorization: `Bearer ${accessToken}` },
-        withCredentials: true,
       })
       const all = allRes.data.content.data.map((r) => r.repo_fullname)
 
