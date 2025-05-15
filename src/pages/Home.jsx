@@ -233,7 +233,7 @@ export const Home = () => {
                 selected={selectedId === project.id}
                 onClick={() => {
                   setSelectedId(project.id)
-                  setProject(project)
+                  // setProject(project)
                   navigate(`/project/${project.id}#issue`)
                 }}
               />
