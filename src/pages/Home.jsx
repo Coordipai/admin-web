@@ -186,6 +186,8 @@ export const Home = () => {
         }
         const data = projectRes?.data?.content?.data || []
         setProjects(data)
+
+        console.log(data)
       } catch {
         navigate('/login')
       }
