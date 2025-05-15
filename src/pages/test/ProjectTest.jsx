@@ -3,14 +3,16 @@ import { useAccessTokenStore } from "@store/useUserStore";
 
 const ProjectTest = () => {
   const [projectName, setProjectName] = useState("TestProject");
-  const [repoName, setRepoName] = useState("test1");
+  const [repoName, setRepoName] = useState("jhssong/test");
   const [startDate, setStartDate] = useState("2025-04-29T22:41");
   const [endDate, setEndDate] = useState("2025-05-29T22:41");
   const [sprintUnit, setSprintUnit] = useState(1);
   const [discordChannelId, setDiscordChannelId] = useState("123");
   const [files, setFiles] = useState([]);
   const [response, setResponse] = useState(null);
-  const accessToken = useAccessTokenStore.getState().accessToken;
+
+  // const URL = "http://localhost:8000";
+  const URL = "https://coordipai-web-server.knuassignx.site";
 
   const handleFileChange = (e) => {
     setFiles(Array.from(e.target.files));
@@ -21,6 +23,8 @@ const ProjectTest = () => {
 
     const formData = new FormData();
 
+    const accessToken = useAccessTokenStore.getState().accessToken;
+
     // 날짜를 ISO 8601 형식으로 변환
     const projectReq = {
       name: projectName,
@@ -28,7 +32,7 @@ const ProjectTest = () => {
       start_date: new Date(startDate).toISOString(),
       end_date: new Date(endDate).toISOString(),
       sprint_unit: Number(sprintUnit),
-      discord_chnnel_id: Number(discordChannelId),
+      discord_channel_id: String(discordChannelId),
       members: [{ id: 1, role: "backend" }],
     };
 
@@ -38,8 +42,9 @@ const ProjectTest = () => {
       formData.append("files", file);
     });
 
+    console.log("Create project: " + accessToken);
     try {
-      const res = await fetch("https://coordipai-web-server.knuassignx.site/project", {
+      const res = await fetch(URL + "/project", {
         method: "POST",
         body: formData,
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -54,9 +59,9 @@ const ProjectTest = () => {
   };
 
   const handleAllProjects = async () => {
-    const accessToken = window.localStorage.getItem("accessToken");
+    const accessToken = useAccessTokenStore.getState().accessToken;
     try {
-      const res = await fetch("https://coordipai-web-server.knuassignx.site/project", {
+      const res = await fetch(URL + "/project", {
         method: "GET",
         headers: { Authorization: `Bearer ${accessToken}` },
       });

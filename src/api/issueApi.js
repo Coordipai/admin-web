@@ -50,7 +50,7 @@ export const fetchIssueDetail = async (projectId, issueNumber) => {
         issue_number: issueNumber
       }
     })
-    return response.data;
+    return response.data.content.data;
   } catch (error) {
 
     showErrorToastMsg(error);
@@ -92,7 +92,7 @@ export const updateIssue = async (issueData) => {
       throw new Error('Access token is not available')
     }
 
-    const response = await api.patch('/issue', issueData, {
+    const response = await api.put('/issue', issueData, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -109,15 +109,14 @@ export const updateIssue = async (issueData) => {
  * 5. 이슈 닫기
  * @param {object} closeData { project_id, issue_number }
  */
-export const deleteIssue = async (closeData) => {
+export const deleteIssue = async (issueData) => {
   try {
     const token = useAccessTokenStore.getState().accessToken
     if (!token) {
       throw new Error('Access token is not available')
     }
 
-    const response = await api.delete('/issue', {
-      data: closeData,
+    const response = await api.patch('/issue', issueData, {
       headers: {
         Authorization: `Bearer ${token}`
       }

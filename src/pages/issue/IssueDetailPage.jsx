@@ -95,7 +95,7 @@ const IssueDetailPage = () => {
         { title: 'Iteration 3', period: '2023-11-01 ~ 2023-11-15' }
       ]
       const assignees = [
-        'Alice', 'Bob', 'Charlie', 'David'
+        'makisepel'
       ]
       setIterationOptions(iterations)
       setIteration(iterations[0])
@@ -109,34 +109,61 @@ const IssueDetailPage = () => {
     }
   }, [])
 
-  const fetchIssue = useCallback(async () => {
-    if (issueId !== 'new') {
-      try {
-        const res = await fetchIssueDetail(projectId, issueId)
-        setIssueTitle(res?.title || '')
-        setIssueContent(res?.body || '')
-        setPriority(res?.priority || priorityOptions[0].value)
-        setIteration(res?.iteration || iterationOptions[0])
-        setSelectedLabels(res?.labels || [])
-        setAssignees(res?.assignees || [])
 
-        console.log("issue fetched")
-      } catch (error) {
-        console.error('Failed to fetch issue:', error)
-        // 기본값 설정
-        setIssueTitle('')
-        setIssueContent('')
-        setPriority(priorityOptions[0].value)
-        setIteration(iterationOptions[0] || { title: '선택해주세요', period: '' })
-        setSelectedLabels([])
-        setAssignees([])
+const fetchIssue = useCallback(async () => {
+  if (issueId !== 'new') {
+    try {
+      const res = await fetchIssueDetail(projectId, issueId)
+
+      const fullBody = res?.body || ''
+      setIssueTitle(res?.title || '')
+
+      const extractMetaFromBody = (body) => {
+        const metaMatch = body.match(/<!--([\s\S]*?)-->/)
+        const result = {}
+
+        if (metaMatch) {
+          const metaContent = metaMatch[1].trim()
+          const lines = metaContent.split('\n')
+          lines.forEach(line => {
+            const [key, value] = line.split(':').map(s => s.trim())
+            if (key && value) {
+              result[key] = isNaN(value) ? value : parseInt(value)
+            }
+          })
+        }
+        return {
+          meta: result,
+          content: body.replace(/<!--[\s\S]*?-->/, '').trim() 
+        }
       }
-    }
-    else {
+      const { meta, content } = extractMetaFromBody(fullBody)
+
+      setIssueContent(content)
+      setPriority(meta.priority || priorityOptions[0].value)
+
+      const matchedIteration = iterationOptions.find(opt => {
+        const num = parseInt(opt.title.replace(/\D/g, ''))
+        return num === meta.iteration
+      })
+      setIteration(matchedIteration || iterationOptions[0])
+      setSelectedLabels(res?.labels || [])
+      setAssignees((res?.assignees || []).map(a => a.name) || [])
+    } catch (error) {
+      console.error('Failed to fetch issue:', error)
+      setIssueTitle('')
+      setIssueContent('')
       setPriority(priorityOptions[0].value)
       setIteration(iterationOptions[0] || { title: '선택해주세요', period: '' })
+      setSelectedLabels([])
+      setAssignees([])
     }
-  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+  } else {
+    setPriority(priorityOptions[0].value)
+    setIteration(iterationOptions[0] || { title: '선택해주세요', period: '' })
+  }
+}, [issueId, projectId])  // eslint-disable-line react-hooks/exhaustive-deps
+
 
 useEffect(() => {
   const init = async () => {
@@ -441,27 +468,39 @@ useEffect(() => {
           handleConfirm={() => {
             if (issueId === 'new') {
               const issueData = {
-                project_id: projectId,
+                project_id: parseInt(projectId),
                 title: issueTitle,
                 body: issueContent,
                 assignees: assignees,
                 priority: priority,
-                iteration: iteration,
+                iteration: parseInt(iteration.title.replace(/\D/g, '')),
                 labels: selectedLabels,
               }
+
+              console.log({
+                project_id: parseInt(projectId),
+                title: issueTitle,
+                body: issueContent,
+                assignees: assignees,
+                priority: priority,
+                iteration: parseInt(iteration.title.replace(/\D/g, '')),
+                labels: selectedLabels,
+              })
+
               createIssue(issueData)
             } else {
               if (isEdit) {
                 const issueData = {
-                  project_id: projectId,
-                  issue_number: issueId,
+                  project_id: parseInt(projectId),
+                  issue_number: parseInt(issueId),
                   title: issueTitle,
                   body: issueContent,
                   assignees: assignees,
                   priority: priority,
-                  iteration: iteration,
+                  iteration: parseInt(iteration.title.replace(/\D/g, '')),
                   labels: selectedLabels,
                 }
+                console.log(issueData)
                 updateIssue(issueData)
               } else {
                 const issueData = {
