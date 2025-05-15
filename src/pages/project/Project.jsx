@@ -1,11 +1,11 @@
 import styled from 'styled-components'
 import Typography from '@components/Edit/Typography'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import IssueTable from '@components/Edit/IssueTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox, ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
-import { fetchAllIssues } from '@api/issueAPI'
+import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -76,14 +76,16 @@ const TabsDivider = styled.div`
 `
 
 const Fieldset = styled.div`
+  box-sizing: border-box;
 	max-height: 100%;
 	display: flex;
 	flex-direction: column;
 	gap: ${({ theme }) => theme.gap.xl};
 	width: 100%;
 	align-items: stretch;
-	overflow-y: auto;
+	overflow-y: hidden;
 	max-height: 100%;
+  flex:1;
 	overflow-x: hidden;
 `
 
@@ -106,11 +108,11 @@ const Section = styled.section`
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	height: 100%;
-		max-height: 100%;
 	gap: ${({ theme }) => theme.gap.xl};
 	overflow-y: hidden;
 	overflow-x: hidden;
+	flex: 1;
+	min-height: 0;
 `
 
 const EmptyIssueWrapper = styled.div`
@@ -127,6 +129,7 @@ export const Project = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { projectId } = useParams()
+  const { Get } = useFetchWithTokenRefresh()
   const [activeTab, setActiveTab] = useState(() => {
     const hash = location.hash.replace('#', '')
     return hash === 'request' ? 'request' : 'issue'
@@ -155,21 +158,25 @@ export const Project = () => {
   const [issueRows, setIssueRows] = useState([])
   const [search, setSearch] = useState('')
   const [requestSearch, setRequestSearch] = useState('')
-  const [requestRows] = useState([
-    { repo_fullname: '레포이름', issue_number: 2, title: '변경요청 ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ타이틀', body: '변경ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ요청 바디', assignee: '담당자', priority: 'S', iteration: 2, labels: ['요청1', '요청2'] }
-    // 필요시 더미 데이터 추가
-  ])
+  const [requestRows, setRequestRows] = useState([])
   
+   
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetchAllIssues(projectId)
-        setIssueRows(response)
+        const issueResponse = await Get(`/issue`,{
+          params: { project_id: projectId }
+        })
+        console.log(issueResponse)
+        setIssueRows(issueResponse)
+        const requestResponse = await Get(`/issue-reschedule/${projectId}`)
+        setRequestRows(requestResponse)
       } catch (error) {
         console.error('Error fetching issues:', error)
       }
     }
     fetchData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId])
 
 
