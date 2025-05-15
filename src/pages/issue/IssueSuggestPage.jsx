@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { useParams } from 'react-router-dom'
 import Badge from '@components/Edit/Badge'
 import InputField from '@components/Edit/InputField'
 import Typography from '@components/Edit/Typography'
@@ -109,7 +108,7 @@ const IssueList = styled.div`
   flex-direction: column;
   gap: 0.75rem;
   overflow-y: auto;
-  flex: 1; // 남은 공간 채우기
+  flex: 1;
   padding: 0.5rem 0.5rem 2rem 0;
   margin-top: 1rem;
   margin-bottom: -1rem;
@@ -164,7 +163,6 @@ const LabelBadge = styled.div`
 `
 
 const IssueSuggestPage = () => {
-  const { projectId, issueId } = useParams()
   const { isLoading, setLoading } = useLoadingStore()
 
   // project 정보

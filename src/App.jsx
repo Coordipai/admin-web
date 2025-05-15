@@ -12,7 +12,7 @@ import LoginPage from '@pages/login/LoginPage'
 import FirstAccountPage from '@pages/AccountSetupPage/AccountSetupPage'
 import RepositoryCheckPage from '@pages/AccountSetupPage/RepositoryCheckPage'
 import UserForm from '@pages/UserPage/UserPage'
-import ComponentTest from '@pages/ComponentTest'
+import ComponentTest from '@pages/test/ComponentTest'
 import IssueModalTest from '@pages/issue/IssueModalTest'
 import { BuildProject } from '@pages/build_project/BuildProject'
 import { BuildProject2 } from '@pages/build_project/BuildProject2'
@@ -23,6 +23,7 @@ import { SettingProject } from '@pages/build_project/SettingProject'
 import IssueRequestPage from '@pages/issue/IssueRequestPage'
 import NotFoundPage from '@pages/NotFoundPage'
 import IssueSuggestPage from '@pages/issue/IssueSuggestPage'
+import ProjectTest from '@pages/test/ProjectTest'
 
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 
@@ -55,6 +56,7 @@ function App () {
         {/* Test Page */}
         <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />
         <Route path='/issueModalTest' element={<IssueModalTest />} />
+        <Route path='/projectTest' element={<PrivateRoute element={ProjectTest} />} />
 
         {/* BuildProject Page */}
         <Route path='/buildproject' element={<PrivateRoute element={BuildProject} />} />
