@@ -19,7 +19,7 @@ import IssueDetailPage from '@pages/issue/IssueDetailPage'
 import { SettingProject } from '@pages/build_project/SettingProject'
 import IssueRequestPage from '@pages/issue/IssueRequestPage'
 import NotFoundPage from '@pages/NotFoundPage'
-
+import A from '@pages/A'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 
 /*
@@ -60,7 +60,7 @@ function App () {
         <Route path='/project/:projectId/issue/:issueId' element={<PrivateRoute element={<IssueDetailPage />} />} />
         <Route path='/project/:projectId/edit' element={<PrivateRoute element={<SettingProject />} />} />
         <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={<IssueRequestPage />} />} />
-
+        <Route path='/a' element={<PrivateRoute element={<A />} />} />
         {/* Not Found Page */}
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
