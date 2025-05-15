@@ -186,6 +186,8 @@ export const Home = () => {
         }
         const data = projectRes?.data?.content?.data || []
         setProjects(data)
+
+        console.log(data)
       } catch {
         navigate('/login')
       }
@@ -233,7 +235,7 @@ export const Home = () => {
                 selected={selectedId === project.id}
                 onClick={() => {
                   setSelectedId(project.id)
-                  setProject(project)
+                  // setProject(project)
                   navigate(`/project/${project.id}#issue`)
                 }}
               />

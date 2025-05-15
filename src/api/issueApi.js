@@ -2,15 +2,13 @@ import { api } from '@hooks/useAxios'
 import { showSuccessToastMsg, showErrorToastMsg } from '@utils/showToastMsg';
 import { useAccessTokenStore } from '@store/useUserStore'
 
-
-
 /**
  * 1. 모든 이슈 받아오기 (프로젝트별)
  * @param {number} projectId
  */
 export const fetchAllIssues = async (projectId) => {
   try {
-    const token = useAccessTokenStore.getState().getAccessToken()
+    const token = useAccessTokenStore.getState().accessToken
     if (!token) {
       throw new Error('Access token is not available')
     }
@@ -23,7 +21,7 @@ export const fetchAllIssues = async (projectId) => {
         project_id: projectId 
       } 
     });
-    return response.data;
+    return response.data.content.data;
   } catch (error) {
     showErrorToastMsg(error);
     throw error;

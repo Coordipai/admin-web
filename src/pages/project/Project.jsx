@@ -1,10 +1,11 @@
 import styled from 'styled-components'
 import Typography from '@components/Edit/Typography'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import IssueTable from '@components/Edit/IssueTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox, ButtonBase } from '@styles/globalStyle'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
+import { fetchAllIssues } from '@api/issueAPI'
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -125,6 +126,7 @@ const EmptyIssueWrapper = styled.div`
 export const Project = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const { projectId } = useParams()
   const [activeTab, setActiveTab] = useState(() => {
     const hash = location.hash.replace('#', '')
     return hash === 'request' ? 'request' : 'issue'
@@ -150,37 +152,27 @@ export const Project = () => {
     navigate(`${location.pathname}#${tab}`, { replace: true })
   }
 
-  const [issueRows] = useState([
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포1이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] }
-  ])
+  const [issueRows, setIssueRows] = useState([])
   const [search, setSearch] = useState('')
   const [requestSearch, setRequestSearch] = useState('')
   const [requestRows] = useState([
     { repo_fullname: '레포이름', issue_number: 2, title: '변경요청 ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ타이틀', body: '변경ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ요청 바디', assignee: '담당자', priority: 'S', iteration: 2, labels: ['요청1', '요청2'] }
     // 필요시 더미 데이터 추가
   ])
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchAllIssues(projectId)
+        setIssueRows(response)
+      } catch (error) {
+        console.error('Error fetching issues:', error)
+      }
+    }
+    fetchData()
+  }, [projectId])
+
+
   const filteredRows = search
     ? issueRows.filter(row =>
       row.title.includes(search) ||
