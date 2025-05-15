@@ -13,6 +13,7 @@ import { MainBox } from '@styles/globalStyle'
 import { api } from '../../hooks/useAxios'
 import dayjs from 'dayjs'
 import { useAccessTokenStore, useRefreshTokenStore, useUserStore } from '@store/useUserStore'
+import { useNavigate } from 'react-router-dom'
 
 const Fieldset = styled.div`
 	display: flex;
@@ -71,6 +72,7 @@ const BuildProject = () => {
 	const [search, setSearch] = useState('')
 	const inputRef = useRef(null)
 	const isSearching = useRef(false)
+	const navigate = useNavigate()
 
 	// hash로 단계 관리
 	useEffect(() => {
@@ -326,15 +328,13 @@ const BuildProject = () => {
 						form.files.forEach(file => {
 							formData.append('files', file)
 						})
-						console.log('POST 전송 project_req:', projectReq)
-						console.log('POST 전송 files:', Array.from(formData.getAll('files')))
 						try {
 							await api.post('/project', formData, {
 								headers: { Authorization: `Bearer ${accessToken}` }
 							})
 							
-							window.location.href = '/'
-						} catch {
+							navigate('/')
+						} catch (error) {
 							alert('프로젝트 생성 실패')
 							console.log('프로젝트 생성 실패:', error)
 						}
