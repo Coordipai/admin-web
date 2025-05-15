@@ -91,7 +91,14 @@ const SearchInputField = ({
         ref={inputRef}
         onFocus={() => setOpen(true)}
         icon={searchIcon}
-        {...props}
+        onKeyDown={e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            if (props.onKeyDown) props.onKeyDown(e)
+          }
+        }}
+        {...Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'onKeyDown'))}
       />
       {open && value && filtered.length > 0 && createPortal(
         <DropDownMenu

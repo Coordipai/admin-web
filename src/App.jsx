@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { ToastContainer } from 'react-toastify'
 
@@ -14,9 +13,7 @@ import RepositoryCheckPage from '@pages/AccountSetupPage/RepositoryCheckPage'
 import UserForm from '@pages/UserPage/UserPage'
 import ComponentTest from '@pages/test/ComponentTest'
 import IssueModalTest from '@pages/issue/IssueModalTest'
-import { BuildProject } from '@pages/build_project/BuildProject'
-import { BuildProject2 } from '@pages/build_project/BuildProject2'
-import { BuildProject3 } from '@pages/build_project/BuildProject3'
+import  BuildProject  from '@pages/build_project/BuildProject'
 import { Project } from '@pages/project/Project'
 import IssueDetailPage from '@pages/issue/IssueDetailPage'
 import { SettingProject } from '@pages/build_project/SettingProject'
@@ -24,6 +21,7 @@ import IssueRequestPage from '@pages/issue/IssueRequestPage'
 import NotFoundPage from '@pages/NotFoundPage'
 import IssueSuggestPage from '@pages/issue/IssueSuggestPage'
 import ProjectTest from '@pages/test/ProjectTest'
+
 
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 
@@ -41,34 +39,34 @@ function App () {
     <BrowserRouter>
       <ToastContainer />
       <Routes>
-        <Route path='/' element={<PrivateRoute element={Home} />} />
+        <Route path='/' element={<PrivateRoute element={<Home />} />} />
 
         <Route path='/login' element={<LoginPage />} />
         <Route path="/register/:githubId" element={<FirstAccountPage />} />
         <Route path="/repositorycheckpage/:githubId" element={<RepositoryCheckPage />} />
-        <Route path="/userform/:githubId" element={<PrivateRoute element={UserForm} />} />
+        <Route path="/userform/:githubId" element={<PrivateRoute element={<UserForm />} />} />
 
         <Route path='/repositorycheckpage' element={<RepositoryCheckPage />} />
 
         {/* Sidebar */}
-        <Route path='/user' element={<PrivateRoute element={UserForm} />} />
+        <Route path='/user' element={<PrivateRoute element={<UserForm />} />} />
 
         {/* Test Page */}
-        <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />
-        <Route path='/issueModalTest' element={<IssueModalTest />} />
-        <Route path='/projectTest' element={<PrivateRoute element={ProjectTest} />} />
+
+        <Route path='/components' element={<PrivateRoute element={<ComponentTest />} />} />
+        <Route path='/issueModalTest' element={<PrivateRoute element={<IssueModalTest />} />} />
+        <Route path='/projectTest' element={<PrivateRoute element={<ProjectTest/>} />} />
+
 
         {/* BuildProject Page */}
-        <Route path='/buildproject' element={<PrivateRoute element={BuildProject} />} />
-        <Route path='/buildproject2' element={<PrivateRoute element={BuildProject2} />} />
-        <Route path='/buildproject3' element={<PrivateRoute element={BuildProject3} />} />
+        <Route path='/buildproject' element={<PrivateRoute element={<BuildProject />} />} />
 
         {/* Project Page */}
-        <Route path='/project/:projectId' element={<PrivateRoute element={Project} />} />
-        <Route path='/project/:projectId/issue/:issueId' element={<PrivateRoute element={IssueDetailPage} />} />
-        <Route path='/project/:projectId/issuesuggest/' element={<PrivateRoute element={IssueSuggestPage} />} />
-        <Route path='/project/:projectId/edit' element={<PrivateRoute element={SettingProject} />} />
-        <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={IssueRequestPage} />} />
+
+        <Route path='/project/:projectId' element={<PrivateRoute element={<Project />} />} />
+        <Route path='/project/:projectId/issue/:issueId' element={<PrivateRoute element={<IssueDetailPage />} />} />
+        <Route path='/project/:projectId/edit' element={<PrivateRoute element={<SettingProject />} />} />
+        <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={<IssueRequestPage />} />} />
 
         {/* Not Found Page */}
         <Route path='*' element={<NotFoundPage />} />
@@ -77,7 +75,7 @@ function App () {
   )
 }
 
-const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
+const PrivateRoute = ({ element, hasSideBar = true }) => {
   const navigate = useNavigate()
   // const location = useLocation();
   // const { authData, isAuthorized, logout, fetchAuthData } = useAuth();
@@ -112,15 +110,15 @@ const PrivateRoute = ({ element: Component, hasSideBar = true }) => {
           />
         )
       }
-      <Component />
+      {element}
     </PageBox>
   ) : (
-    <Component />
+    {element}
   )
 }
 
 PrivateRoute.propTypes = {
-  element: PropTypes.elementType.isRequired,
+  element: PropTypes.element.isRequired,
   hasSideBar: PropTypes.bool
 }
 
