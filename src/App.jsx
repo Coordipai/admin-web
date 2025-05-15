@@ -12,7 +12,7 @@ import LoginPage from '@pages/login/LoginPage'
 import FirstAccountPage from '@pages/AccountSetupPage/AccountSetupPage'
 import RepositoryCheckPage from '@pages/AccountSetupPage/RepositoryCheckPage'
 import UserForm from '@pages/UserPage/UserPage'
-import ComponentTest from '@pages/ComponentTest'
+import ComponentTest from '@pages/test/ComponentTest'
 import IssueModalTest from '@pages/issue/IssueModalTest'
 import { BuildProject } from '@pages/build_project/BuildProject'
 import { BuildProject2 } from '@pages/build_project/BuildProject2'
@@ -22,6 +22,8 @@ import IssueDetailPage from '@pages/issue/IssueDetailPage'
 import { SettingProject } from '@pages/build_project/SettingProject'
 import IssueRequestPage from '@pages/issue/IssueRequestPage'
 import NotFoundPage from '@pages/NotFoundPage'
+import IssueSuggestPage from '@pages/issue/IssueSuggestPage'
+import ProjectTest from '@pages/test/ProjectTest'
 
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 
@@ -54,6 +56,7 @@ function App () {
         {/* Test Page */}
         <Route path='/components' element={<PrivateRoute element={ComponentTest} />} />
         <Route path='/issueModalTest' element={<IssueModalTest />} />
+        <Route path='/projectTest' element={<PrivateRoute element={ProjectTest} />} />
 
         {/* BuildProject Page */}
         <Route path='/buildproject' element={<PrivateRoute element={BuildProject} />} />
@@ -63,6 +66,7 @@ function App () {
         {/* Project Page */}
         <Route path='/project/:projectId' element={<PrivateRoute element={Project} />} />
         <Route path='/project/:projectId/issue/:issueId' element={<PrivateRoute element={IssueDetailPage} />} />
+        <Route path='/project/:projectId/issuesuggest/' element={<PrivateRoute element={IssueSuggestPage} />} />
         <Route path='/project/:projectId/edit' element={<PrivateRoute element={SettingProject} />} />
         <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={IssueRequestPage} />} />
 
