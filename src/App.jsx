@@ -41,12 +41,12 @@ function App () {
         <Route path='/login' element={<LoginPage />} />
         <Route path="/register/:githubId" element={<FirstAccountPage />} />
         <Route path="/repositorycheckpage/:githubId" element={<RepositoryCheckPage />} />
-        <Route path="/userform/:githubId" element={<PrivateRoute element={UserForm} />} />
+        <Route path="/userform/:githubId" element={<PrivateRoute element={<UserForm />} />} />
 
         <Route path='/repositorycheckpage' element={<RepositoryCheckPage />} />
 
         {/* Sidebar */}
-        <Route path='/user' element={<PrivateRoute element={UserForm} />} />
+        <Route path='/user' element={<PrivateRoute element={<UserForm />} />} />
 
         {/* Test Page */}
         <Route path='/components' element={<PrivateRoute element={<ComponentTest />} />} />
