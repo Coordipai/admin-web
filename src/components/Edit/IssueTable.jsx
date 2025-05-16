@@ -11,9 +11,10 @@ import { useNavigate, useLocation } from 'react-router-dom'
 const TableWrapper = styled.div`
   box-sizing: border-box;
   display: flex;
+  justify-content: space-between;
+  flex:1;
   flex-direction: column;
   width: 100%;
-  max-height: 100%;
   background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.gray200};
   border-radius: ${({ theme }) => theme.radius.lg};
@@ -21,20 +22,14 @@ const TableWrapper = styled.div`
   overflow: hidden;
 `
 
-const TableScrollArea = styled.div`
-  width: 100%;
-  overflow-x: auto;
-  flex: 1 1 auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar { display: none; }
-`
-
 const Table = styled.table`
+  
   width: 100%;
+  max-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   background: ${({ theme }) => theme.colors.white};
+  table-layout: fixed;
 `
 
 const Thead = styled.thead`
@@ -51,6 +46,7 @@ const Th = styled.th`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
 `
 
 const Td = styled.td`
@@ -72,10 +68,8 @@ const Td = styled.td`
 `
 
 const Tr = styled.tr`
-  &:last-child ${Td} {
-    border-bottom: none;
-  }
 
+  max-height:60px;
   &:hover {
     background: ${({ theme }) => theme.colors.gray200};
   }
@@ -104,18 +98,19 @@ const PaginationWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: ${({ theme }) => `${theme.padding.md} ${theme.padding.lg}`};
-  border-top: 1px solid ${({ theme }) => theme.colors.gray200};
+  // border-top: 1px solid ${({ theme }) => theme.colors.gray200};
   background: ${({ theme }) => theme.colors.white};
   width: 100%;
   max-width: 100%;
+  height: 66px;
 `
 
 const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) => {
   const wrapperRef = useRef(null)
   const [pageSize, setPageSize] = useState(99)
-  const HEADER_HEIGHT = 47 // px
-  const PAGINATION_HEIGHT = 57 // px
-  const ROW_HEIGHT = 52.5 // px
+  const HEADER_HEIGHT = 53 // px
+  const PAGINATION_HEIGHT = 66 // px
+  const ROW_HEIGHT = 40.5 // px
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -152,14 +147,12 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
 
   return (
     <TableWrapper ref={wrapperRef}>
-      <TableScrollArea>
         <Table>
           <Thead>
             <TrHeader>
               <Th># 이슈번호</Th>
               <Th>레포이름</Th>
               <Th>제목</Th>
-              <Th>바디</Th>
               <Th>어사이니</Th>
               <Th>우선순위</Th>
               <Th>이터레이션</Th>
@@ -168,11 +161,11 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
           <tbody>
             {pagedRows.length === 0
               ? (
-                <Tr>
-                  <Td colSpan={8} style={{ textAlign: 'center', color: undefined }}>
-                    <Typography variant='textMD' color='gray500' value='검색된 이슈가 없습니다.' />
+                <tr>
+                  <Td colSpan={7} rowSpan={8} align="center">
+                    <Typography variant='textMD' color='gray500' value={variant === 'request' ? '변경요청서가 없습니다.' : '이슈가 없습니다.'} />
                   </Td>
-                </Tr>
+                </tr>
                 )
               : (
                   pagedRows.map((row, idx) => (
@@ -180,8 +173,11 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
                       <Td># {row.issue_number}</Td>
                       <Td>{row.repo_fullname}</Td>
                       <Td>{row.title}</Td>
-                      <Td>{row.body}</Td>
-                      <Td>{row.assignee}</Td>
+                      <Td>
+                        {Array.isArray(row.assignees) && row.assignees.length > 0
+                          ? row.assignees.map(a => a.github_name).join(', ')
+                          : ''}
+                      </Td>
                       <Td><Badge priority={row.priority} /></Td>
                       <Td>Iteration {row.iteration}</Td>
                     </Tr>
@@ -189,7 +185,7 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
                 )}
           </tbody>
         </Table>
-      </TableScrollArea>
+
       <PaginationWrapper>
         <Button
           icon={<img src={ArrowLeftIcon} alt='이전' />}
