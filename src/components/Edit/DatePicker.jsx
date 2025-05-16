@@ -198,6 +198,17 @@ const DatePicker = ({ paramYear, paramMonth, paramDate, setPickedDate, label, re
     setOriginalDate()
   }, [setOriginalDate])
 
+  useEffect(() => {
+    console.log(paramYear, paramMonth, paramDate)
+    if (paramYear && paramMonth && paramDate) {
+      setYear(paramYear)
+      setMonth(paramMonth)
+      setDate(paramDate)
+      setSelectedDate(`${paramYear}-${String(paramMonth).padStart(2, '0')}-${String(paramDate).padStart(2, '0')}`)
+      generateCalendar(paramYear, paramMonth, paramDate)
+    }
+  }, [paramYear, paramMonth, paramDate])
+
   return (
     <>
       <InputField

@@ -37,15 +37,22 @@ const useFetchWithTokenRefresh = () => {
   // headers, params, data 등의 옵션을 포함할 수 있습니다.
   // 예: { headers: {...}, params: {...}, data: {...} }
   const wrappedRequest = async (method, url, config = {}) => {
-    // 항상 Authorization 헤더 추가
     const headers = {
       ...(config.headers || {}),
       Authorization: `Bearer ${accessToken}`
     }
     const mergedConfig = { ...config, headers }
     try {
-      const response = await api[method](url, mergedConfig)
-      return response.data.content.data;
+      if (method === 'get' || method === 'delete') {
+        const response = await api[method](url, mergedConfig)
+        return response.data.content.data
+      } else {
+        const data = mergedConfig.data
+        const configForAxios = { ...mergedConfig }
+        delete configForAxios.data
+        const response = await api[method](url, data, configForAxios)
+        return response.data.content.data
+      }
     } catch (error) {
       if (error.response && error.response.status === 401) {
         const refreshResult = await refreshAccessToken()
@@ -61,8 +68,16 @@ const useFetchWithTokenRefresh = () => {
         }
         const retryConfig = { ...config, headers: retryHeaders }
         try {
-          const retryResponse = await api[method](url, retryConfig)
-          return retryResponse.data.content.data;
+          if (method === 'get' || method === 'delete') {
+            const retryResponse = await api[method](url, retryConfig)
+            return retryResponse.data.content.data;
+          } else {
+            const data = retryConfig.data
+            const configForAxios = { ...retryConfig }
+            delete configForAxios.data
+            const retryResponse = await api[method](url, data, configForAxios)
+            return retryResponse.data.content.data;
+          }
         } catch {
           navigate('/login')
           return
@@ -94,7 +109,18 @@ const useFetchWithTokenRefresh = () => {
    */
   const Post = (url, data, config) => wrappedRequest('post', url, { ...config, data })
 
-  return { Get, Post, wrappedRequest }
+  /**
+   * PUT 요청
+   * @param {string} url - 요청할 API 엔드포인트
+   * @param {object} [data] - request body
+   * @param {object} [config] - axios config (params, headers 등)
+   * @returns {Promise<any>} - API 응답 데이터
+   * @example
+   *   await Put('/api/endpoint', { foo: 1 }, { params: { bar: 2 } })
+   */
+  const Put = (url, data, config) => wrappedRequest('put', url, { ...config, data })
+
+  return { Get, Post, Put, wrappedRequest }
 }
 
 export default useFetchWithTokenRefresh 

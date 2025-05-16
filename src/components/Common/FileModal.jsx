@@ -269,13 +269,13 @@ const FileModal = ({ open, onClose, onAttach }) => {
                       style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                       value={f.name}
                     />
-                    <Typography
+                    {/* <Typography
                       as='div'
                       variant='textSM'
                       weight='regular'
                       color='gray500'
                       value={formatFileSize(f.size)}
-                    />
+                    /> */}
                   </FileItemInfo>
                   <IconButton
                     icon={<img src='/src/assets/icons/trash-icon.svg' alt='Delete' />}

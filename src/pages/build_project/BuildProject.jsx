@@ -315,9 +315,6 @@ const BuildProject = () => {
 				<ButtonGroup>
 					<Button text='취소' type='button' onClick={() => (window.location.hash = '#step2')} />
 					<Button text='완료' type='submit' onClick={async () => {
-						const sprintMap = { '1주': 1, '2주': 2, '1개월': 4 }
-						const sprint_unit = sprintMap[form.sprint] || 1
-
 						// 날짜를 ISO 8601로 변환
 						const startDate = form.deadline ? new Date().toISOString() : dayjs().format('YYYY-MM-DDT00:00:00[Z]')
 						const endDate = form.deadline ? `${form.deadline}T00:00:00Z` : ''
@@ -332,7 +329,7 @@ const BuildProject = () => {
 							repo_fullname: form.github,
 							start_date: startDate,
 							end_date: endDate,
-							sprint_unit: Number(sprint_unit),
+							sprint_unit: Number(form.sprint),
 							discord_channel_id: String(form.discord),
 							members
 						}
