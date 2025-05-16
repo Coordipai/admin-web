@@ -92,8 +92,13 @@ const SearchInputField = ({
         onFocus={() => setOpen(true)}
         icon={searchIcon}
         onKeyDown={e => {
-          e.stopPropagation();
-          if (props.onKeyDown) props.onKeyDown(e)
+
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            if (props.onKeyDown) props.onKeyDown(e)
+          }
+
         }}
         {...Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'onKeyDown'))}
       />

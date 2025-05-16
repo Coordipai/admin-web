@@ -174,24 +174,16 @@ const FileTable = ({ files, setFiles }) => {
   const [modalOpen, setModalOpen] = useState(false)
 
   // 파일 삭제
-  const handleDelete = (name) => {
-    setFiles(files.filter((f) => f.name !== name))
+  const handleDelete = (name, size) => {
+    setFiles(files.filter((f) => !(f.name === name && f.size === size)))
   }
 
   // 파일 첨부(모달에서 Attach 클릭)
   const handleAttach = (newFiles) => {
-    // 실제 API 전송 예시 (주석처리)
-    // const formData = new FormData();
-    // newFiles.forEach(file => formData.append('files', file));
-    // await axios.post('/api/upload', formData);
-
+    // newFiles는 File 객체 배열임
     setFiles([
       ...files,
-      ...newFiles.map(f => ({
-        name: f.name,
-        size: f.size,
-        icon: 'file'
-      }))
+      ...newFiles
     ])
     setModalOpen(false)
   }
@@ -222,12 +214,12 @@ const FileTable = ({ files, setFiles }) => {
           </TableHeaderRow>
           <TableRowContainer>
             {files.map((file, index) => (
-              <TableRow key={file.name + index} $isEven={index % 2 === 0}>
+              <TableRow key={file.name + file.size + index} $isEven={index % 2 === 0}>
                 <FileIconCell>
                   <FileIcon>
                     <img
-                      src={`/src/assets/icons/${file.icon}-icon.svg`}
-                      alt={file.icon}
+                      src={'/src/assets/icons/file-icon.svg'}
+                      alt='file'
                     />
                   </FileIcon>
                 </FileIconCell>
@@ -239,7 +231,7 @@ const FileTable = ({ files, setFiles }) => {
                   <IconButton
                     icon={<img src='/src/assets/icons/trash-icon.svg' alt='Delete' />}
                     type='button'
-                    onClick={() => handleDelete(file.name)}
+                    onClick={() => handleDelete(file.name, file.size)}
                   />
                 </ActionCell>
               </TableRow>

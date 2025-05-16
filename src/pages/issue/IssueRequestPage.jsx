@@ -9,6 +9,7 @@ import Header from '@components/Header'
 import { EditContentHeader } from '@components/Edit/EditContentHeader'
 import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
+import axios from 'axios'
 
 const FormWrapper = styled.div`
   max-width: 1120px;
@@ -21,9 +22,9 @@ const FormWrapper = styled.div`
 
 const LabeledRow = styled.div`
   width: 100%;
-  display: flex;;
+  display: flex;
   gap: 2rem;
-  padding: 2rem ;
+  padding: 2rem;
 `
 
 const TextareaWrapper = styled.div`
@@ -79,33 +80,64 @@ const Button = styled(ButtonBase)`
 `
 
 export default function IssueRequestPage () {
-  const { requestId } = useParams()
+  const { projectId, requestId } = useParams()
   const [issueData, setIssueData] = useState(null)
   const [aiFeedback, setAiFeedback] = useState('')
   const [aiFeedbackReason, setAiFeedbackReason] = useState('')
 
-  useEffect(() => {
-    const fetchIssueData = async () => {
-      try {
-        console.log('Request ID:', requestId) // Log the requestId for debugging
-        // const response = await axios.get(`/api/issue/${requestId}`)
-        const mockIssue = {
-          username: 'Oliva',
-          userPart: '프론트엔드',
-          reason: '변경 사유 내용',
-          currentSprint: 'sprint 1',
-          targetSprint: 'sprint 3',
-          oldAssignee: 'Oliva',
-          newAssignee: 'Lucas'
-        }
-        setIssueData(mockIssue)
-      } catch (error) {
-        console.error('이슈 데이터 가져오기 실패:', error)
-      }
+  const handleApproveChange = async () => {
+    if (!issueData || selectedSprint === -1 || selectedAssignee === -1) {
+      alert('변경할 스프린트와 담당자를 모두 선택해주세요.');
+      return;
     }
 
-    fetchIssueData()
-  }, [requestId]) // Add requestId as a dependency
+    try {
+      const payload = {
+        project_id: Number(projectId),
+        issue_number: Number(requestId),
+        reason: issueData.reason,
+        new_iteration: sprintOptions[selectedSprint]?.title,
+        new_assignees: [assigneeOptions[selectedAssignee]?.title],
+      };
+
+      const res = await axios.post('/issue-reschedule/', payload);
+      console.log('요청 성공:', res.data);
+    } catch (error) {
+      console.error('요청 실패:', error);
+    }
+  };
+
+useEffect(() => {
+  const fetchIssueData = async () => {
+    try {
+      const res = await axios.get(`/issue-reschedule/${projectId}`);
+      const issues = res.data?.content?.data || [];
+
+      const matched = issues.find(issue => issue.issue_number === Number(requestId));
+
+      if (!matched) {
+        alert('해당 요청을 찾을 수 없습니다.');
+        return;
+      }
+
+      const transformed = {
+        username: matched.old_assignees?.[0] || '', // 실제로는 백엔드에서 사용자 정보도 줘야 함
+        userPart: '프론트엔드', // 마찬가지로 추가 필요
+        reason: matched.reason,
+        currentSprint: matched.old_iteration,
+        targetSprint: matched.new_iteration,
+        oldAssignee: matched.old_assignees?.[0] || '',
+        newAssignee: matched.new_assignees?.[0] || ''
+      };
+
+      setIssueData(transformed);
+    } catch (error) {
+      console.error('이슈 데이터 가져오기 실패:', error);
+    }
+  };
+
+  fetchIssueData();
+}, [projectId, requestId]);
 
   useEffect(() => {
     const fetchAiFeedback = async () => {
@@ -161,15 +193,28 @@ export default function IssueRequestPage () {
 
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
-  const handleRejectChange = () => {
-    console.log('변경 반려 요청 처리')
-    // TODO: axios.post('/api/issue/reject', { issueId })
-  }
+  const handleRejectChange = async () => {
+    if (!issueData || selectedSprint === -1 || selectedAssignee === -1) {
+      alert('변경할 스프린트와 담당자를 모두 선택해주세요.');
+      return;
+    }
 
-  const handleApproveChange = () => {
-    console.log('변경 승인 요청 처리')
-    // TODO: axios.post('/api/issue/approve', { issueId })
-  }
+    try {
+      const payload = {
+        project_id: Number(projectId),
+        issue_number: Number(requestId),
+        reason: issueData.reason + ' (반려)', // 혹은 별도 reason 전달
+        new_iteration: sprintOptions[selectedSprint]?.title,
+        new_assignees: [assigneeOptions[selectedAssignee]?.title],
+      };
+
+      const res = await axios.put('/issue-reschedule/', payload);
+      console.log('반려 처리 완료:', res.data);
+    } catch (error) {
+      console.error('반려 요청 실패:', error);
+    }
+  };
+
 
   const handleRequestFeedbackAgain = () => {
     console.log('AI 피드백 재요청 처리')

@@ -12,9 +12,8 @@ import { extractDate } from '@utils/dateUtils'
 
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
-import { projectData } from '../mocks/project'
-import { useUserStore } from '@store/useUserStore'
-import { userData } from '../mocks/user'
+import { api } from '../hooks/useAxios'
+import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -97,33 +96,105 @@ export const Home = () => {
   const theme = useTheme()
   const navigate = useNavigate()
   const { setProject, clearProject } = useProjectStore();
-
-  const setUser = useUserStore((state) => state.setUser)
-
-  // const [projects] = useState([
-  //   { id: 1, name: '프로젝트1', start_date: '2021-01-01', end_date: '2021-01-01' },
-  //   { id: 2, name: '프로젝트2', start_date: '2021-01-01', end_date: '2021-01-01' },
-  //   { id: 3, name: '프로젝트3', start_date: '2021-01-01', end_date: '2021-01-01' }
-  // ])
+  const accessToken = useAccessTokenStore(state => state.accessToken)
+  const setUser = useUserStore(state => state.setUser)
+  const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
+  const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
+  const refreshToken = useRefreshTokenStore(state => state.refreshToken)
 
   const [projects, setProjects] = useState([])  // 프로젝트 목록 
 
-  // useCallback을 사용하는 게 좋은가?
   useEffect(() => {
-    const fetchProjects = async () => {
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(projectData) // projectData는 dummy data
-        }, 1000)
-      })
+    const loginAndFetchProjects = async () => {
+      try {
+        // 1. 로그인 요청 (쿠키 기반)
+        let loginData = null
+        try {
+          const loginRes = await api.post('/auth/login', {}, { withCredentials: true })
+          loginData = loginRes.data?.content?.data
+          if (loginData) {
+            setUser(loginData.user)
+            setAccessToken(loginData.access_token)
+            setRefreshToken(loginData.refresh_token)
+          }
+        } catch {
+          // 로그인 실패 시 refresh 시도
+          if (refreshToken) {
+            try {
+              const refreshRes = await api.post('/auth/refresh', {
+                refresh_token: refreshToken
+              })
+              const refreshData = refreshRes.data?.content?.data
+              if (refreshData) {
+                setUser(refreshData.user)
+                setAccessToken(refreshData.access_token)
+                setRefreshToken(refreshData.refresh_token)
+                loginData = refreshData
+              } else {
+                navigate('/login')
+                return
+              }
+            } catch {
+              navigate('/login')
+              return
+            }
+          } else {
+            navigate('/login')
+            return
+          }
+        }
 
-      // content.data만 추출하여 projects로 설정
-      const extractedProjects = response.map(res => res.content.data)
-      setProjects(extractedProjects)
+        // 2. 프로젝트 목록 요청 (로그인/리프레시 후 토큰 사용)
+        let tokenToUse = loginData?.access_token || accessToken
+        let projectRes
+        try {
+          projectRes = await api.get('/project', {
+            headers: {
+              Authorization: `Bearer ${tokenToUse}`
+            }
+          })
+        } catch (err) {
+          // 401 에러 시 토큰 갱신
+          if (err.response && err.response.status === 401 && refreshToken) {
+            try {
+              const refreshRes = await api.post('/auth/refresh', {
+                refresh_token: refreshToken
+              })
+              const refreshData = refreshRes.data?.content?.data
+              if (refreshData) {
+                setUser(refreshData.user)
+                setAccessToken(refreshData.access_token)
+                setRefreshToken(refreshData.refresh_token)
+                // 갱신된 토큰으로 재요청
+                projectRes = await api.get('/project', {
+                  headers: {
+                    Authorization: `Bearer ${refreshData.access_token}`
+                  }
+                })
+              } else {
+                navigate('/login')
+                return
+              }
+            } catch {
+              navigate('/login')
+              return
+            }
+          } else {
+            navigate('/login')
+            return
+          }
+        }
+        const data = projectRes?.data?.content?.data || []
+        setProjects(data)
+
+        console.log(data)
+      } catch {
+        navigate('/login')
+      }
     }
-
-    fetchProjects()
+    loginAndFetchProjects()
   }, [])
+
   
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState(null)
@@ -137,23 +208,6 @@ export const Home = () => {
   useEffect(() => {
     clearProject()  
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
-
-
-  // 로그인 과정으로 옮겨야 함
-  useEffect(() => {
-    const fetchUser = async () => {
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(userData) // userData는 dummy data
-        }, 1000)
-      })
-
-      setUser(response)
-      // console.log(response)
-    }
-    fetchUser()
-  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
-
 
   return (
     <MainBox>
@@ -175,11 +229,13 @@ export const Home = () => {
             {filteredProjects.map((project) => (
               <ProjectCard
                 key={project.id}
-                {...project}
+                name={project.name}
+                start_date={project.start_date}
+                end_date={project.end_date}
                 selected={selectedId === project.id}
                 onClick={() => {
                   setSelectedId(project.id)
-                  setProject(project)
+                  // setProject(project)
                   navigate(`/project/${project.id}#issue`)
                 }}
               />

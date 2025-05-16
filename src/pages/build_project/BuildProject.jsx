@@ -10,8 +10,11 @@ import Header from '@components/Header'
 import UserTable from '@components/Edit/UserTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox } from '@styles/globalStyle'
-import { api } from '@hooks/useAxios'
+import { api } from '../../hooks/useAxios'
 import dayjs from 'dayjs'
+import { useAccessTokenStore, useRefreshTokenStore, useUserStore } from '@store/useUserStore'
+import { useNavigate } from 'react-router-dom'
+
 
 const Fieldset = styled.div`
 	display: flex;
@@ -51,6 +54,13 @@ const sprintOptions = [
 ]
 
 const BuildProject = () => {
+
+	const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
+	const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
+	const setUser = useUserStore(state => state.setUser)
+	const accessToken = useAccessTokenStore(state => state.accessToken)
+	const refreshToken = useRefreshTokenStore(state => state.refreshToken)
+
 	const [step, setStep] = useState(1)
 	const [form, setForm] = useState({
 		projectName: '',
@@ -63,8 +73,11 @@ const BuildProject = () => {
 	})
 	const [error, setError] = useState({})
 	const [search, setSearch] = useState('')
-	const [searchResults, setSearchResults] = useState([])
+
 	const inputRef = useRef(null)
+	const isSearching = useRef(false)
+	const navigate = useNavigate()
+
 
 	// hash로 단계 관리
 	useEffect(() => {
@@ -175,7 +188,18 @@ const BuildProject = () => {
 			<Header text='프로젝트 생성' />
 			<Section>
 				<Fieldset>
-					<FileTable files={form.files} setFiles={files => setForm(f => ({ ...f, files }))} />
+
+					<FileTable
+						files={form.files}
+						setFiles={newFiles => {
+							console.log('FileTable에서 form에 저장되는 파일:', newFiles)
+							setForm(f => ({
+								...f,
+								files: Array.from(newFiles, file => file instanceof File ? file : file.file)
+							}))
+						}}
+					/>
+
 				</Fieldset>
 				<ButtonGroup>
 					<Button text='취소' type='button' onClick={() => (window.location.hash = '#step1')} />
@@ -188,32 +212,69 @@ const BuildProject = () => {
 	// 3단계: 팀원 관리 및 제출
 	const handleSearchKeyDown = async (e) => {
 		if (e.key !== 'Enter') return;
-		const keyword = e.target.value;
-		if (!keyword) return;
-		try {
-			const res = await api.get('/user/search', { params: { user_name: keyword } })
-			const users = res.data?.content?.data || []
-			if (users.length === 0) {
-				alert('해당 사용자가 없습니다')
-				setSearchResults([])
-				return
-			}
-			setSearchResults(users.map(user => ({
-				value: user.github_name,
-				label: `${user.name} (${user.github_name})`,
-				_raw: user
-			})))
-		} catch {
-			setSearchResults([])
-			alert('해당 사용자가 없습니다')
-		}
-	}
 
-	const handleSelectUser = (githubName) => {
-		if (form.members.some(member => member.githubId === githubName)) return
-		const selectedUser = searchResults.find(user => user.value === githubName)
-		if (!selectedUser) return
-		const userInfo = selectedUser._raw
+		if (isSearching.current) return;
+		isSearching.current = true;
+		e.preventDefault();
+		const keyword = e.target.value;
+		if (!keyword) {
+			isSearching.current = false;
+			return;
+		}
+		let res;
+		try {
+			res = await api.get('/user/search', {
+				headers: {
+					Authorization: `Bearer ${accessToken}`
+				},
+				params: { user_name: keyword }
+			})
+		} catch (err) {
+			if (err.response && err.response.status === 401 && refreshToken) {
+				try {
+					const refreshRes = await api.post('/auth/refresh', {
+						refresh_token: refreshToken
+					})
+					const refreshData = refreshRes.data?.content?.data
+					if (refreshData) {
+						setUser(refreshData.user)
+						setAccessToken(refreshData.access_token)
+						setRefreshToken(refreshData.refresh_token)
+						res = await api.get('/user/search', {
+							headers: {
+								Authorization: `Bearer ${refreshData.access_token}`
+							},
+							params: { user_name: keyword }
+						})
+					} else {
+						alert('인증이 만료되었습니다. 다시 로그인 해주세요.')
+						isSearching.current = false;
+						return;
+					}
+				} catch {
+					alert('인증이 만료되었습니다. 다시 로그인 해주세요.')
+					isSearching.current = false;
+					return;
+				}
+			} else {
+				alert('존재하지 않는 사용자입니다')
+				isSearching.current = false;
+				return;
+			}
+		}
+		const users = res.data?.content?.data || []
+		if (users.length === 0) {
+			alert('존재하지 않는 사용자입니다')
+			isSearching.current = false;
+			return;
+		}
+		const userInfo = users[0]
+		if (form.members.some(member => member.id === userInfo.id)) {
+			alert('이미 추가된 팀원입니다')
+			isSearching.current = false;
+			return;
+		}
+
 		setForm(f => ({
 			...f,
 			members: [
@@ -228,7 +289,9 @@ const BuildProject = () => {
 			]
 		}))
 		setSearch('')
-		setSearchResults([])
+
+		isSearching.current = false;
+
 	}
 
 	const renderStep3 = () => (
@@ -240,8 +303,9 @@ const BuildProject = () => {
 						label='팀원 검색'
 						value={search}
 						onChange={e => setSearch(e.target.value)}
-						options={searchResults}
-						onSelect={handleSelectUser}
+
+						options={[]}
+
 						onKeyDown={handleSearchKeyDown}
 						placeholder='팀원을 검색하세요'
 						ref={inputRef}
@@ -253,27 +317,43 @@ const BuildProject = () => {
 					<Button text='완료' type='submit' onClick={async () => {
 						const sprintMap = { '1주': 1, '2주': 2, '1개월': 4 }
 						const sprint_unit = sprintMap[form.sprint] || 1
-						const today = dayjs().format('YYYY-MM-DDT00:00:00[Z]')
+
+						// 날짜를 ISO 8601로 변환
+						const startDate = form.deadline ? new Date().toISOString() : dayjs().format('YYYY-MM-DDT00:00:00[Z]')
+						const endDate = form.deadline ? `${form.deadline}T00:00:00Z` : ''
+
 						const members = form.members.map(row => ({
 							id: row.id,
 							role: row.field || 'member'
 						}))
-						const endDate = form.deadline ? `${form.deadline}T00:00:00Z` : ''
-						const body = {
+
+						const projectReq = {
 							name: form.projectName,
 							repo_fullname: form.github,
-							start_date: today,
+							start_date: startDate,
 							end_date: endDate,
-							sprint_unit,
-							discord_chnnel_id: form.discord,
-							members,
-							files: form.files
+							sprint_unit: Number(sprint_unit),
+							discord_channel_id: String(form.discord),
+							members
 						}
+						/**
+						 * Coordipai/admin-web
+						 */
+						const formData = new FormData()
+						formData.append('project_req', JSON.stringify(projectReq))
+						form.files.forEach(file => {
+							formData.append('files', file)
+						})
 						try {
-							await api.post('/project', body)
-							window.location.href = '/'
-						} catch {
+							await api.post('/project', formData, {
+								headers: { Authorization: `Bearer ${accessToken}` }
+							})
+							
+							navigate('/')
+						} catch (error) {
 							alert('프로젝트 생성 실패')
+							console.log('프로젝트 생성 실패:', error)
+
 						}
 					}} />
 				</ButtonGroup>
