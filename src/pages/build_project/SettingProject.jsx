@@ -71,7 +71,7 @@ const DropDownWrapper = styled.div`
 export const SettingProject = () => {
   const { projectId } = useParams()
   const navigate = useNavigate()
-  const { Get, Put } = useFetchWithTokenRefresh()
+  const { Get, Put, Delete } = useFetchWithTokenRefresh()
 
   // form 상태로 통합 관리
   const [form, setForm] = useState({
@@ -161,6 +161,14 @@ export const SettingProject = () => {
       navigate('/')
     } catch {
       alert('프로젝트 수정 실패')
+    }
+  }
+  const handleDelete = async () => {
+    try {
+      await Delete(`/project/${projectId}`)
+      navigate('/')
+    } catch {
+      alert('프로젝트 삭제 실패') 
     }
   }
 
@@ -254,8 +262,9 @@ export const SettingProject = () => {
             <UserTable rows={form.members} setRows={rows => setForm(f => ({ ...f, members: rows }))} />
           </TableWrapper>
           <ButtonGroup>
-            <Button text='취소' type='button' onClick={() => navigate(-1)} />
-            <Button text='완료' type='button' onClick={handleUpdate} />
+            <Button variant='contained' onClick={() => navigate(-1)} >취소</Button>
+            <Button variant='outlined' color='brand500' onClick={handleUpdate} >완료</Button>
+            <Button variant='contained' onClick={handleDelete}>삭제</Button>
           </ButtonGroup>
         </Fieldset>
       </Section>

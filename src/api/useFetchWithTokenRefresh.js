@@ -120,7 +120,14 @@ const useFetchWithTokenRefresh = () => {
    */
   const Put = (url, data, config) => wrappedRequest('put', url, { ...config, data })
 
-  return { Get, Post, Put, wrappedRequest }
+  /**
+   * DELETE 요청
+   * @param {string} url - 요청할 API 엔드포인트
+   * @param {object} [config] - axios config (params, headers 등)
+   * @returns {Promise<any>} - API 응답 데이터
+   */
+  const Delete = (url, config) => wrappedRequest('delete', url, config)
+  return { Get, Post, Put, Delete, wrappedRequest }
 }
 
 export default useFetchWithTokenRefresh 
