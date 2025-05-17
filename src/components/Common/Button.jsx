@@ -7,52 +7,62 @@ const StyledButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: ${({ theme }) => theme.gap.sm};
-  padding: ${({ theme, $variant }) =>
-    $variant === 'icon' ? `${theme.padding.sm}` : `${theme.padding.sm} ${theme.padding.lg}`};
+  padding: ${({ theme }) => `${theme.padding.sm} ${theme.padding.lg}`};
   border-radius: ${({ theme }) => theme.radius.lg};
-  border: 1px solid
-    ${({ theme, $color }) =>
-      $color === 'white'
-        ? theme.colors.gray300
-        : $color
-        ? theme.colors[$color]
-        : theme.colors.brand500};
-  background: ${({ theme, $color }) => $color ? theme.colors[$color] : theme.colors.brand500};
-  color: ${({ theme, $color }) => $color === 'white' ? theme.colors.gray700 : theme.colors.white};
   font-family: Poppins, sans-serif;
   font-weight: ${({ theme }) => theme.weights.semiBold};
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
   box-sizing: border-box;
-  ${({ disabled, theme }) =>
-    disabled &&
-    css`
-      background: ${theme.colors.gray200};
-      color: ${theme.colors.gray400};
-      border-color: ${theme.colors.gray200};
-      cursor: not-allowed;
-    `}
-  &:hover {
-    background: ${({ theme, $color, disabled }) =>
-      disabled
-        ? theme.colors.gray200
-        : $color === 'white'
-        ? theme.colors.gray200
-        : theme.colors.brand600};
-  }
-  ${({ $variant, theme }) =>
-    $variant === 'text' &&
-    css`
-      background: none;
-      border: none;
-      color: ${theme.colors.brand500};
-      padding: 0;
-      &:hover {
-        background: none;
-        color: ${theme.colors.brand600};
-      }
-    `}
+  border-width: 1px;
+  border-style: solid;
+
+  ${({ theme, $variant = 'text', $color = 'brand500', disabled }) => {
+    const colorValue = theme.colors[$color] || theme.colors.brand500;
+    if (disabled) {
+      return css`
+        background: ${theme.colors.gray200};
+        color: ${theme.colors.gray400};
+        border-color: ${theme.colors.gray200};
+        cursor: not-allowed;
+      `
+    }
+    switch ($variant) {
+      case 'contained':
+        return css`
+          background: ${colorValue};
+          color: ${theme.colors.white};
+          border-color: ${colorValue};
+          &:hover {
+            background: ${theme.colors[$color + '600'] || colorValue};
+            border-color: ${theme.colors[$color + '600'] || colorValue};
+          }
+        `
+      case 'outlined':
+        return css`
+          background: ${theme.colors.white};
+          color: ${colorValue};
+          border-color: ${colorValue};
+          &:hover {
+            background: ${theme.colors.gray50};
+            color: ${theme.colors[$color + '600'] || colorValue};
+            border-color: ${theme.colors[$color + '600'] || colorValue};
+          }
+        `
+      case 'text':
+      default:
+        return css`
+          background: ${theme.colors.white};
+          color: ${colorValue};
+          border: none;
+          &:hover {
+            background: ${theme.colors.gray50};
+            color: ${theme.colors[$color + '600'] || colorValue};
+          }
+        `
+    }
+  }}
 `
 
 const IconWrapper = styled.span`
@@ -63,9 +73,10 @@ const IconWrapper = styled.span`
 
 /**
  * 버튼 컴포넌트
- * @param {string} text - 버튼에 표시될 텍스트
+ * @param {ReactNode} children - 버튼에 표시될 내용(텍스트 또는 노드)
  * @param {ReactNode} icon - 버튼에 표시될 아이콘
- * @param {'default'|'text'} variant - 버튼의 스타일 변형 ('default' 또는 'text')
+ * @param {'contained'|'outlined'|'text'} variant - 버튼의 스타일 변형
+ * @param {string} color - theme.js에 정의된 색상 키
  * @param {function} onClick - 클릭 이벤트 핸들러
  * @param {'button'|'submit'|'reset'} type - 버튼의 타입
  * @param {boolean} disabled - 버튼의 비활성화 여부
@@ -73,38 +84,13 @@ const IconWrapper = styled.span`
  * @returns {JSX.Element} 버튼 컴포넌트
  *
  * @example
- * // 기본 버튼
- * <Button text="확인" onClick={() => console.log('clicked')} />
- *
- * @example
- * // 아이콘이 있는 버튼
- * <Button
- *   text="업로드"
- *   icon={<UploadIcon />}
- *   onClick={handleUpload}
- * />
- *
- * @example
- * // 텍스트 변형 버튼
- * <Button
- *   text="더 보기"
- *   variant="text"
- *   onClick={handleShowMore}
- * />
- *
- * @example
- * // 제출 버튼
- * <Button
- *   text="저장"
- *   type="submit"
- *   disabled={!isValid}
- * />
+ * <Button variant="contained" color="brand500">확인</Button>
  */
 const Button = ({
-  text,
+  children,
   icon,
-  variant = 'default',
-  color,
+  variant = 'text',
+  color = 'brand500',
   onClick,
   type = 'button',
   disabled = false,
@@ -120,12 +106,18 @@ const Button = ({
       {...props}
     >
       {icon && <IconWrapper>{icon}</IconWrapper>}
-      {text && (
+      {children && (
         <Typography
           variant='textMD'
           weight={variant === 'text' ? 'medium' : 'semibold'}
-          color={variant === 'text' ? 'brand500' : 'white'}
-          value={text}
+          color={
+            disabled
+              ? 'gray400'
+              : variant === 'contained'
+              ? 'white'
+              : color
+          }
+          value={children}
         />
       )}
     </StyledButton>

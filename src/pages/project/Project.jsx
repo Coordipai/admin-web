@@ -6,6 +6,7 @@ import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox, ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
+import Button from '@components/Common/Button'
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -125,6 +126,8 @@ const EmptyIssueWrapper = styled.div`
 	gap: ${({ theme }) => theme.gap.md};
 `
 
+
+
 export const Project = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -203,12 +206,7 @@ export const Project = () => {
       <HeaderSection>
         <HeaderRow>
           <Typography variant='displayXS' weight='semiBold' color='gray700' value='대시보드' />
-          <ButtonBase
-            $isHighlighted
-            onClick={() => navigate(`${location.pathname}/edit`)}
-          >
-            프로젝트 설정
-          </ButtonBase>
+          <Button variant='contained' onClick={() => navigate(`${location.pathname}/edit`)} >프로젝트 설정</Button>
         </HeaderRow>
         <TabsWrapper>
           <TabsRow>
@@ -240,12 +238,14 @@ export const Project = () => {
                   placeholder='이슈를 검색하세요'
                 />
               </div>
-              <ButtonBase
-                $isHighlighted={false}
-                onClick={() => navigate(`${location.pathname}/issue/new`)}
-              >
-                이슈 추가
-              </ButtonBase>
+              <ButtonGroup>
+                <Button variant='outlined' color='gray700' onClick={() => navigate(`${location.pathname}/issue/new`)} >
+                  이슈 추가
+                </Button>
+                <Button variant='contained' color='brand500' onClick={() => navigate(`/project/${projectId}/issuesuggest`)} >
+                  이슈 자동 생성
+                </Button>
+              </ButtonGroup>
             </div>
             <IssueTable
               rows={filteredRows.length > 0 ? filteredRows : []}
