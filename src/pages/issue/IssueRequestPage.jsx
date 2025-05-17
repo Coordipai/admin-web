@@ -9,9 +9,11 @@ import Header from '@components/Header'
 import { EditContentHeader } from '@components/Edit/EditContentHeader'
 import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
+import { useProjectStore } from '@store/useProjectStore'
 import axios from 'axios'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
+
 
 const FormWrapper = styled.div`
   max-width: 1120px;
@@ -86,6 +88,8 @@ export default function IssueRequestPage () {
   const [issueData, setIssueData] = useState(null)
   const [aiFeedback, setAiFeedback] = useState('')
   const [aiFeedbackReason, setAiFeedbackReason] = useState('')
+  const [assigneeOptions, setAssigneeOptions] = useState([])
+  const iterationOptions = useProjectStore((state) => state.project?.iterationOptions || [])
 
   
 useEffect(() => {
@@ -101,15 +105,20 @@ useEffect(() => {
         return;
       }
 
+      const oldAssignee = matched.old_assignees?.[0] || ''
+      const newAssignee = matched.new_assignees?.[0] || ''
+
+      const members = useProjectStore.getState().project?.members || []
+      const userPart = members.find((m) => m.github_name === oldAssignee)?.role || ''
+
       const transformed = {
-        username: matched.old_assignees?.[0] || '', // 실제로는 백엔드에서 사용자 정보도 줘야 함
-        userPart: '프론트엔드', // 마찬가지로 추가 필요
+        oldAssignee,
+        newAssignee,
         reason: matched.reason,
         currentSprint: matched.old_iteration,
         targetSprint: matched.new_iteration,
-        oldAssignee: matched.old_assignees?.[0] || '',
-        newAssignee: matched.new_assignees?.[0] || ''
-      };
+        userPart
+      }
 
       setIssueData(transformed);
     } catch (error) {
@@ -119,6 +128,25 @@ useEffect(() => {
 
   fetchIssueData();
 }, [projectId, requestId]);
+
+  useEffect(() => {
+    const fetchProjectMembers = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/project/${projectId}`)
+        const members = res.data?.content?.data?.members || []
+
+        const mappedOptions = members.map((member) => ({
+          title: member.name || member.github_id // 혹은 github_name
+        }))
+
+        setAssigneeOptions(mappedOptions)
+      } catch (error) {
+        console.error('프로젝트 멤버 불러오기 실패:', error)
+      }
+    }
+
+    fetchProjectMembers()
+  }, [projectId])
 
   useEffect(() => {
     const fetchAiFeedback = async () => {
@@ -139,29 +167,7 @@ useEffect(() => {
     fetchAiFeedback()
   }, [requestId]) // Add requestId as a dependency
 
-  const sprintOptions = [
-    { title: 'sprint 1' },
-    { title: 'sprint 2' },
-    { title: 'sprint 3' },
-    { title: 'sprint 4' }
-  ]
-
-  const assigneeOptions = [
-    { title: 'Lucas' },
-    { title: 'Mina' },
-    { title: 'Oliva' },
-    { title: 'Jisoo' }
-  ]
-
   const [selectedSprint, setSelectedSprint] = useState(-1)
-  useEffect(() => {
-    if (issueData) {
-      const sprintIndex = sprintOptions.findIndex(
-        (option) => option.title === issueData.targetSprint
-      )
-      setSelectedSprint(sprintIndex)
-    }
-  }, [issueData])
 
   const [selectedAssignee, setSelectedAssignee] = useState(-1)
 
@@ -171,6 +177,16 @@ useEffect(() => {
       setSelectedAssignee(index)
     }
   }, [issueData])
+
+  useEffect(() => {
+  if (issueData) {
+      const sprintIndex = iterationOptions.findIndex(
+        (option) => option.title === issueData.targetSprint
+      )
+      setSelectedSprint(sprintIndex)
+    }
+  }, [issueData, iterationOptions])
+
 
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
@@ -211,7 +227,7 @@ useEffect(() => {
           <Label>담당자 / 분야 </Label>
           <RowGroup2>
             <div style={{ width: '244px' }}>
-              <FormInput value={issueData?.username || ''} readOnly />
+              <FormInput value={issueData?.oldAssignee || ''} readOnly />
             </div>
             <span />
             <div style={{ width: '244px' }}>
@@ -239,10 +255,9 @@ useEffect(() => {
               <img src={arrowright} alt='arrow' width='12' height='12' />
             </div>
             <div style={{ width: '244px' }}>
-
               <FormDropdown
-                placeholder='스프린트를 선택하세요'
-                menus={sprintOptions}
+                placeholder="스프린트를 선택하세요"
+                menus={iterationOptions}
                 selectedMenu={selectedSprint}
                 handleChange={setSelectedSprint}
               />
@@ -262,11 +277,12 @@ useEffect(() => {
             </div>
             <div style={{ width: '244px' }}>
               <FormDropdown
-                placeholder='변경할 사용자를 선택하세요'
+                placeholder="변경할 사용자를 선택하세요"
                 menus={assigneeOptions}
                 selectedMenu={selectedAssignee}
                 handleChange={setSelectedAssignee}
               />
+
             </div>
           </RowGroup>
         </LabeledRow>
