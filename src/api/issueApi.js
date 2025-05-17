@@ -126,3 +126,31 @@ export const deleteIssue = async (issueData) => {
     throw error
   }
 }
+
+/**
+ * 6. 이슈 현황(갯수) 받아오기
+ * @param {number} projectId
+ * 
+ */
+export const fetchIssueSummary = async (projectId) => {
+  try {
+    const token = useAccessTokenStore.getState().accessToken
+    if (!token) {
+      throw new Error('Access token is not available')
+    }
+
+    const response = await api.get('/issue/summary', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        project_id: projectId
+      }
+    })
+    console.log("response: ", response.data.content.data)
+    return response.data.content.data;
+  } catch (error) {
+    showErrorToastMsg(error);
+    throw error;
+  }
+}

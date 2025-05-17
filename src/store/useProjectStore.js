@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { differenceInDays } from 'date-fns'
 import { fetchProjectDetail } from '@api/projectApi'
+import { fetchIssueSummary } from '@api/issueApi'
 
 const calculateIteration = (startDate, sprintUnit) => {
   const start = new Date(startDate)
@@ -24,48 +25,46 @@ const calculateIteration = (startDate, sprintUnit) => {
 }
 
 export const useProjectStore = create((set) => ({
-    project: null,
-    /*
-    setProject: (rawProject) => {
-    const iteration = calculateIteration(rawProject.start_date, rawProject.sprint_unit)
-    // const categoriesObj = rawProject.members.reduce((acc, member) => {
-    //   if (!acc[member.category]) acc[member.category] = []
-    //   acc[member.category].push({
-    //     image: member.profile_img,
-    //     userName: member.name,
-    //     githubId: member.github_name
-    //   })
-    //   return acc
-    // }, {})
-
-    // const categories = Object.entries(categoriesObj).map(([categoryName, people]) => ({
-    //   categoryName,
-    //   people
-    // }))
-
-    set({
-      project: {
-        ...rawProject,
-        iteration,
-        // categories
-      }
-    })
-  },
-  */
+  project: null,
   setProject: async (projectId) => {
     try {
-      const project = await fetchProjectDetail(projectId)
-      const iteration = calculateIteration(project.start_date, project.sprint_unit)
+      const [rawProject, issueSummaryData] = await Promise.all([
+        fetchProjectDetail(projectId),
+        fetchIssueSummary(projectId)
+      ])
 
-      console.log('Project:', project)
+      const iteration = calculateIteration(rawProject.start_date, rawProject.sprint_unit)
+
+      const categoriesObj = rawProject.members.reduce((acc, member) => {
+        if (!acc[member.category]) acc[member.category] = []
+        acc[member.category].push({
+          image: member.profile_img,
+          userName: member.name,
+          githubId: member.github_name
+        })
+        return acc
+      }, {})
+      const categories = Object.entries(categoriesObj).map(([categoryName, people]) => ({
+        categoryName,
+        people
+      }))
+
+      const issueSummary = {
+        openedIssues: issueSummaryData.opened_issues,
+        closedIssues: issueSummaryData.closed_issues,
+        allIssues: issueSummaryData.all_issues
+      }
+
       set({
         project: {
-          ...project,
+          ...rawProject,
           iteration,
+          categories,
+          issueSummary
         }
       })
     } catch (error) {
-      console.error('[setProject] Failed to fetch project:', error)
+      console.error('[setProject] Failed to fetch project or issue summary:', error)
       set({ project: null })
     }
   },

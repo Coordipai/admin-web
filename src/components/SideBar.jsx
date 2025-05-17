@@ -196,7 +196,7 @@ FormAccount.propTypes = {
   image: PropTypes.string
 }
 
-const NavBodySection = ({ projectName, iteration, issues, categories }) => {
+const NavBodySection = ({ projectName, iteration, issueSummary, categories }) => {
   return (
     <NavBox>
       <NavProjectHeaderText>{projectName}</NavProjectHeaderText>
@@ -211,11 +211,11 @@ const NavBodySection = ({ projectName, iteration, issues, categories }) => {
         <ListIcon />
         <NavProjectItemTextContainer>
           <NavProjectItemHeaderText>Issues</NavProjectItemHeaderText>
-          <NavProjectItemSubText>{issues}</NavProjectItemSubText>
+          <NavProjectItemSubText>{issueSummary.openedIssues}개 완료 / {issueSummary.allIssues}개</NavProjectItemSubText>
         </NavProjectItemTextContainer>
       </NavProjectItemBox>
 
-      {/* {categories.map((category, index) => (
+      {categories.map((category, index) => (
         <NavProjectCategoryBox key={index}>
           <NavProjectCategoryHeaderText>{category.categoryName}</NavProjectCategoryHeaderText>
           <NavProjectCategoryItemBox>
@@ -229,7 +229,7 @@ const NavBodySection = ({ projectName, iteration, issues, categories }) => {
             ))}
           </NavProjectCategoryItemBox>
         </NavProjectCategoryBox>
-      ))} */}
+      ))}
     </NavBox>
   )
 }
@@ -240,7 +240,10 @@ NavBodySection.propTypes = {
     sprint: PropTypes.string.isRequired,
     period: PropTypes.string.isRequired
   }).isRequired,
-  issues: PropTypes.number.isRequired,
+  issueSummary: PropTypes.shape({
+    openedIssues: PropTypes.number.isRequired,
+    allIssues: PropTypes.number.isRequired
+  }).isRequired,
   categories: PropTypes.arrayOf(
     PropTypes.shape({
       categoryName: PropTypes.string.isRequired,
@@ -280,7 +283,7 @@ const SideBar = ({
           <NavBodySection
             projectName={currentProject.repo_fullname}
             iteration={currentProject.iteration}
-            issues={currentProject.issues}
+            issueSummary={currentProject.issueSummary}
             categories={currentProject.categories}
           />
         )}
