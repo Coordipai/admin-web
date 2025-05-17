@@ -11,6 +11,8 @@ import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
 import axios from 'axios'
 
+const BASE_URL = import.meta.env.VITE_BASE_URL
+
 const FormWrapper = styled.div`
   max-width: 1120px;
   flex: 1;
@@ -85,32 +87,11 @@ export default function IssueRequestPage () {
   const [aiFeedback, setAiFeedback] = useState('')
   const [aiFeedbackReason, setAiFeedbackReason] = useState('')
 
-  const handleApproveChange = async () => {
-    if (!issueData || selectedSprint === -1 || selectedAssignee === -1) {
-      alert('변경할 스프린트와 담당자를 모두 선택해주세요.');
-      return;
-    }
-
-    try {
-      const payload = {
-        project_id: Number(projectId),
-        issue_number: Number(requestId),
-        reason: issueData.reason,
-        new_iteration: sprintOptions[selectedSprint]?.title,
-        new_assignees: [assigneeOptions[selectedAssignee]?.title],
-      };
-
-      const res = await axios.post('/issue-reschedule/', payload);
-      console.log('요청 성공:', res.data);
-    } catch (error) {
-      console.error('요청 실패:', error);
-    }
-  };
-
+  
 useEffect(() => {
   const fetchIssueData = async () => {
     try {
-      const res = await axios.get(`/issue-reschedule/${projectId}`);
+      const res = await axios.get(`${BASE_URL}/issue-reschedule/${projectId}`);
       const issues = res.data?.content?.data || [];
 
       const matched = issues.find(issue => issue.issue_number === Number(requestId));
@@ -193,27 +174,21 @@ useEffect(() => {
 
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
-  const handleRejectChange = async () => {
-    if (!issueData || selectedSprint === -1 || selectedAssignee === -1) {
-      alert('변경할 스프린트와 담당자를 모두 선택해주세요.');
-      return;
-    }
+  const handleDecision = async (isApproved) => {
+  const action = isApproved ? 'approve' : 'reject';
+  const confirmMessage = isApproved ? '정말로 변경을 승인하시겠습니까?' : '정말로 반려하시겠습니까?';
+  
+  if (!window.confirm(confirmMessage)) return;
 
-    try {
-      const payload = {
-        project_id: Number(projectId),
-        issue_number: Number(requestId),
-        reason: issueData.reason + ' (반려)', // 혹은 별도 reason 전달
-        new_iteration: sprintOptions[selectedSprint]?.title,
-        new_assignees: [assigneeOptions[selectedAssignee]?.title],
-      };
-
-      const res = await axios.put('/issue-reschedule/', payload);
-      console.log('반려 처리 완료:', res.data);
-    } catch (error) {
-      console.error('반려 요청 실패:', error);
-    }
-  };
+  try {
+    const res = await axios.delete(`${BASE_URL}/issue-reschedule/${requestId}?action=${action}`);
+    console.log(`${action} 완료:`, res.data);
+    alert(`${isApproved ? '승인' : '반려'} 처리되었습니다.`);
+  } catch (error) {
+    console.error(`${action} 실패:`, error);
+    alert(`${isApproved ? '승인' : '반려'} 처리에 실패했습니다.`);
+  }
+};
 
 
   const handleRequestFeedbackAgain = () => {
@@ -229,10 +204,9 @@ useEffect(() => {
           title='변경 요청서 작성'
           subAction={{ label: '이슈 상세보기', onClick: () => setIsIssueModalOpen(true) }}
           buttonsData={[
-            { value: '변경 반려', onClick: handleRejectChange },
-            { value: '변경 승인', onClick: handleApproveChange }
-          ]}
-        />
+            { value: '변경 반려', onClick: () => handleDecision(false) },
+            { value: '변경 승인', onClick: () => handleDecision(true) }
+          ]}/>
         <LabeledRow>
           <Label>담당자 / 분야 </Label>
           <RowGroup2>
