@@ -126,6 +126,8 @@ const EmptyIssueWrapper = styled.div`
 	gap: ${({ theme }) => theme.gap.md};
 `
 
+
+
 export const Project = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -236,9 +238,15 @@ export const Project = () => {
                   placeholder='이슈를 검색하세요'
                 />
               </div>
-              <Button variant='outlined' color='gray700' onClick={() => navigate(`${location.pathname}/issue/new`)} >
-                이슈 추가
-              </Button>
+
+              <ButtonGroup>
+                <Button variant='outlined' color='gray700' onClick={() => navigate(`${location.pathname}/issue/new`)} >
+                  이슈 추가
+                </Button>
+                <Button variant='contained' color='brand500' onClick={() => navigate(`/project/${projectId}/issuesuggest`)} >
+                  이슈 자동 생성
+                </Button>
+              </ButtonGroup>
             </div>
             <IssueTable
               rows={filteredRows.length > 0 ? filteredRows : []}
