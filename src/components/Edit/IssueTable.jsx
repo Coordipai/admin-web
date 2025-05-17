@@ -179,7 +179,7 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
                           : ''}
                       </Td>
                       <Td><Badge priority={row.priority} /></Td>
-                      <Td>Iteration {row.iteration}</Td>
+                      <Td>{row.iteration === -1 ? 'Unassigned' : `Iteration ${row.iteration}`}</Td>
                     </Tr>
                   ))
                 )}
