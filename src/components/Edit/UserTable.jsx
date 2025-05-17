@@ -104,11 +104,11 @@ const TableRowContainer = styled.div`
 
 const fieldOptions = [
   { value: '', label: '분야 선택' },
-  { value: 'frontend', label: '프론트엔드' },
-  { value: 'backend', label: '백엔드' },
-  { value: 'design', label: '디자인' },
-  { value: 'pm', label: 'PM' }
-]
+  { value: 'WEB_FE', label: '웹프론트엔드' },
+  { value: 'WEB_BE', label: '웹백엔드' },
+  { value: 'AI', label: 'AI' },
+  { value: 'MOBLIE_APP', label: '모바일 앱' },
+];
 
 const UserTable = ({ rows, setRows }) => {
   const handleFieldChange = (id, value) => {

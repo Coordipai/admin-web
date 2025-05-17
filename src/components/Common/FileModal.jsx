@@ -179,7 +179,7 @@ const FileModal = ({ open, onClose, onAttach }) => {
 
   const handleAttach = () => {
     if (fileQueue.length > 0) {
-      onAttach(fileQueue.map(f => f.file))
+      onAttach(Array.from(fileQueue, f => f.file))
       setFileQueue([])
       onClose()
     }

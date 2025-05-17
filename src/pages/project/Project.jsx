@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react'
 import IssueTable from '@components/Edit/IssueTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox, ButtonBase } from '@styles/globalStyle'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
+import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
+import Button from '@components/Common/Button'
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -75,14 +77,16 @@ const TabsDivider = styled.div`
 `
 
 const Fieldset = styled.div`
+  box-sizing: border-box;
 	max-height: 100%;
 	display: flex;
 	flex-direction: column;
 	gap: ${({ theme }) => theme.gap.xl};
 	width: 100%;
 	align-items: stretch;
-	overflow-y: auto;
+	overflow-y: hidden;
 	max-height: 100%;
+  flex:1;
 	overflow-x: hidden;
 `
 
@@ -105,11 +109,11 @@ const Section = styled.section`
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	height: 100%;
-		max-height: 100%;
 	gap: ${({ theme }) => theme.gap.xl};
 	overflow-y: hidden;
 	overflow-x: hidden;
+	flex: 1;
+	min-height: 0;
 `
 
 const EmptyIssueWrapper = styled.div`
@@ -122,9 +126,13 @@ const EmptyIssueWrapper = styled.div`
 	gap: ${({ theme }) => theme.gap.md};
 `
 
+
+
 export const Project = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const { projectId } = useParams()
+  const { Get } = useFetchWithTokenRefresh()
   const [activeTab, setActiveTab] = useState(() => {
     const hash = location.hash.replace('#', '')
     return hash === 'request' ? 'request' : 'issue'
@@ -150,37 +158,31 @@ export const Project = () => {
     navigate(`${location.pathname}#${tab}`, { replace: true })
   }
 
-  const [issueRows] = useState([
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포1이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] },
-
-    { repo_fullname: '레포이름', issue_number: 1, title: '타이틀', body: '바디', assignee: '어사이니', priority: 'W', iteration: 1, labels: ['레이블1', '레이블2', '레이블3'] }
-  ])
+  const [issueRows, setIssueRows] = useState([])
   const [search, setSearch] = useState('')
   const [requestSearch, setRequestSearch] = useState('')
-  const [requestRows] = useState([
-    { repo_fullname: '레포이름', issue_number: 2, title: '변경요청 ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ타이틀', body: '변경ㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ요청 바디', assignee: '담당자', priority: 'S', iteration: 2, labels: ['요청1', '요청2'] }
-    // 필요시 더미 데이터 추가
-  ])
+  const [requestRows, setRequestRows] = useState([])
+  
+   
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const issueResponse = await Get(`/issue`,{
+          params: { project_id: projectId }
+        })
+        console.log(issueResponse)
+        setIssueRows(issueResponse)
+        const requestResponse = await Get(`/issue-reschedule/${projectId}`)
+        setRequestRows(requestResponse)
+      } catch (error) {
+        console.error('Error fetching issues:', error)
+      }
+    }
+    fetchData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId])
+
+
   const filteredRows = search
     ? issueRows.filter(row =>
       row.title.includes(search) ||
@@ -204,12 +206,7 @@ export const Project = () => {
       <HeaderSection>
         <HeaderRow>
           <Typography variant='displayXS' weight='semiBold' color='gray700' value='대시보드' />
-          <ButtonBase
-            $isHighlighted
-            onClick={() => navigate(`${location.pathname}/edit`)}
-          >
-            프로젝트 설정
-          </ButtonBase>
+          <Button variant='contained' onClick={() => navigate(`${location.pathname}/edit`)} >프로젝트 설정</Button>
         </HeaderRow>
         <TabsWrapper>
           <TabsRow>
@@ -241,12 +238,14 @@ export const Project = () => {
                   placeholder='이슈를 검색하세요'
                 />
               </div>
-              <ButtonBase
-                $isHighlighted={false}
-                onClick={() => navigate(`${location.pathname}/issue/new`)}
-              >
-                이슈 추가
-              </ButtonBase>
+              <ButtonGroup>
+                <Button variant='outlined' color='gray700' onClick={() => navigate(`${location.pathname}/issue/new`)} >
+                  이슈 추가
+                </Button>
+                <Button variant='contained' color='brand500' onClick={() => navigate(`/project/${projectId}/issuesuggest`)} >
+                  이슈 자동 생성
+                </Button>
+              </ButtonGroup>
             </div>
             <IssueTable
               rows={filteredRows.length > 0 ? filteredRows : []}

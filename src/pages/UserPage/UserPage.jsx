@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
+import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
+import { useNavigate, useParams } from 'react-router-dom'
+
+import axios from 'axios'
+import { set } from 'date-fns'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -182,7 +188,12 @@ useEffect(() => {
       github_id: githubId,
       github_name: githubName,
       discord_id: discordId,
+      name: username,
+      github_id: githubId,
+      github_name: githubName,
+      discord_id: discordId,
       career,
+      category: fieldOptions[field]?.title || '',
       category: fieldOptions[field]?.title || '',
       repositories: selectedRepos
     }
@@ -285,6 +296,9 @@ const handleEvaluationRequest = async () => {
             <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
               setUsername(v)
             }} />
+            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
+              setUsername(v)
+            }} />
           </FieldWrapper>
 
           <FieldWrapper>
@@ -292,12 +306,16 @@ const handleEvaluationRequest = async () => {
             <FormInput
               placeholder='깃허브 계정'
               value={githubName}
+              value={githubName}
               readOnly
             />
           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>Discord ID</LabelText>
+            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
+              setDiscordId(v)
+            }} />
             <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
               setDiscordId(v)
             }} />
@@ -312,11 +330,15 @@ const handleEvaluationRequest = async () => {
               handleChange={(v) => {
                 setField(v)
             }}
+              handleChange={(v) => {
+                setField(v)
+            }}
             />
           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>간단한 경력을 입력해주세요.</LabelText>
+            <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} onChange={setCareer} />
             <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} onChange={setCareer} />
           </FieldWrapper>
 
