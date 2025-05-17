@@ -52,7 +52,6 @@ function App () {
         <Route path='/user' element={<PrivateRoute element={<UserForm />} />} />
 
         {/* Test Page */}
-
         <Route path='/components' element={<PrivateRoute element={<ComponentTest />} />} />
         <Route path='/issueModalTest' element={<PrivateRoute element={<IssueModalTest />} />} />
         <Route path='/projectTest' element={<PrivateRoute element={<ProjectTest/>} />} />
@@ -65,6 +64,7 @@ function App () {
 
         <Route path='/project/:projectId' element={<PrivateRoute element={<Project />} />} />
         <Route path='/project/:projectId/issue/:issueId' element={<PrivateRoute element={<IssueDetailPage />} />} />
+        <Route path='/project/:projectId/issuesuggest' element={<PrivateRoute element={<IssueSuggestPage />} />} />
         <Route path='/project/:projectId/edit' element={<PrivateRoute element={<SettingProject />} />} />
         <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={<IssueRequestPage />} />} />
 

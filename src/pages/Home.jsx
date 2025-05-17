@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
 import { api } from '../hooks/useAxios'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
+import { set } from 'date-fns'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -236,6 +237,7 @@ export const Home = () => {
                 onClick={() => {
                   setSelectedId(project.id)
                   // setProject(project)
+                  setProject(project.id)
                   navigate(`/project/${project.id}#issue`)
                 }}
               />

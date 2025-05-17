@@ -215,7 +215,7 @@ const NavBodySection = ({ projectName, iteration, issues, categories }) => {
         </NavProjectItemTextContainer>
       </NavProjectItemBox>
 
-      {categories.map((category, index) => (
+      {/* {categories.map((category, index) => (
         <NavProjectCategoryBox key={index}>
           <NavProjectCategoryHeaderText>{category.categoryName}</NavProjectCategoryHeaderText>
           <NavProjectCategoryItemBox>
@@ -229,7 +229,7 @@ const NavBodySection = ({ projectName, iteration, issues, categories }) => {
             ))}
           </NavProjectCategoryItemBox>
         </NavProjectCategoryBox>
-      ))}
+      ))} */}
     </NavBox>
   )
 }

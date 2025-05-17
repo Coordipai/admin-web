@@ -164,7 +164,6 @@ const LabelBadge = styled.div`
 
 const IssueSuggestPage = () => {
   const { isLoading, setLoading } = useLoadingStore()
-
   // project 정보
   const [priorityOptions] = useState([
     { value: 'M', label: '[M] Must Have' },

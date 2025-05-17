@@ -6,6 +6,7 @@ import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox, ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
+import { useProjectStore } from '@store/useProjectStore'
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -135,6 +136,10 @@ export const Project = () => {
     return hash === 'request' ? 'request' : 'issue'
   })
 
+  // const { project } = useProjectStore()
+  // console.log('project', project)
+
+
   // URL 해시에 따라 탭 상태 설정
   useEffect(() => {
     const hash = location.hash.replace('#', '')
@@ -167,7 +172,6 @@ export const Project = () => {
         const issueResponse = await Get(`/issue`,{
           params: { project_id: projectId }
         })
-        console.log(issueResponse)
         setIssueRows(issueResponse)
         const requestResponse = await Get(`/issue-reschedule/${projectId}`)
         setRequestRows(requestResponse)
