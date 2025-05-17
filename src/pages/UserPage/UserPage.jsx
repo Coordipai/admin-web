@@ -98,6 +98,8 @@ const TextButton = styled(ButtonBase)`
   }
 `
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function UserPage () {
   const navigate = useNavigate()
   //const { githubId } = useParams() // 여기서 param으로 받아오기
@@ -141,13 +143,13 @@ useEffect(() => {
   const fetchRepos = async () => {
     try {
       // 🔹 선택된 레포 불러오기
-      const selectedRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
+      const selectedRes = await axios.get(`${BASE_URL}/user-repo`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       const selected = selectedRes.data.content.data.map((r) => r.repo_fullname)
 
       // 🔹 GitHub의 전체 레포 불러오기
-      const allRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
+      const allRes = await axios.get(`${BASE_URL}/user-repo/github`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       const all = allRes.data.content.data.map((r) => r.repo_fullname)
@@ -173,6 +175,7 @@ useEffect(() => {
 
   const [field, setField] = useState(-1)
 
+  
   const handleSave = async () => {
     const payload = {
       name: username,
@@ -188,7 +191,7 @@ useEffect(() => {
 
     try {
       const response = await axios.put(
-        'https://coordipai-web-server.knuassignx.site/auth/update',
+        `${BASE_URL}/auth/update`,
         payload,
         {
           headers: {
@@ -213,7 +216,7 @@ useEffect(() => {
 
   try {
     const response = await axios.delete(
-      'https://coordipai-web-server.knuassignx.site/auth/unregister',
+      `${BASE_URL}/auth/unregister`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -243,7 +246,7 @@ const handleEvaluationRequest = async () => {
 
     try {
       const response = await axios.post(
-        'https://coordipai-web-server.knuassignx.site/agent/assess_stat',
+        `${BASE_URL}/agent/assess_stat`,
         {},
         {
           headers: {
