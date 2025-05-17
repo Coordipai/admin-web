@@ -247,7 +247,7 @@ const FileModal = ({ open, onClose, onAttach }) => {
               variant='textSM'
               weight='regular'
               color='gray500'
-              value='SVG, PNG, JPG or PDF (max. 800x400px)'
+              value='JSON, DOCX or PDF (max. 4GB)'
             />
           </div>
         </UploadBox>
