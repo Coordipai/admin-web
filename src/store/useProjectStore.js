@@ -38,7 +38,7 @@ export const useProjectStore = create(
 
           const nowIteration = calculateIteration(rawProject.start_date, rawProject.sprint_unit)
 
-          const assigneeOptions = rawProject.members.map((member) => member.name)
+          const assigneeOptions = rawProject.members.map((member) => member.github_name)
 
           const iterationOptions = []
           const start = new Date(rawProject.start_date)

@@ -192,18 +192,8 @@ const IssueSuggestPage = () => {
   const [isCompleted, setIsCompleted] = useState(false)
   const isIssueSelected = !!selectedIssue
 
-  // projectStore에서 정보 가져오기
   const fetchProject = useCallback(async () => {
     try {
-      // dummy
-      // const iterations = [    
-      //   { title: 'Iteration 1', period: '2023-10-01 ~ 2023-10-15' },
-      //   { title: 'Iteration 2', period: '2023-10-16 ~ 2023-10-31' },
-      //   { title: 'Iteration 3', period: '2023-11-01 ~ 2023-11-15' }
-      // ]
-      // const assignees = [
-      //   'makisepel'
-      // ]
       setIterationOptions(project.iterationOptions)
       setAssigneeOptions(project.assigneeOptions)
     } catch (error) {
@@ -220,16 +210,6 @@ const IssueSuggestPage = () => {
       setLoading(true)
       const response = await getGeneratedIssues(projectId)
       console.log(response)
-
-      // const response = mockIssueList.map(issue => ({
-      //   ...issue,
-      //   isCompleted: false,
-      //   priority: 'M',
-      //   iteration: iterationOptions[0],
-      //   assignees: []
-      // }))
-      // setIssueList(response)
-
     } catch (error) {
       console.error('Failed to fetch issue list:', error)
       setIssueList([])

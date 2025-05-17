@@ -211,7 +211,7 @@ const NavBodySection = ({ projectName, iteration, issueSummary, categories }) =>
         <ListIcon />
         <NavProjectItemTextContainer>
           <NavProjectItemHeaderText>Issues</NavProjectItemHeaderText>
-          <NavProjectItemSubText>{issueSummary.openedIssues}개 완료 / {issueSummary.allIssues}개</NavProjectItemSubText>
+          <NavProjectItemSubText>{issueSummary.openedIssues}개 진행중 / {issueSummary.allIssues}개</NavProjectItemSubText>
         </NavProjectItemTextContainer>
       </NavProjectItemBox>
 

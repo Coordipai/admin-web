@@ -63,7 +63,7 @@ function App () {
         {/* Project Page */}
 
         <Route path='/project/:projectId' element={<PrivateRoute element={<Project />} />} />
-        <Route path='/project/:projectId/issue/:issueId' element={<PrivateRoute element={<IssueDetailPage />} />} />
+        <Route path='/project/:projectId/issue/:issueNumber' element={<PrivateRoute element={<IssueDetailPage />} />} />
         <Route path='/project/:projectId/issuesuggest' element={<PrivateRoute element={<IssueSuggestPage />} />} />
         <Route path='/project/:projectId/edit' element={<PrivateRoute element={<SettingProject />} />} />
         <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={<IssueRequestPage />} />} />

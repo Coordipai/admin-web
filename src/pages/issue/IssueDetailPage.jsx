@@ -18,6 +18,7 @@ import { Plus, X } from '@untitled-ui/icons-react'
 
 import { createIssue, updateIssue, deleteIssue, fetchIssueDetail } from '@api/issueAPI'
 import useLoadingStore from '@store/useLoadingStore'
+import { useProjectStore } from '@store/useProjectStore'
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -59,8 +60,9 @@ const LabelBadge = styled.div`
 `
 
 const IssueDetailPage = () => {
-  const { projectId, issueId } = useParams()
+  const { projectId, issueNumber } = useParams()
   const { isLoading, setLoading } = useLoadingStore()
+  const { project } = useProjectStore()
 
   // project 정보
   const [priorityOptions] = useState([
@@ -84,22 +86,8 @@ const IssueDetailPage = () => {
 
   const fetchProject = useCallback(async () => {
     try {
-      // Fetch project data here
-
-      console.log("fetched")
-
-      // dummy
-      const iterations = [    
-        { title: 'Iteration 1', period: '2023-10-01 ~ 2023-10-15' },
-        { title: 'Iteration 2', period: '2023-10-16 ~ 2023-10-31' },
-        { title: 'Iteration 3', period: '2023-11-01 ~ 2023-11-15' }
-      ]
-      const assignees = [
-        'makisepel'
-      ]
-      setIterationOptions(iterations)
-      setIteration(iterations[0])
-      setAssigneeOptions(assignees)
+      setIterationOptions(project.iterationOptions)
+      setAssigneeOptions(project.assigneeOptions)
     } catch (error) {
       console.error('Failed to fetch project:', error)
       // 기본값 설정
@@ -107,17 +95,17 @@ const IssueDetailPage = () => {
       setIteration({ title: '선택해주세요', period: '' })
       setAssigneeOptions([])
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
 
 const fetchIssue = useCallback(async () => {
-  if (issueId !== 'new') {
+  if (issueNumber !== 'new') {
     try {
-      const res = await fetchIssueDetail(projectId, issueId)
+      const res = await fetchIssueDetail(projectId, issueNumber)
 
-      const fullBody = res?.body || ''
       setIssueTitle(res?.title || '')
 
+      const fullBody = res?.body || ''
       const extractMetaFromBody = (body) => {
         const metaMatch = body.match(/<!--([\s\S]*?)-->/)
         const result = {}
@@ -133,13 +121,13 @@ const fetchIssue = useCallback(async () => {
           })
         }
         return {
-          meta: result,
-          content: body.replace(/<!--[\s\S]*?-->/, '').trim() 
+          content: body.replace(/<!--[\s\S]*?-->/, '').trim(),
+          meta: result
         }
       }
-      const { meta, content } = extractMetaFromBody(fullBody)
-
+      const { content, meta } = extractMetaFromBody(fullBody)
       setIssueContent(content)
+
       setPriority(meta.priority || priorityOptions[0].value)
 
       const matchedIteration = iterationOptions.find(opt => {
@@ -148,7 +136,7 @@ const fetchIssue = useCallback(async () => {
       })
       setIteration(matchedIteration || iterationOptions[0])
       setSelectedLabels(res?.labels || [])
-      setAssignees((res?.assignees || []).map(a => a.name) || [])
+      setAssignees(res?.assignees.map(a => a.github_name) || [])
     } catch (error) {
       console.error('Failed to fetch issue:', error)
       setIssueTitle('')
@@ -162,7 +150,7 @@ const fetchIssue = useCallback(async () => {
     setPriority(priorityOptions[0].value)
     setIteration(iterationOptions[0] || { title: '선택해주세요', period: '' })
   }
-}, [issueId, projectId])  // eslint-disable-line react-hooks/exhaustive-deps
+}, [issueNumber, projectId, iterationOptions]) // eslint-disable-line react-hooks/exhaustive-deps
 
 
 useEffect(() => {
@@ -285,9 +273,9 @@ useEffect(() => {
   return (
     <MainBox>
       <Header
-        text={issueId === 'new' ? '이슈 추가' : '이슈 수정'}
+        text={issueNumber === 'new' ? '이슈 추가' : '이슈 수정'}
         buttonsData={
-            issueId === 'new'
+            issueNumber === 'new'
               ? [
                   { 
                     value: '저장',
@@ -466,7 +454,7 @@ useEffect(() => {
           text={modalText}
           setShowModal={setShowModal}
           handleConfirm={() => {
-            if (issueId === 'new') {
+            if (issueNumber === 'new') {
               const issueData = {
                 project_id: parseInt(projectId),
                 title: issueTitle,
@@ -492,7 +480,7 @@ useEffect(() => {
               if (isEdit) {
                 const issueData = {
                   project_id: parseInt(projectId),
-                  issue_number: parseInt(issueId),
+                  issue_number: parseInt(issueNumber),
                   title: issueTitle,
                   body: issueContent,
                   assignees: assignees,
@@ -505,7 +493,7 @@ useEffect(() => {
               } else {
                 const issueData = {
                   project_id: projectId,
-                  issue_number: issueId
+                  issue_number: issueNumber
                 }
                 deleteIssue(issueData)
               }

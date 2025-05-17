@@ -50,7 +50,6 @@ export const fetchIssueDetail = async (projectId, issueNumber) => {
     })
     return response.data.content.data;
   } catch (error) {
-
     showErrorToastMsg(error);
     throw error;
   }
@@ -147,7 +146,6 @@ export const fetchIssueSummary = async (projectId) => {
         project_id: projectId
       }
     })
-    console.log("response: ", response.data.content.data)
     return response.data.content.data;
   } catch (error) {
     showErrorToastMsg(error);
