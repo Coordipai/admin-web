@@ -187,12 +187,9 @@ const IssueSuggestPage = () => {
   const [isCompleted, setIsCompleted] = useState(false)
   const isIssueSelected = !!selectedIssue
 
-
+  // projectStore에서 정보 가져오기
   const fetchProject = useCallback(async () => {
     try {
-      // Fetch project data here
-      console.log("fetched")
-
       // dummy
       const iterations = [    
         { title: 'Iteration 1', period: '2023-10-01 ~ 2023-10-15' },
@@ -200,12 +197,12 @@ const IssueSuggestPage = () => {
         { title: 'Iteration 3', period: '2023-11-01 ~ 2023-11-15' }
       ]
       const assignees = [
-        'Alice', 'Bob', 'Charlie', 'David'
+        'makisepel'
       ]
       setIterationOptions(iterations)
       setAssigneeOptions(assignees)
     } catch (error) {
-      console.error('Failed to fetch project:', error)
+      console.error('Failed to get project data:', error)
       // 기본값 설정
       setIterationOptions([{ title: '선택해주세요', period: '' }])
       setIteration({ title: '선택해주세요', period: '' })
@@ -213,7 +210,7 @@ const IssueSuggestPage = () => {
     }
   }, [])
 
-  const fetchIssueList = useCallback(async () => {
+  const fetchSuggestedIssues = useCallback(async () => {
     try {
       setLoading(true)
       // TODO: 실제 API 호출로 교체
@@ -221,7 +218,7 @@ const IssueSuggestPage = () => {
       const response = mockIssueList.map(issue => ({
         ...issue,
         isCompleted: false,
-        priority: 'M', // 기본 우선순위
+        priority: 'M',
         iteration: iterationOptions[0],
         assignees: []
       }))
@@ -240,7 +237,7 @@ const IssueSuggestPage = () => {
       setLoading(true)
       try {
         await fetchProject()
-        await fetchIssueList()
+        await fetchSuggestedIssues()
       } finally {
         setLoading(false)
       }
@@ -393,154 +390,222 @@ const IssueSuggestPage = () => {
       {!isLoading && (
         <SplitContainer>
           <LeftContainer>
-          <ContentWrapper>
-            <InputField disabled={isIssueSelected} label='이슈 타이틀' placeholder='이슈를 선택해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
-            <FormTextarea disabled={isIssueSelected} label='이슈 내용' placeholder='이슈를 선택해주세요.' value={issueContent} onChange={setIssueContent} />
-            <Row>
-              <Typography value='Priority' variant='textSM' weight='medium' color='gray900' />
-              <div ref={badgeRef} onClick={() => setBadgeDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
-                <Badge priority={priority} />
-              </div>
-              {badgeDropdownOpen && createPortal(
-                <DropDownMenu ref={badgeMenuRef} style={badgeMenuStyle}>
-                  {priorityOptions.map((opt) => {
-                    const isSelected = priority === opt.value
-                    return (
-                      <DropDownItem
-                        key={opt.value}
-                        selected={isSelected}
-                        onClick={() => {
-                          setPriority(opt.value)
-                          setBadgeDropdownOpen(false)
-                        }}
-                        role='option'
-                      >
-                        {opt.label}
-                      </DropDownItem>
-                    )
-                  })}
-                </DropDownMenu>,
-                document.body
-              )}
-            </Row>
-
-            <Row>
-              <Typography value='Iteration' variant='textSM' weight='medium' color='gray900' />
-              {iteration && (
-                <>
-                  <div ref={iterationRef} onClick={() => setIterationDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
-                    <IterationBox>
-                      <Typography value={iteration.title} variant='textSM' weight='regular' color='gray900' />
-                      <Typography value={iteration.period} variant='textXS' weight='regular' color='gray500' />
-                    </IterationBox>
-                  </div>
-                  {iterationDropdownOpen && createPortal(
-                    <DropDownMenu ref={iterationMenuRef} style={iterationMenuStyle}>
-                      {iterationOptions.map((opt, index) => {
-                        const isSelected = iteration.title === opt.title
-                        return (
-                          <DropDownItem
-                            key={index}
-                            selected={isSelected}
-                            onClick={() => {
-                              setIteration(opt)
-                              setIterationDropdownOpen(false)
-                            }}
-                            role='option'
-                          >
-                            {opt.title} / {opt.period}
-                          </DropDownItem>
-                        )
-                      })}
-                    </DropDownMenu>,
-                    document.body
-                  )}
-                </>
-              )}
-            </Row>
-
-            <Row>
-              <Typography value='Label' variant='textSM' weight='medium' color='gray900' />
-              <LabelContainer>
-                {selectedLabels.map((label) => (
-                  <LabelBadge key={label} onClick={() => handleLabelClick(label)}>
-                    <Typography value={label} variant='textXS' weight='medium' color='brand700' />
-                    <CancelIcon />
-                  </LabelBadge>
-                ))}
-                <LabelBadge ref={labelRef} onClick={() => setLabelDropdownOpen(prev => !prev)}>
-                  <PlusIcon />
-                </LabelBadge>
-                {labelDropdownOpen && createPortal(
-                  <DropDownMenu ref={labelMenuRef} style={labelMenuStyle}>
-                    {labelOptions.map((label) => {
-                      const isSelected = selectedLabels.includes(label)
+            <ContentWrapper>
+              <InputField disabled={!isIssueSelected} label='이슈 타이틀' placeholder='이슈를 선택해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
+              <FormTextarea disabled={!isIssueSelected} label='이슈 내용' placeholder='이슈를 선택해주세요.' value={issueContent} onChange={setIssueContent} />
+              <Row>
+                <Typography value='Priority' variant='textSM' weight='medium' color='gray900' />
+                <div 
+                  ref={badgeRef} 
+                  onClick={() => {
+                    if (!isIssueSelected) return
+                    setBadgeDropdownOpen(prev => !prev)
+                  }} 
+                  style={{
+                    cursor: isIssueSelected ? 'pointer' : 'not-allowed',
+                    opacity: isIssueSelected ? 1 : 0.5 
+                  }}>
+                  <Badge priority={priority} />
+                </div>
+                {badgeDropdownOpen && isIssueSelected && createPortal(
+                  <DropDownMenu ref={badgeMenuRef} style={badgeMenuStyle}>
+                    {priorityOptions.map((opt) => {
+                      const isSelected = priority === opt.value
                       return (
                         <DropDownItem
-                          key={label}
+                          key={opt.value}
                           selected={isSelected}
-                          onClick={() => handleLabelClick(label)}
+                          onClick={() => {
+                            setPriority(opt.value)
+                            setBadgeDropdownOpen(false)
+                          }}
                           role='option'
                         >
-                          {label}
+                          {opt.label}
                         </DropDownItem>
                       )
                     })}
                   </DropDownMenu>,
                   document.body
                 )}
-              </LabelContainer>
-            </Row>
-            
-            <Row>
-              <Typography value='Assignee' variant='textSM' weight='medium' color='gray900' />
-              <div ref={assigneeRef} onClick={() => setAssigneeDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
-                <Typography
-                  value={renderAssigneeText()}
-                  variant='textSM'
-                  weight='regular'
-                  color={assignees.length > 0 ? 'gray900' : 'gray400'}
-                />
-              </div>
-              {assigneeDropdownOpen && createPortal(
-                <DropDownMenu ref={assigneeMenuRef} style={assigneeMenuStyle}>
-                  {assigneeOptions.map((name, index) => {
-                    const isSelected = assignees.includes(name)
-                    return (
-                      <DropDownItem
-                        key={index}
-                        selected={isSelected}
-                        onClick={() => {
-                          if (isSelected) {
-                            setAssignees(prev => prev.filter(a => a !== name))
-                          } else {
-                            setAssignees(prev => [...prev, name])
-                          }
-                        }}
-                        role='option'
-                      >
-                        {name}
-                      </DropDownItem>
-                    )
-                  })}
-                </DropDownMenu>,
-                document.body
-              )}
-            </Row>
+              </Row>
 
-            <Row>
-              <ButtonBase 
-                $isHighlighted={isCompleted}
-                onClick={handleStateToggle}
-                style={{ marginLeft: 'auto' }}
-              >
-                {isCompleted ? '완료됨' : '완료하기'}
-              </ButtonBase>
+              <Row>
+                <Typography value='Iteration' variant='textSM' weight='medium' color='gray900' />
+                {iteration && (
+                  <>
+                    <div
+                      ref={iterationRef}
+                      onClick={() => {
+                        if (!isIssueSelected) return
+                        setIterationDropdownOpen(prev => !prev)
+                      }}
+                      style={{
+                        cursor: isIssueSelected ? 'pointer' : 'not-allowed',
+                        opacity: isIssueSelected ? 1 : 0.5
+                      }}
+                    >
+                      <IterationBox>
+                        <Typography value={iteration.title} variant='textSM' weight='regular' color='gray900' />
+                        <Typography value={iteration.period} variant='textXS' weight='regular' color='gray500' />
+                      </IterationBox>
+                    </div>
+                    {iterationDropdownOpen && isIssueSelected && createPortal(
+                      <DropDownMenu ref={iterationMenuRef} style={iterationMenuStyle}>
+                        {iterationOptions.map((opt, index) => {
+                          const isSelected = iteration.title === opt.title
+                          return (
+                            <DropDownItem
+                              key={index}
+                              selected={isSelected}
+                              onClick={() => {
+                                setIteration(opt)
+                                setIterationDropdownOpen(false)
+                              }}
+                              role='option'
+                            >
+                              {opt.title} / {opt.period}
+                            </DropDownItem>
+                          )
+                        })}
+                      </DropDownMenu>,
+                      document.body
+                    )}
+                  </>
+                )}
+              </Row>
 
-            </Row>
+              <Row>
+                <Typography value='Label' variant='textSM' weight='medium' color='gray900' />
+                <LabelContainer>
+                  {selectedLabels.map((label) => (
+                    <LabelBadge
+                      key={label}
+                      onClick={() => {
+                        if (!isIssueSelected) return
+                        handleLabelClick(label)
+                      }}
+                      style={{
+                        cursor: isIssueSelected ? 'pointer' : 'not-allowed',
+                        opacity: isIssueSelected ? 1 : 0.5
+                      }}
+                    >
+                      <Typography value={label} variant='textXS' weight='medium' color='brand700' />
+                      <CancelIcon />
+                    </LabelBadge>
+                  ))}
+
+                  <LabelBadge
+                    ref={labelRef}
+                    onClick={() => {
+                      if (!isIssueSelected) return
+                      setLabelDropdownOpen(prev => !prev)
+                    }}
+                    style={{
+                      cursor: isIssueSelected ? 'pointer' : 'not-allowed',
+                      opacity: isIssueSelected ? 1 : 0.5
+                    }}
+                  >
+                    <PlusIcon />
+                  </LabelBadge>
+
+                  {labelDropdownOpen && isIssueSelected && createPortal(
+                    <DropDownMenu ref={labelMenuRef} style={labelMenuStyle}>
+                      {labelOptions.map((label) => {
+                        const isSelected = selectedLabels.includes(label)
+                        return (
+                          <DropDownItem
+                            key={label}
+                            selected={isSelected}
+                            onClick={() => handleLabelClick(label)}
+                            role='option'
+                          >
+                            {label}
+                          </DropDownItem>
+                        )
+                      })}
+                    </DropDownMenu>,
+                    document.body
+                  )}
+                </LabelContainer>
+              </Row>     
+
+              <Row>
+                <Typography value='Assignee' variant='textSM' weight='medium' color='gray900' />
+
+                <div
+                  ref={assigneeRef}
+                  onClick={() => {
+                    if (!isIssueSelected) return
+                    setAssigneeDropdownOpen(prev => !prev)
+                  }}
+                  style={{
+                    cursor: isIssueSelected ? 'pointer' : 'not-allowed',
+                    opacity: isIssueSelected ? 1 : 0.5
+                  }}
+                >
+                  <Typography
+                    value={renderAssigneeText()}
+                    variant='textSM'
+                    weight='regular'
+                    color={assignees.length > 0 ? 'gray900' : 'gray400'}
+                  />
+                </div>
+
+                {assigneeDropdownOpen && isIssueSelected && createPortal(
+                  <DropDownMenu ref={assigneeMenuRef} style={assigneeMenuStyle}>
+                    {assigneeOptions.map((name, index) => {
+                      const isSelected = assignees.includes(name)
+                      return (
+                        <DropDownItem
+                          key={index}
+                          selected={isSelected}
+                          onClick={() => {
+                            if (!isIssueSelected) return
+                            if (isSelected) {
+                              setAssignees(prev => prev.filter(a => a !== name))
+                            } else {
+                              setAssignees(prev => [...prev, name])
+                            }
+                          }}
+                          role='option'
+                        >
+                          {name}
+                        </DropDownItem>
+                      )
+                    })}
+                  </DropDownMenu>,
+                  document.body
+                )}
+              </Row>
+
+              <Row>
+                <ButtonBase 
+                  $isHighlighted={isCompleted}
+                  onClick={() => {
+                    if (!isIssueSelected) return
+                    handleStateToggle()
+                  }}
+                  style={{
+                    marginLeft: 'auto',
+                    cursor: isIssueSelected ? 'pointer' : 'not-allowed',
+                    opacity: isIssueSelected ? 1 : 0.5
+                  }}
+                >
+                  {isCompleted ? '확정됨' : '확정하기'}
+                </ButtonBase>
+              </Row>
             </ContentWrapper>
+
             <Footer>
-              <ButtonBase>전체 이슈 확정</ButtonBase>
+              <ButtonBase
+                onClick={() => {
+                  const updated = issueList.map(issue => ({ ...issue, isCompleted: true }))
+                  setIssueList(updated)
+                }}
+              >
+                전체 이슈 확정
+              </ButtonBase>
               <ButtonBase $isHighlighted>전체 이슈 재요청</ButtonBase>
             </Footer>
           </LeftContainer>
