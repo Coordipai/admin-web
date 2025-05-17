@@ -17,7 +17,6 @@ import FormTextarea from '@components/FormTextarea'
 import { Plus, X } from '@untitled-ui/icons-react'
 
 import useLoadingStore from '@store/useLoadingStore'
-import { mockIssueList } from '@mocks/issueList'
 import { getGeneratedIssues } from '@api/agentApi'
 import { useParams } from 'react-router-dom'
 import { useProjectStore } from '@store/useProjectStore'
@@ -207,16 +206,13 @@ const IssueSuggestPage = () => {
 
   const fetchSuggestedIssues = useCallback(async () => {
     try {
-      setLoading(true)
       const response = await getGeneratedIssues(projectId)
       console.log(response)
     } catch (error) {
       console.error('Failed to fetch issue list:', error)
       setIssueList([])
-    } finally {
-      setLoading(false)
     }
-  }, [setLoading, iterationOptions])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const init = async () => {
@@ -229,7 +225,7 @@ const IssueSuggestPage = () => {
       }
     }
     init()
-  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [projectId, iterationOptions])  // eslint-disable-line react-hooks/exhaustive-deps
 
   // render 부분
   const [badgeDropdownOpen, setBadgeDropdownOpen] = useState(false)

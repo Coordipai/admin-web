@@ -97,78 +97,71 @@ const IssueDetailPage = () => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-
-const fetchIssue = useCallback(async () => {
-  if (issueNumber !== 'new') {
-    try {
-      const res = await fetchIssueDetail(projectId, issueNumber)
-
-      setIssueTitle(res?.title || '')
-
-      const fullBody = res?.body || ''
-      const extractMetaFromBody = (body) => {
-        const metaMatch = body.match(/<!--([\s\S]*?)-->/)
-        const result = {}
-
-        if (metaMatch) {
-          const metaContent = metaMatch[1].trim()
-          const lines = metaContent.split('\n')
-          lines.forEach(line => {
-            const [key, value] = line.split(':').map(s => s.trim())
-            if (key && value) {
-              result[key] = isNaN(value) ? value : parseInt(value)
-            }
-          })
+  const fetchIssue = useCallback(async () => {
+    if (issueNumber !== 'new') {
+      try {
+        const res = await fetchIssueDetail(projectId, issueNumber)
+        setIssueTitle(res?.title || '')
+        const fullBody = res?.body || ''
+        const extractMetaFromBody = (body) => {
+          const metaMatch = body.match(/<!--([\s\S]*?)-->/)
+          const result = {}
+          if (metaMatch) {
+            const metaContent = metaMatch[1].trim()
+            const lines = metaContent.split('\n')
+            lines.forEach(line => {
+              const [key, value] = line.split(':').map(s => s.trim())
+              if (key && value) {
+                result[key] = isNaN(value) ? value : parseInt(value)
+              }
+            })
+          }
+          return {
+            content: body.replace(/<!--[\s\S]*?-->/, '').trim(),
+            meta: result
+          }
         }
-        return {
-          content: body.replace(/<!--[\s\S]*?-->/, '').trim(),
-          meta: result
-        }
+        const { content, meta } = extractMetaFromBody(fullBody)
+        setIssueContent(content)
+        setPriority(meta.priority || priorityOptions[0].value)
+        const matchedIteration = project.iterationOptions.find(opt => {
+          const num = parseInt(opt.title.replace(/\D/g, ''))
+          return num === meta.iteration
+        })        
+        setIteration(matchedIteration || iterationOptions[0])
+        setSelectedLabels(res?.labels || [])
+        setAssignees(res?.assignees.map(a => a.github_name) || [])
+      } catch (error) {
+        console.error('Failed to fetch issue:', error)
+        setIssueTitle('')
+        setIssueContent('')
+        setPriority(priorityOptions[0].value)
+        setIteration(iterationOptions[0] || { title: '선택해주세요', period: '' })
+        setSelectedLabels([])
+        setAssignees([])
       }
-      const { content, meta } = extractMetaFromBody(fullBody)
-      setIssueContent(content)
-
-      setPriority(meta.priority || priorityOptions[0].value)
-
-      const matchedIteration = iterationOptions.find(opt => {
-        const num = parseInt(opt.title.replace(/\D/g, ''))
-        return num === meta.iteration
-      })
-      setIteration(matchedIteration || iterationOptions[0])
-      setSelectedLabels(res?.labels || [])
-      setAssignees(res?.assignees.map(a => a.github_name) || [])
-    } catch (error) {
-      console.error('Failed to fetch issue:', error)
-      setIssueTitle('')
-      setIssueContent('')
+    } else {
       setPriority(priorityOptions[0].value)
       setIteration(iterationOptions[0] || { title: '선택해주세요', period: '' })
-      setSelectedLabels([])
-      setAssignees([])
     }
-  } else {
-    setPriority(priorityOptions[0].value)
-    setIteration(iterationOptions[0] || { title: '선택해주세요', period: '' })
-  }
-}, [issueNumber, projectId, iterationOptions]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-
-useEffect(() => {
-  const init = async () => {
-    setLoading(true)
-    try {
-      await fetchProject()
-      await fetchIssue()
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    const init = async () => {
+      setLoading(true)
+      try {
+        await fetchProject()
+        await fetchIssue()
+      } finally {
+        setLoading(false)
+      }
     }
-  }
-  init()
-}, [])  // eslint-disable-line react-hooks/exhaustive-deps
+    init()
+  }, [issueNumber, projectId, iterationOptions])  // eslint-disable-line react-hooks/exhaustive-deps
 
   // 모달 관련
   const [showModal, setShowModal] = useState(false)
-  const [modalText, setModalText] = useState('Modal Text')
+  const [modalText, setModalText] = useState('Modal Test')
   const [isEdit, setIsEdit] = useState(false)
 
   // render 부분
