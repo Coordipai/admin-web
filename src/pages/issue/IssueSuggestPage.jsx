@@ -18,6 +18,8 @@ import { Plus, X } from '@untitled-ui/icons-react'
 
 import useLoadingStore from '@store/useLoadingStore'
 import { mockIssueList } from '@mocks/issueList'
+import { getGeneratedIssues } from '@api/agentApi'
+import { useParams } from 'react-router-dom'
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -163,6 +165,7 @@ const LabelBadge = styled.div`
 `
 
 const IssueSuggestPage = () => {
+  const { projectId } = useParams()
   const { isLoading, setLoading } = useLoadingStore()
   // project 정보
   const [priorityOptions] = useState([
@@ -213,16 +216,17 @@ const IssueSuggestPage = () => {
   const fetchSuggestedIssues = useCallback(async () => {
     try {
       setLoading(true)
-      // TODO: 실제 API 호출로 교체
-      // const response = await fetchIssueListAPI(projectId)
-      const response = mockIssueList.map(issue => ({
-        ...issue,
-        isCompleted: false,
-        priority: 'M',
-        iteration: iterationOptions[0],
-        assignees: []
-      }))
-      setIssueList(response)
+      const response = await getGeneratedIssues(projectId)
+      console.log(response)
+
+      // const response = mockIssueList.map(issue => ({
+      //   ...issue,
+      //   isCompleted: false,
+      //   priority: 'M',
+      //   iteration: iterationOptions[0],
+      //   assignees: []
+      // }))
+      // setIssueList(response)
 
     } catch (error) {
       console.error('Failed to fetch issue list:', error)
@@ -230,7 +234,7 @@ const IssueSuggestPage = () => {
     } finally {
       setLoading(false)
     }
-  }, [setLoading, iterationOptions])
+  }, [setLoading, iterationOptions])  // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const init = async () => {

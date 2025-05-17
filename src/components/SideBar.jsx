@@ -236,7 +236,7 @@ const NavBodySection = ({ projectName, iteration, issueSummary, categories }) =>
 
 NavBodySection.propTypes = {
   projectName: PropTypes.string.isRequired,
-  iteration: PropTypes.shape({
+  nowIteration: PropTypes.shape({
     sprint: PropTypes.string.isRequired,
     period: PropTypes.string.isRequired
   }).isRequired,
@@ -282,7 +282,7 @@ const SideBar = ({
         {currentProject && (
           <NavBodySection
             projectName={currentProject.repo_fullname}
-            iteration={currentProject.iteration}
+            iteration={currentProject.nowIteration}
             issueSummary={currentProject.issueSummary}
             categories={currentProject.categories}
           />

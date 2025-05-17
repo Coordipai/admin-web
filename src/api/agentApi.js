@@ -7,13 +7,13 @@ import { useAccessTokenStore } from '@store/useUserStore'
  * 
  * @returns {object} issueData
  */
-export const getGeneratedIssues = async () => {
+export const getGeneratedIssues = async (projectId) => {
     try {
         const token = useAccessTokenStore.getState().accessToken
         if (!token) {
             throw new Error('Access token is not available')
         }
-        const response = await api.get('/agent/generate_issues', {
+        const response = await api.get(`/agent/generate_issues/${projectId}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

@@ -33,7 +33,29 @@ export const useProjectStore = create((set) => ({
         fetchIssueSummary(projectId)
       ])
 
-      const iteration = calculateIteration(rawProject.start_date, rawProject.sprint_unit)
+      const nowIteration = calculateIteration(rawProject.start_date, rawProject.sprint_unit)
+      const assigneeOptions = rawProject.members.map((member) => member.name)
+      const iterationOptions = []
+      const start = new Date(rawProject.start_date)
+      const end = new Date(rawProject.end_date)
+      const sprintUnit = rawProject.sprint_unit
+
+      let sprintStart = new Date(start)
+      let sprintIndex = 1
+
+      while (sprintStart <= end) {
+        const sprintEnd = new Date(sprintStart)
+        sprintEnd.setDate(sprintStart.getDate() + sprintUnit - 1)
+
+        const format = (d) => `${d.getMonth() + 1}.${d.getDate()}`
+        iterationOptions.push({
+          title: `Iteration ${sprintIndex}`,
+          period: `${format(sprintStart)} ~ ${format(sprintEnd)}`
+        })
+
+        sprintStart.setDate(sprintStart.getDate() + sprintUnit)
+        sprintIndex++
+      }
 
       const categoriesObj = rawProject.members.reduce((acc, member) => {
         if (!acc[member.category]) acc[member.category] = []
@@ -44,6 +66,7 @@ export const useProjectStore = create((set) => ({
         })
         return acc
       }, {})
+
       const categories = Object.entries(categoriesObj).map(([categoryName, people]) => ({
         categoryName,
         people
@@ -58,7 +81,9 @@ export const useProjectStore = create((set) => ({
       set({
         project: {
           ...rawProject,
-          iteration,
+          nowIteration,
+          iterationOptions,
+          assigneeOptions,
           categories,
           issueSummary
         }

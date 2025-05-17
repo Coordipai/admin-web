@@ -136,8 +136,8 @@ export const Project = () => {
     return hash === 'request' ? 'request' : 'issue'
   })
 
-  // const { project } = useProjectStore()
-  // console.log('project', project)
+  const { project } = useProjectStore()
+  console.log('project', project)
 
 
   // URL 해시에 따라 탭 상태 설정
