@@ -203,13 +203,14 @@ const FileTable = ({ files, setFiles }) => {
       <TableWrapper>
         <TableHeader>
           <Typography variant='displaySM' weight='medium' value='프로젝트 자료' />
+          
           <Button
-            text='Upload'
             icon={<img src='/src/assets/icons/upload-icon.svg' alt='Upload' />}
-            variant='default'
-            type='button'
+            variant='contained'
+            color='brand500'
             onClick={() => setModalOpen(true)}
-          />
+          >Upload
+          </Button>
         </TableHeader>
         <Table>
           <TableHeaderRow>

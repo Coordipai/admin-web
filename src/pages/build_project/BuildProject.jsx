@@ -164,8 +164,8 @@ const BuildProject = () => {
 					/>
 				</Fieldset>
 				<ButtonGroup>
-					<Button text='취소' type='button' onClick={() => (window.location.href = '/')} />
-					<Button text='다음' type='button' onClick={() => {
+					<Button variant='outlined'onClick={() => (window.location.href = '/')} >취소</Button>
+					<Button variant='contained'  onClick={() => {
 						const newError = {}
 						if (!form.projectName) newError.projectName = true
 						if (!form.deadline) newError.deadline = true
@@ -176,7 +176,7 @@ const BuildProject = () => {
 						if (Object.keys(newError).length === 0) {
 							window.location.hash = '#step2'
 						}
-					}} />
+					}} >다음</Button>
 				</ButtonGroup>
 			</Section>
 		</MainBox>
@@ -202,8 +202,8 @@ const BuildProject = () => {
 
 				</Fieldset>
 				<ButtonGroup>
-					<Button text='취소' type='button' onClick={() => (window.location.hash = '#step1')} />
-					<Button text='다음' type='button' onClick={() => (window.location.hash = '#step3')} />
+					<Button variant='outlined' onClick={() => (window.location.hash = '#step1')} >취소</Button>
+					<Button variant='contained' onClick={() => (window.location.hash = '#step3')} >다음</Button>
 				</ButtonGroup>
 			</Section>
 		</MainBox>
@@ -313,8 +313,8 @@ const BuildProject = () => {
 					<UserTable rows={form.members} setRows={rows => setForm(f => ({ ...f, members: rows }))} />
 				</Fieldset>
 				<ButtonGroup>
-					<Button text='취소' type='button' onClick={() => (window.location.hash = '#step2')} />
-					<Button text='완료' type='submit' onClick={async () => {
+					<Button variant='outlined' onClick={() => (window.location.hash = '#step2')} >취소</Button>
+					<Button variant='contained' onClick={async () => {
 						// 날짜를 ISO 8601로 변환
 						const startDate = form.deadline ? new Date().toISOString() : dayjs().format('YYYY-MM-DDT00:00:00[Z]')
 						const endDate = form.deadline ? `${form.deadline}T00:00:00Z` : ''
@@ -352,7 +352,7 @@ const BuildProject = () => {
 							console.log('프로젝트 생성 실패:', error)
 
 						}
-					}} />
+					}} >완료</Button>
 				</ButtonGroup>
 			</Section>
 		</MainBox>
