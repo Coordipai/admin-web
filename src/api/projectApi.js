@@ -1,5 +1,5 @@
 import { api } from '@hooks/useAxios'
-import { showSuccessToastMsg, showErrorToastMsg } from '@utils/showToastMsg';
+import { showErrorToastMsg } from '@utils/showToastMsg';
 import { useAccessTokenStore } from '@store/useUserStore'
 
 
@@ -15,8 +15,6 @@ export const fetchProjectDetail = async (projectId) => {
         Authorization: `Bearer ${token}`
       },
     });
-
-    console.log("pid: ", projectId, "response: ", response.data)
     return response.data.content.data;
   } catch (error) {
     showErrorToastMsg(error);

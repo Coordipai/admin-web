@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { differenceInDays } from 'date-fns'
 import { fetchProjectDetail } from '@api/projectApi'
 import { fetchIssueSummary } from '@api/issueApi'
@@ -24,74 +25,87 @@ const calculateIteration = (startDate, sprintUnit) => {
   }
 }
 
-export const useProjectStore = create((set) => ({
-  project: null,
-  setProject: async (projectId) => {
-    try {
-      const [rawProject, issueSummaryData] = await Promise.all([
-        fetchProjectDetail(projectId),
-        fetchIssueSummary(projectId)
-      ])
+export const useProjectStore = create(
+  persist(
+    (set) => ({
+      project: null,
+      setProject: async (projectId) => {
+        try {
+          const [rawProject, issueSummaryData] = await Promise.all([
+            fetchProjectDetail(projectId),
+            fetchIssueSummary(projectId)
+          ])
 
-      const nowIteration = calculateIteration(rawProject.start_date, rawProject.sprint_unit)
-      const assigneeOptions = rawProject.members.map((member) => member.name)
-      const iterationOptions = []
-      const start = new Date(rawProject.start_date)
-      const end = new Date(rawProject.end_date)
-      const sprintUnit = rawProject.sprint_unit
+          const nowIteration = calculateIteration(rawProject.start_date, rawProject.sprint_unit)
 
-      let sprintStart = new Date(start)
-      let sprintIndex = 1
+          const assigneeOptions = rawProject.members.map((member) => member.name)
 
-      while (sprintStart <= end) {
-        const sprintEnd = new Date(sprintStart)
-        sprintEnd.setDate(sprintStart.getDate() + sprintUnit - 1)
+          const iterationOptions = []
+          const start = new Date(rawProject.start_date)
+          const end = new Date(rawProject.end_date)
+          const sprintUnit = rawProject.sprint_unit
 
-        const format = (d) => `${d.getMonth() + 1}.${d.getDate()}`
-        iterationOptions.push({
-          title: `Iteration ${sprintIndex}`,
-          period: `${format(sprintStart)} ~ ${format(sprintEnd)}`
-        })
+          let sprintStart = new Date(start)
+          let sprintIndex = 1
 
-        sprintStart.setDate(sprintStart.getDate() + sprintUnit)
-        sprintIndex++
-      }
+          while (sprintStart <= end) {
+            const sprintEnd = new Date(sprintStart)
+            sprintEnd.setDate(sprintStart.getDate() + sprintUnit - 1)
 
-      const categoriesObj = rawProject.members.reduce((acc, member) => {
-        if (!acc[member.category]) acc[member.category] = []
-        acc[member.category].push({
-          image: member.profile_img,
-          userName: member.name,
-          githubId: member.github_name
-        })
-        return acc
-      }, {})
+            const format = (d) => `${d.getMonth() + 1}.${d.getDate()}`
+            iterationOptions.push({
+              title: `Iteration ${sprintIndex}`,
+              period: `${format(sprintStart)} ~ ${format(sprintEnd)}`
+            })
 
-      const categories = Object.entries(categoriesObj).map(([categoryName, people]) => ({
-        categoryName,
-        people
-      }))
+            sprintStart.setDate(sprintStart.getDate() + sprintUnit)
+            sprintIndex++
+          }
 
-      const issueSummary = {
-        openedIssues: issueSummaryData.opened_issues,
-        closedIssues: issueSummaryData.closed_issues,
-        allIssues: issueSummaryData.all_issues
-      }
+          const categoriesObj = rawProject.members.reduce((acc, member) => {
+            if (!acc[member.category]) acc[member.category] = []
+            acc[member.category].push({
+              image: member.profile_img,
+              userName: member.name,
+              githubId: member.github_name
+            })
+            return acc
+          }, {})
 
-      set({
-        project: {
-          ...rawProject,
-          nowIteration,
-          iterationOptions,
-          assigneeOptions,
-          categories,
-          issueSummary
+          const categories = Object.entries(categoriesObj).map(([categoryName, people]) => ({
+            categoryName,
+            people
+          }))
+
+          const issueSummary = {
+            openedIssues: issueSummaryData.opened_issues,
+            closedIssues: issueSummaryData.closed_issues,
+            allIssues: issueSummaryData.all_issues
+          }
+
+          set({
+            project: {
+              ...rawProject,
+
+              // project details
+              iterationOptions,
+              assigneeOptions,
+
+              // sidebar 
+              nowIteration,
+              categories,
+              issueSummary
+            }
+          })
+        } catch (error) {
+          console.error('[setProject] Failed to fetch project or issue summary:', error)
+          set({ project: null })
         }
-      })
-    } catch (error) {
-      console.error('[setProject] Failed to fetch project or issue summary:', error)
-      set({ project: null })
+      },
+      clearProject: () => set({ project: null })
+    }),
+    {
+      name: 'project-storage'
     }
-  },
-  clearProject: () => set({ project: null }),
-}))
+  )
+)

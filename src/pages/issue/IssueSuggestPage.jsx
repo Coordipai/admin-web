@@ -20,6 +20,7 @@ import useLoadingStore from '@store/useLoadingStore'
 import { mockIssueList } from '@mocks/issueList'
 import { getGeneratedIssues } from '@api/agentApi'
 import { useParams } from 'react-router-dom'
+import { useProjectStore } from '@store/useProjectStore'
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -167,6 +168,7 @@ const LabelBadge = styled.div`
 const IssueSuggestPage = () => {
   const { projectId } = useParams()
   const { isLoading, setLoading } = useLoadingStore()
+  const { project } = useProjectStore()
   // project 정보
   const [priorityOptions] = useState([
     { value: 'M', label: '[M] Must Have' },
@@ -194,16 +196,16 @@ const IssueSuggestPage = () => {
   const fetchProject = useCallback(async () => {
     try {
       // dummy
-      const iterations = [    
-        { title: 'Iteration 1', period: '2023-10-01 ~ 2023-10-15' },
-        { title: 'Iteration 2', period: '2023-10-16 ~ 2023-10-31' },
-        { title: 'Iteration 3', period: '2023-11-01 ~ 2023-11-15' }
-      ]
-      const assignees = [
-        'makisepel'
-      ]
-      setIterationOptions(iterations)
-      setAssigneeOptions(assignees)
+      // const iterations = [    
+      //   { title: 'Iteration 1', period: '2023-10-01 ~ 2023-10-15' },
+      //   { title: 'Iteration 2', period: '2023-10-16 ~ 2023-10-31' },
+      //   { title: 'Iteration 3', period: '2023-11-01 ~ 2023-11-15' }
+      // ]
+      // const assignees = [
+      //   'makisepel'
+      // ]
+      setIterationOptions(project.iterationOptions)
+      setAssigneeOptions(project.assigneeOptions)
     } catch (error) {
       console.error('Failed to get project data:', error)
       // 기본값 설정
@@ -211,7 +213,7 @@ const IssueSuggestPage = () => {
       setIteration({ title: '선택해주세요', period: '' })
       setAssigneeOptions([])
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSuggestedIssues = useCallback(async () => {
     try {
