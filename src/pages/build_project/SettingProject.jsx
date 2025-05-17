@@ -262,9 +262,9 @@ export const SettingProject = () => {
             <UserTable rows={form.members} setRows={rows => setForm(f => ({ ...f, members: rows }))} />
           </TableWrapper>
           <ButtonGroup>
-            <Button variant='contained' onClick={() => navigate(-1)} >취소</Button>
-            <Button variant='outlined' color='brand500' onClick={handleUpdate} >완료</Button>
             <Button variant='contained' onClick={handleDelete}>삭제</Button>
+            <Button variant='outlined'  onClick={() => navigate(-1)} >취소</Button>
+            <Button variant='contained'  onClick={handleUpdate} >완료</Button>
           </ButtonGroup>
         </Fieldset>
       </Section>
