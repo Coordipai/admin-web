@@ -31,11 +31,12 @@ const LogoRow = styled.div`
   align-items: center;
   gap: 32px;
 `
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // 로그인 handler
 const handleGithubLogin = () => {
   // TODO: 백엔드 OAuth 로그인 URL 배포용으로 교체 예정
-  window.location.href = 'https://coordipai-web-server.knuassignx.site/auth/github/login'
+  window.location.href = `${BASE_URL}/auth/github/login`
 }
 
 export default function LoginPage () {
