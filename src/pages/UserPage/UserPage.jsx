@@ -236,29 +236,33 @@ useEffect(() => {
 
 
 const handleEvaluationRequest = async () => {
+
   const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
-  if (!confirmed) return
+    //console.log('selectedRepos:', selectedRepos)
+    if (!confirmed) return
 
-  try {
-    const response = await axios.post(
-      'https://coordipai-web-server.knuassignx.site/evaluation/request', // ⚠️ 임시 평가 요청 엔드포인트
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        withCredentials: true,
-      }
-    )
+    try {
+      const response = await axios.post(
+        'https://coordipai-web-server.knuassignx.site/agent/assess_stat',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      )
 
-    console.log('✅ 평가요청 성공:', response.data)
-    alert('평가 요청이 완료되었습니다.')
+      const result = response.data.content
+      console.log('✅ 평가 결과:', result)
+      alert(`평가가 완료되었습니다!\n\n점수: ${result.evaluation_score}\n분야: ${result.field}`)
+
     } catch (error) {
-      console.error('❌ 평가요청 실패:', error)
+      console.error('❌ 평가 요청 실패:', error)
       alert('평가 요청 중 오류가 발생했습니다.')
     }
   }
-
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
