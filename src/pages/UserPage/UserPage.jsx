@@ -1,16 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
 import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
-import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
-import { useNavigate, useParams } from 'react-router-dom'
-
-import axios from 'axios'
-import { set } from 'date-fns'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate, useParams } from 'react-router-dom'
 

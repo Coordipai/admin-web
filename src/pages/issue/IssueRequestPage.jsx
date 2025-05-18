@@ -10,6 +10,7 @@ import { EditContentHeader } from '@components/Edit/EditContentHeader'
 import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
 import { useProjectStore } from '@store/useProjectStore'
+import { useAccessTokenStore } from '@store/useUserStore'
 import axios from 'axios'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
@@ -190,21 +191,27 @@ useEffect(() => {
 
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
-  const handleDecision = async (isApproved) => {
-  const action = isApproved ? 'approve' : 'reject';
-  const confirmMessage = isApproved ? '정말로 변경을 승인하시겠습니까?' : '정말로 반려하시겠습니까?';
-  
-  if (!window.confirm(confirmMessage)) return;
+  const accessToken = useAccessTokenStore((state) => state.accessToken);
 
-  try {
-    const res = await axios.delete(`${BASE_URL}/issue-reschedule/${requestId}?action=${action}`);
-    console.log(`${action} 완료:`, res.data);
-    alert(`${isApproved ? '승인' : '반려'} 처리되었습니다.`);
-  } catch (error) {
-    console.error(`${action} 실패:`, error);
-    alert(`${isApproved ? '승인' : '반려'} 처리에 실패했습니다.`);
+  const handleDecision = async (isApproved) => {
+    const type = isApproved ? 'Approve' : 'Disapprove'
+    const confirmMessage = isApproved ? '정말로 변경을 승인하시겠습니까?' : '정말로 반려하시겠습니까?'
+
+    if (!window.confirm(confirmMessage)) return
+
+    try {
+      const res = await axios.delete(`${BASE_URL}/issue-reschedule/${requestId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: { type },
+      })
+      console.log(`${type} 완료:`, res.data)
+      alert(`${isApproved ? '승인' : '반려'} 처리되었습니다.`)
+    } catch (error) {
+      console.error(`${type} 실패:`, error);
+      alert(`${isApproved ? '승인' : '반려'} 처리에 실패했습니다.`)
+    }
   }
-};
+
 
 
   const handleRequestFeedbackAgain = () => {

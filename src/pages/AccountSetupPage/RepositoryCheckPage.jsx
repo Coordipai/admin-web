@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
@@ -70,10 +69,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 export default function AccountSetupPage () {
   // 추가
   const { githubId } = useParams()
-  // 추가
-  const { githubId } = useParams()
   const [selectedRepos, setSelectedRepos] = useState([])
-  const [repoList, setRepoList] = useState([])
   const [repoList, setRepoList] = useState([])
   const navigate = useNavigate()
 
