@@ -7,7 +7,6 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
-import { useUserStore, useAccessTokenStore } from '@store/useUserStore'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -65,6 +64,7 @@ const Button = styled(ButtonBase)`
   justify-content: center;      // 가로 중앙 정렬
   ${({ theme }) => theme.texts.textSM};
 `
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function AccountSetupPage () {
   // 추가
@@ -79,7 +79,7 @@ export default function AccountSetupPage () {
         // zustand에서 access_token 꺼내기
         // const userResponse = useAccessTokenStore.getState().user || JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.user
         const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
-        const res = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
+        const res = await axios.get(`${BASE_URL}/user-repo/github`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -110,7 +110,7 @@ export default function AccountSetupPage () {
     try{
       const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
       const res = await axios.post(
-        'https://coordipai-web-server.knuassignx.site/user-repo',
+        `${BASE_URL}/user-repo`,
         payload,
         {
           headers: {
