@@ -16,12 +16,11 @@ import {
 import FormTextarea from '@components/FormTextarea'
 import { Plus, X } from '@untitled-ui/icons-react'
 
-import useLoadingStore from '@store/useLoadingStore'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useProjectStore } from '@store/useProjectStore'
 import { useAccessTokenStore } from '@store/useUserStore'
-import { Loading } from '@components/Loading'
 import loadingSvg from "@assets/icons/loading-indicator.svg";
+import { showWarningToastMsg } from '@utils/showToastMsg'
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -168,8 +167,19 @@ const LabelBadge = styled.div`
 
 const IssueSuggestPage = () => {
   const { projectId } = useParams()
-  const { isLoading, setLoading } = useLoadingStore()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [isFetching, setIsFetching] = useState(false)
   const { project } = useProjectStore()
+  const [step, setStep] = useState(() => {
+    const hash = location.hash.replace('#', '')
+    return hash === 'confirm' ? 'confirm' : 'assign'
+  })
+
+  useEffect(() => {
+    const hash = location.hash.replace('#', '')
+    setStep(hash === 'confirm' ? 'confirm' : 'assign')
+  }, [location.hash])
   
   // project 정보
   const [priorityOptions] = useState([
@@ -193,6 +203,7 @@ const IssueSuggestPage = () => {
   const [issueList, setIssueList] = useState([])
   const [isCompleted, setIsCompleted] = useState(false)
   const isIssueSelected = !!selectedIssue
+  const isAllCompleted = issueList.every(issue => issue.isCompleted);
 
   const fetchProject = useCallback(async () => {
     try {
@@ -208,7 +219,7 @@ const IssueSuggestPage = () => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSuggestedIssues = useCallback(async () => {
-    setLoading(true);
+    setIsFetching(true);
     const token = useAccessTokenStore.getState().accessToken;
     if (!token) {
       console.error('Access token is not available');
@@ -263,7 +274,7 @@ const IssueSuggestPage = () => {
       console.error('Failed to fetch issue list:', error);
       setIssueList([]);
     } finally {
-      setLoading(false);
+      setIsFetching(false);
     }
 
     function appendContentInline(issue) {
@@ -288,12 +299,12 @@ const IssueSuggestPage = () => {
 
   useEffect(() => {
     const init = async () => {
-      setLoading(true)
+      setIsFetching(true)
       try {
         await fetchProject()
         await fetchSuggestedIssues()
       } finally {
-        setLoading(false)
+        setIsFetching(false)
       }
     }
     init()
@@ -426,13 +437,52 @@ const IssueSuggestPage = () => {
   return (
     <MainBox>
       <Header
-        text={'이슈 자동생성'}
+        text={step === 'confirm'
+            ? '이슈 자동 생성 - 내용 확인':
+              '이슈 자동 생성 - 팀원 배정'}
         buttonsData={[
-          { 
-            value: '다음', 
-            onClick: () => {}, 
-            isHighlighted: true 
-          },
+          step === 'confirm'
+            ? {
+                value: '다음',
+                onClick: () => {
+                  // fetch(`/api/issues`, {
+                  //   method: 'POST',
+                  //   headers: { 'Content-Type': 'application/json' },
+                  //   body: JSON.stringify(issueList),
+                  // })
+                  //   .then(res => res.json())
+                  //   .then((confirmedIssues) => {
+                  //     setIssueList(confirmedIssues)
+                  //     navigate(`${location.pathname}#assign`, { replace: true })
+                  //   })
+                  //   .catch(err => console.error('POST 실패', err))
+
+                  if (issueList.length <= 0 || isFetching === true) {
+                    showWarningToastMsg('이슈가 자동으로 생성될때까지 기다려주세요.')
+                    return
+                  }
+
+                  if (!isAllCompleted) { 
+                    showWarningToastMsg('모든 이슈를 확정해주세요.')
+                    return
+                  }
+                  
+                  const resetIssues = issueList.map(issue => ({
+                    ...issue,
+                    isCompleted: false
+                  }));
+                  setIssueList(resetIssues)
+                  setSelectedIssue(null)
+                  setIsCompleted(false)
+                  navigate(`${location.pathname}#assign`)
+                },
+                isHighlighted: true,
+              }
+            : {
+                value: '완료',
+                onClick: () => window.history.back(),
+                isHighlighted: true,
+              },
           { value: '취소', onClick: () => window.history.back() }
         ]}
       />
@@ -578,54 +628,55 @@ const IssueSuggestPage = () => {
                 </LabelContainer>
               </Row>     
 
-              <Row>
-                <Typography value='Assignee' variant='textSM' weight='medium' color='gray900' />
+              {step === 'assign' && (
+                <Row>
+                  <Typography value='Assignee' variant='textSM' weight='medium' color='gray900' />
+                  <div
+                    ref={assigneeRef}
+                    onClick={() => {
+                      if (!isIssueSelected) return
+                      setAssigneeDropdownOpen(prev => !prev)
+                    }}
+                    style={{
+                      cursor: isIssueSelected ? 'pointer' : 'not-allowed',
+                      opacity: isIssueSelected ? 1 : 0.5,
+                    }}
+                  >
+                    <Typography
+                      value={renderAssigneeText()}
+                      variant='textSM'
+                      weight='regular'
+                      color={assignees.length > 0 ? 'gray900' : 'gray400'}
+                    />
+                  </div>
 
-                <div
-                  ref={assigneeRef}
-                  onClick={() => {
-                    if (!isIssueSelected) return
-                    setAssigneeDropdownOpen(prev => !prev)
-                  }}
-                  style={{
-                    cursor: isIssueSelected ? 'pointer' : 'not-allowed',
-                    opacity: isIssueSelected ? 1 : 0.5
-                  }}
-                >
-                  <Typography
-                    value={renderAssigneeText()}
-                    variant='textSM'
-                    weight='regular'
-                    color={assignees.length > 0 ? 'gray900' : 'gray400'}
-                  />
-                </div>
-
-                {assigneeDropdownOpen && isIssueSelected && createPortal(
-                  <DropDownMenu ref={assigneeMenuRef} style={assigneeMenuStyle}>
-                    {assigneeOptions.map((name, index) => {
-                      const isSelected = assignees.includes(name)
-                      return (
-                        <DropDownItem
-                          key={index}
-                          selected={isSelected}
-                          onClick={() => {
-                            if (!isIssueSelected) return
-                            if (isSelected) {
-                              setAssignees(prev => prev.filter(a => a !== name))
-                            } else {
-                              setAssignees(prev => [...prev, name])
-                            }
-                          }}
-                          role='option'
-                        >
-                          {name}
-                        </DropDownItem>
-                      )
-                    })}
-                  </DropDownMenu>,
-                  document.body
-                )}
-              </Row>
+                  {assigneeDropdownOpen && isIssueSelected && createPortal(
+                    <DropDownMenu ref={assigneeMenuRef} style={assigneeMenuStyle}>
+                      {assigneeOptions.map((name, index) => {
+                        const isSelected = assignees.includes(name)
+                        return (
+                          <DropDownItem
+                            key={index}
+                            selected={isSelected}
+                            onClick={() => {
+                              if (!isIssueSelected) return
+                              if (isSelected) {
+                                setAssignees(prev => prev.filter(a => a !== name))
+                              } else {
+                                setAssignees(prev => [...prev, name])
+                              }
+                            }}
+                            role='option'
+                          >
+                            {name}
+                          </DropDownItem>
+                        )
+                      })}
+                    </DropDownMenu>,
+                    document.body
+                  )}
+                </Row>
+              )}
 
               <Row>
                 <ButtonBase 
@@ -677,7 +728,7 @@ const IssueSuggestPage = () => {
                   {issue.isCompleted && <CheckIcon>✓</CheckIcon>}
                 </IssueBox>
               ))}
-              { isLoading && (
+              { isFetching && (
                 <div style={{ display: 'flex', justifyContent: 'center'}} >
                   <img src={loadingSvg} alt="로딩 중" style={{ width: '2rem'}} />
                 </div>

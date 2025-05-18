@@ -246,7 +246,7 @@ export const Project = () => {
                 <Button variant='outlined' color='gray700' onClick={() => navigate(`${location.pathname}/issue/new`)} >
                   이슈 추가
                 </Button>
-                <Button variant='contained' color='brand500' onClick={() => navigate(`/project/${projectId}/issuesuggest`)} >
+                <Button variant='contained' color='brand500' onClick={() => navigate(`/project/${projectId}/issuesuggest#confirm`)} >
                   이슈 자동 생성
                 </Button>
               </ButtonGroup>
