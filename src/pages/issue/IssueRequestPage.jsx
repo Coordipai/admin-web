@@ -9,7 +9,12 @@ import Header from '@components/Header'
 import { EditContentHeader } from '@components/Edit/EditContentHeader'
 import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
+import { useProjectStore } from '@store/useProjectStore'
+import { useAccessTokenStore } from '@store/useUserStore'
 import axios from 'axios'
+
+const BASE_URL = import.meta.env.VITE_BASE_URL
+
 
 const FormWrapper = styled.div`
   max-width: 1120px;
@@ -84,33 +89,14 @@ export default function IssueRequestPage () {
   const [issueData, setIssueData] = useState(null)
   const [aiFeedback, setAiFeedback] = useState('')
   const [aiFeedbackReason, setAiFeedbackReason] = useState('')
+  const [assigneeOptions, setAssigneeOptions] = useState([])
+  const iterationOptions = useProjectStore((state) => state.project?.iterationOptions || [])
 
-  const handleApproveChange = async () => {
-    if (!issueData || selectedSprint === -1 || selectedAssignee === -1) {
-      alert('변경할 스프린트와 담당자를 모두 선택해주세요.');
-      return;
-    }
-
-    try {
-      const payload = {
-        project_id: Number(projectId),
-        issue_number: Number(requestId),
-        reason: issueData.reason,
-        new_iteration: sprintOptions[selectedSprint]?.title,
-        new_assignees: [assigneeOptions[selectedAssignee]?.title],
-      };
-
-      const res = await axios.post('/issue-reschedule/', payload);
-      console.log('요청 성공:', res.data);
-    } catch (error) {
-      console.error('요청 실패:', error);
-    }
-  };
-
+  
 useEffect(() => {
   const fetchIssueData = async () => {
     try {
-      const res = await axios.get(`/issue-reschedule/${projectId}`);
+      const res = await axios.get(`${BASE_URL}/issue-reschedule/${projectId}`);
       const issues = res.data?.content?.data || [];
 
       const matched = issues.find(issue => issue.issue_number === Number(requestId));
@@ -120,15 +106,20 @@ useEffect(() => {
         return;
       }
 
+      const oldAssignee = matched.old_assignees?.[0] || ''
+      const newAssignee = matched.new_assignees?.[0] || ''
+
+      const members = useProjectStore.getState().project?.members || []
+      const userPart = members.find((m) => m.github_name === oldAssignee)?.role || ''
+
       const transformed = {
-        username: matched.old_assignees?.[0] || '', // 실제로는 백엔드에서 사용자 정보도 줘야 함
-        userPart: '프론트엔드', // 마찬가지로 추가 필요
+        oldAssignee,
+        newAssignee,
         reason: matched.reason,
         currentSprint: matched.old_iteration,
         targetSprint: matched.new_iteration,
-        oldAssignee: matched.old_assignees?.[0] || '',
-        newAssignee: matched.new_assignees?.[0] || ''
-      };
+        userPart
+      }
 
       setIssueData(transformed);
     } catch (error) {
@@ -138,6 +129,25 @@ useEffect(() => {
 
   fetchIssueData();
 }, [projectId, requestId]);
+
+  useEffect(() => {
+    const fetchProjectMembers = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/project/${projectId}`)
+        const members = res.data?.content?.data?.members || []
+
+        const mappedOptions = members.map((member) => ({
+          title: member.name || member.github_id // 혹은 github_name
+        }))
+
+        setAssigneeOptions(mappedOptions)
+      } catch (error) {
+        console.error('프로젝트 멤버 불러오기 실패:', error)
+      }
+    }
+
+    fetchProjectMembers()
+  }, [projectId])
 
   useEffect(() => {
     const fetchAiFeedback = async () => {
@@ -158,29 +168,7 @@ useEffect(() => {
     fetchAiFeedback()
   }, [requestId]) // Add requestId as a dependency
 
-  const sprintOptions = [
-    { title: 'sprint 1' },
-    { title: 'sprint 2' },
-    { title: 'sprint 3' },
-    { title: 'sprint 4' }
-  ]
-
-  const assigneeOptions = [
-    { title: 'Lucas' },
-    { title: 'Mina' },
-    { title: 'Oliva' },
-    { title: 'Jisoo' }
-  ]
-
   const [selectedSprint, setSelectedSprint] = useState(-1)
-  useEffect(() => {
-    if (issueData) {
-      const sprintIndex = sprintOptions.findIndex(
-        (option) => option.title === issueData.targetSprint
-      )
-      setSelectedSprint(sprintIndex)
-    }
-  }, [issueData])
 
   const [selectedAssignee, setSelectedAssignee] = useState(-1)
 
@@ -191,29 +179,39 @@ useEffect(() => {
     }
   }, [issueData])
 
+  useEffect(() => {
+  if (issueData) {
+      const sprintIndex = iterationOptions.findIndex(
+        (option) => option.title === issueData.targetSprint
+      )
+      setSelectedSprint(sprintIndex)
+    }
+  }, [issueData, iterationOptions])
+
+
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
-  const handleRejectChange = async () => {
-    if (!issueData || selectedSprint === -1 || selectedAssignee === -1) {
-      alert('변경할 스프린트와 담당자를 모두 선택해주세요.');
-      return;
-    }
+  const accessToken = useAccessTokenStore((state) => state.accessToken);
+
+  const handleDecision = async (isApproved) => {
+    const type = isApproved ? 'Approve' : 'Disapprove'
+    const confirmMessage = isApproved ? '정말로 변경을 승인하시겠습니까?' : '정말로 반려하시겠습니까?'
+
+    if (!window.confirm(confirmMessage)) return
 
     try {
-      const payload = {
-        project_id: Number(projectId),
-        issue_number: Number(requestId),
-        reason: issueData.reason + ' (반려)', // 혹은 별도 reason 전달
-        new_iteration: sprintOptions[selectedSprint]?.title,
-        new_assignees: [assigneeOptions[selectedAssignee]?.title],
-      };
-
-      const res = await axios.put('/issue-reschedule/', payload);
-      console.log('반려 처리 완료:', res.data);
+      const res = await axios.delete(`${BASE_URL}/issue-reschedule/${requestId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: { type },
+      })
+      console.log(`${type} 완료:`, res.data)
+      alert(`${isApproved ? '승인' : '반려'} 처리되었습니다.`)
     } catch (error) {
-      console.error('반려 요청 실패:', error);
+      console.error(`${type} 실패:`, error);
+      alert(`${isApproved ? '승인' : '반려'} 처리에 실패했습니다.`)
     }
-  };
+  }
+
 
 
   const handleRequestFeedbackAgain = () => {
@@ -229,15 +227,14 @@ useEffect(() => {
           title='변경 요청서 작성'
           subAction={{ label: '이슈 상세보기', onClick: () => setIsIssueModalOpen(true) }}
           buttonsData={[
-            { value: '변경 반려', onClick: handleRejectChange },
-            { value: '변경 승인', onClick: handleApproveChange }
-          ]}
-        />
+            { value: '변경 반려', onClick: () => handleDecision(false) },
+            { value: '변경 승인', onClick: () => handleDecision(true) }
+          ]}/>
         <LabeledRow>
           <Label>담당자 / 분야 </Label>
           <RowGroup2>
             <div style={{ width: '244px' }}>
-              <FormInput value={issueData?.username || ''} readOnly />
+              <FormInput value={issueData?.oldAssignee || ''} readOnly />
             </div>
             <span />
             <div style={{ width: '244px' }}>
@@ -265,10 +262,9 @@ useEffect(() => {
               <img src={arrowright} alt='arrow' width='12' height='12' />
             </div>
             <div style={{ width: '244px' }}>
-
               <FormDropdown
-                placeholder='스프린트를 선택하세요'
-                menus={sprintOptions}
+                placeholder="스프린트를 선택하세요"
+                menus={iterationOptions}
                 selectedMenu={selectedSprint}
                 handleChange={setSelectedSprint}
               />
@@ -288,11 +284,12 @@ useEffect(() => {
             </div>
             <div style={{ width: '244px' }}>
               <FormDropdown
-                placeholder='변경할 사용자를 선택하세요'
+                placeholder="변경할 사용자를 선택하세요"
                 menus={assigneeOptions}
                 selectedMenu={selectedAssignee}
                 handleChange={setSelectedAssignee}
               />
+
             </div>
           </RowGroup>
         </LabeledRow>
