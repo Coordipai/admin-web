@@ -17,10 +17,11 @@ import FormTextarea from '@components/FormTextarea'
 import { Plus, X } from '@untitled-ui/icons-react'
 
 import useLoadingStore from '@store/useLoadingStore'
-import { getGeneratedIssues } from '@api/agentApi'
 import { useParams } from 'react-router-dom'
 import { useProjectStore } from '@store/useProjectStore'
 import { useAccessTokenStore } from '@store/useUserStore'
+import { Loading } from '@components/Loading'
+import loadingSvg from "@assets/icons/loading-indicator.svg";
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -169,6 +170,7 @@ const IssueSuggestPage = () => {
   const { projectId } = useParams()
   const { isLoading, setLoading } = useLoadingStore()
   const { project } = useProjectStore()
+  
   // project 정보
   const [priorityOptions] = useState([
     { value: 'M', label: '[M] Must Have' },
@@ -224,15 +226,16 @@ const IssueSuggestPage = () => {
       const reader = response.body.getReader();
       const decoder = new TextDecoder('utf-8');
       let buffer = '';
-      let issues = [];
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
+          // 남은 마지막 JSON 처리
           if (buffer.trim() !== '') {
             try {
               const lastIssue = JSON.parse(buffer);
-              issues.push(appendContentInline(lastIssue));
+              const processed = appendContentInline(lastIssue);
+              setIssueList(prev => [...prev, processed]);
             } catch (err) {
               console.error('마지막 이슈 파싱 실패:', err, buffer);
             }
@@ -246,8 +249,9 @@ const IssueSuggestPage = () => {
         while (boundary !== -1) {
           const jsonString = buffer.substring(0, boundary + 1);
           try {
-            const issue = JSON.parse(jsonString);
-            issues.push(appendContentInline(issue));
+            const parsed = JSON.parse(jsonString);
+            const processed = appendContentInline(parsed);
+            setIssueList(prev => [...prev, processed]);
           } catch (err) {
             console.error('JSON 파싱 실패:', err, jsonString);
           }
@@ -255,7 +259,6 @@ const IssueSuggestPage = () => {
           boundary = buffer.indexOf('}{');
         }
       }
-      setIssueList(issues);
     } catch (error) {
       console.error('Failed to fetch issue list:', error);
       setIssueList([]);
@@ -263,7 +266,6 @@ const IssueSuggestPage = () => {
       setLoading(false);
     }
 
-    // 👇 내부에서 직접 content 필드 구성
     function appendContentInline(issue) {
       if (!issue.body || !Array.isArray(issue.body)) {
         return { ...issue, content: '' };
@@ -278,18 +280,11 @@ const IssueSuggestPage = () => {
       const todos = findValueById('todos');
       const assigneeInfo = findValueById('wish-assignee-info');
 
-      const content = `📌 기능 설명
-  ${description}
-
-  ✅ 구현 단계 (TODO)
-  ${todos}
-
-  👤 희망 담당자 정보
-  ${assigneeInfo}`;
-
+      const content = `📌 기능 설명\n${description}\n\n✅ 구현 단계 (TODO)\n${todos}\n\n👤 희망 담당자 정보\n${assigneeInfo}`;
       return { ...issue, content };
     }
-  }, [projectId]);
+  }, [projectId]) // eslint-disable-line react-hooks/exhaustive-deps
+
 
   useEffect(() => {
     const init = async () => {
@@ -302,7 +297,7 @@ const IssueSuggestPage = () => {
       }
     }
     init()
-  }, [projectId, iterationOptions])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [projectId])  // eslint-disable-line react-hooks/exhaustive-deps
 
   // render 부분
   const [badgeDropdownOpen, setBadgeDropdownOpen] = useState(false)
@@ -431,22 +426,21 @@ const IssueSuggestPage = () => {
   return (
     <MainBox>
       <Header
-        text={'이슈 생성하기'}
+        text={'이슈 자동생성'}
         buttonsData={[
           { 
-            value: '저장', 
+            value: '다음', 
             onClick: () => {}, 
             isHighlighted: true 
           },
           { value: '취소', onClick: () => window.history.back() }
         ]}
       />
-      {!isLoading && (
         <SplitContainer>
           <LeftContainer>
             <ContentWrapper>
-              <InputField disabled={!isIssueSelected} label='이슈 타이틀' placeholder='이슈를 선택해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
-              <FormTextarea disabled={!isIssueSelected} label='이슈 내용' placeholder='이슈를 선택해주세요.' value={issueContent} onChange={setIssueContent} />
+              <InputField disabled={!isIssueSelected} label='이슈 타이틀' placeholder='이슈를 먼저 선택해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
+              <FormTextarea disabled={!isIssueSelected} label='이슈 내용' placeholder='이슈를 먼저 선택해주세요.' value={issueContent} onChange={setIssueContent} />
               <Row>
                 <Typography value='Priority' variant='textSM' weight='medium' color='gray900' />
                 <div 
@@ -677,16 +671,20 @@ const IssueSuggestPage = () => {
                 <IssueBox
                   key={`${issue.name}-${idx}`}
                   $checked={selectedIssue === issue}
-                  onClick={() => {handleIssueSelect(issue); console.log(issue)}}
+                  onClick={() => {handleIssueSelect(issue); console.log(issue)}}  // TODO: CONSOLE LOG 제거
                 >
                   <Typography value={issue.title} variant='textSM' weight='medium' color='gray900' />
                   {issue.isCompleted && <CheckIcon>✓</CheckIcon>}
                 </IssueBox>
               ))}
+              { isLoading && (
+                <div style={{ display: 'flex', justifyContent: 'center'}} >
+                  <img src={loadingSvg} alt="로딩 중" style={{ width: '2rem'}} />
+                </div>
+              )}
             </IssueList>
           </RightContainer>
         </SplitContainer>
-      )}
     </MainBox>
   )
 }

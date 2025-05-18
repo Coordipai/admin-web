@@ -38,7 +38,7 @@ import { Loading } from '@components/Loading'
 function App () {
   return (
     <>
-    <GlobalLoading />
+    {/* <GlobalLoading /> */}
       <BrowserRouter>
         <ToastContainer />
         <Routes>
