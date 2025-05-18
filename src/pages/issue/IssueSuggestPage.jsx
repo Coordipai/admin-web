@@ -205,79 +205,91 @@ const IssueSuggestPage = () => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // const fetchSuggestedIssues = useCallback(async () => {
-  //   try {
-  //     const response = await getGeneratedIssues(projectId)
-  //     console.log(response)
-  //   } catch (error) {
-  //     console.error('Failed to fetch issue list:', error)
-  //     setIssueList([])
-  //   }
-  // }, [])  // eslint-disable-line react-hooks/exhaustive-deps
-
-const fetchSuggestedIssues = useCallback(async () => {
-  setLoading(true);
-
-  const token = useAccessTokenStore.getState().accessToken;
-  if (!token) {
-    console.error('Access token is not available');
-    return;
-  }
-
-  try {
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/agent/generate_issues/${projectId}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    console.log('response', response)
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder('utf-8');
-    let buffer = '';
-    let issues = [];
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        if (buffer.trim() !== '') {
-          try {
-            const lastIssue = JSON.parse(buffer);
-            issues.push(lastIssue);
-          } catch (err) {
-            console.error('마지막 이슈 파싱 실패:', err, buffer);
-          }
-        }
-        break;
-      }
-
-      buffer += decoder.decode(value, { stream: true });
-
-      let boundary = buffer.indexOf('}{');
-      while (boundary !== -1) {
-        const jsonString = buffer.substring(0, boundary + 1);
-        try {
-          const issue = JSON.parse(jsonString);
-          issues.push(issue);
-        } catch (err) {
-          console.error('JSON 파싱 실패:', err, jsonString);
-        }
-        buffer = buffer.substring(boundary + 1);
-        boundary = buffer.indexOf('}{');
-      }
+  const fetchSuggestedIssues = useCallback(async () => {
+    setLoading(true);
+    const token = useAccessTokenStore.getState().accessToken;
+    if (!token) {
+      console.error('Access token is not available');
+      return;
     }
 
-    setIssueList(issues);
-  } catch (error) {
-    console.error('Failed to fetch issue list:', error);
-    setIssueList([]);
-  } finally {
-    setLoading(false);
-  }
-}, [projectId]);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/agent/generate_issues/${projectId}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+      let issues = [];
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          if (buffer.trim() !== '') {
+            try {
+              const lastIssue = JSON.parse(buffer);
+              issues.push(appendContentInline(lastIssue));
+            } catch (err) {
+              console.error('마지막 이슈 파싱 실패:', err, buffer);
+            }
+          }
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+
+        let boundary = buffer.indexOf('}{');
+        while (boundary !== -1) {
+          const jsonString = buffer.substring(0, boundary + 1);
+          try {
+            const issue = JSON.parse(jsonString);
+            issues.push(appendContentInline(issue));
+          } catch (err) {
+            console.error('JSON 파싱 실패:', err, jsonString);
+          }
+          buffer = buffer.substring(boundary + 1);
+          boundary = buffer.indexOf('}{');
+        }
+      }
+      setIssueList(issues);
+    } catch (error) {
+      console.error('Failed to fetch issue list:', error);
+      setIssueList([]);
+    } finally {
+      setLoading(false);
+    }
+
+    // 👇 내부에서 직접 content 필드 구성
+    function appendContentInline(issue) {
+      if (!issue.body || !Array.isArray(issue.body)) {
+        return { ...issue, content: '' };
+      }
+
+      const findValueById = (id) => {
+        const item = issue.body.find((field) => field.id === id);
+        return item?.attributes?.value || '';
+      };
+
+      const description = findValueById('description');
+      const todos = findValueById('todos');
+      const assigneeInfo = findValueById('wish-assignee-info');
+
+      const content = `📌 기능 설명
+  ${description}
+
+  ✅ 구현 단계 (TODO)
+  ${todos}
+
+  👤 희망 담당자 정보
+  ${assigneeInfo}`;
+
+      return { ...issue, content };
+    }
+  }, [projectId]);
 
   useEffect(() => {
     const init = async () => {
@@ -395,7 +407,7 @@ const fetchSuggestedIssues = useCallback(async () => {
     setSelectedIssue(issue)
     // Update form fields with selected issue data
     setIssueTitle(issue.title)
-    setIssueContent(issue.description)
+    setIssueContent(issue.content)
     setPriority(issue.priority || 'M')
     setIteration(issue.iteration || iterationOptions[0])
     setSelectedLabels(issue.labels || [])

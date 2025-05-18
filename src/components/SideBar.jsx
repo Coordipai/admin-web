@@ -307,7 +307,7 @@ const SideBar = ({
 }
 
 SideBar.propTypes = {
-  brandIcon: PropTypes.elementType.isRequired,
+  brandIcon: PropTypes.string.isRequired,
   brandTitle: PropTypes.string.isRequired,
   titleOnClick: PropTypes.func.isRequired,
   userOnClick: PropTypes.func,
