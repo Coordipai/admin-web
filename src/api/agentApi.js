@@ -3,28 +3,54 @@ import { showSuccessToastMsg, showErrorToastMsg } from '@utils/showToastMsg';
 import { useAccessTokenStore } from '@store/useUserStore'
 
 /**
- * 1. 이슈 자동 생성 요청하기 (Post)
- * 
- * @returns {object} issueData
+ * 1. 이슈 자동 생성 요청하기 (Streaming 방식)
+ *
+ * @param {number} projectId
+ * @param {(chunk: string) => void} onChunk - 데이터를 스트리밍 단위로 받을 때마다 호출되는 콜백
+ * @returns {Promise<string>} 전체 스트림 결과
  */
-export const getGeneratedIssues = async (projectId) => {
-    try {
-        const token = useAccessTokenStore.getState().accessToken
-        if (!token) {
-            throw new Error('Access token is not available')
-        }
-        const response = await api.get(`/agent/generate_issues/${projectId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        showSuccessToastMsg('이슈 제안 완료');
-        return response.data.content.data;
-    } catch (error) {
-        showErrorToastMsg(error);
-        throw error;
+export const getGeneratedIssues = async (projectId, onChunk) => {
+  try {
+    const token = useAccessTokenStore.getState().accessToken;
+    if (!token) {
+      throw new Error('Access token is not available');
     }
-}
+
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/agent/generate_issues/${projectId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('response', response);
+
+    if (!response.ok || !response.body) {
+      throw new Error(`Streaming response failed: ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let result = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      console.log('value', value);
+      const chunk = decoder.decode(value, { stream: true });
+      result += chunk;
+    
+      onChunk(chunk);
+    }
+
+    showSuccessToastMsg('자동 이슈 생성 완료');
+    return result;
+  } catch (error) {
+    showErrorToastMsg(error);
+    throw error;
+  }
+};
 
 
 /**

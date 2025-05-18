@@ -20,6 +20,7 @@ import useLoadingStore from '@store/useLoadingStore'
 import { getGeneratedIssues } from '@api/agentApi'
 import { useParams } from 'react-router-dom'
 import { useProjectStore } from '@store/useProjectStore'
+import { useAccessTokenStore } from '@store/useUserStore'
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -204,15 +205,79 @@ const IssueSuggestPage = () => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchSuggestedIssues = useCallback(async () => {
-    try {
-      const response = await getGeneratedIssues(projectId)
-      console.log(response)
-    } catch (error) {
-      console.error('Failed to fetch issue list:', error)
-      setIssueList([])
+  // const fetchSuggestedIssues = useCallback(async () => {
+  //   try {
+  //     const response = await getGeneratedIssues(projectId)
+  //     console.log(response)
+  //   } catch (error) {
+  //     console.error('Failed to fetch issue list:', error)
+  //     setIssueList([])
+  //   }
+  // }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
+const fetchSuggestedIssues = useCallback(async () => {
+  setLoading(true);
+
+  const token = useAccessTokenStore.getState().accessToken;
+  if (!token) {
+    console.error('Access token is not available');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/agent/generate_issues/${projectId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('response', response)
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buffer = '';
+    let issues = [];
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        if (buffer.trim() !== '') {
+          try {
+            const lastIssue = JSON.parse(buffer);
+            issues.push(lastIssue);
+          } catch (err) {
+            console.error('마지막 이슈 파싱 실패:', err, buffer);
+          }
+        }
+        break;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
+
+      let boundary = buffer.indexOf('}{');
+      while (boundary !== -1) {
+        const jsonString = buffer.substring(0, boundary + 1);
+        try {
+          const issue = JSON.parse(jsonString);
+          issues.push(issue);
+        } catch (err) {
+          console.error('JSON 파싱 실패:', err, jsonString);
+        }
+        buffer = buffer.substring(boundary + 1);
+        boundary = buffer.indexOf('}{');
+      }
     }
-  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+
+    setIssueList(issues);
+  } catch (error) {
+    console.error('Failed to fetch issue list:', error);
+    setIssueList([]);
+  } finally {
+    setLoading(false);
+  }
+}, [projectId]);
+
 
   useEffect(() => {
     const init = async () => {
@@ -358,11 +423,6 @@ const IssueSuggestPage = () => {
         buttonsData={[
           { 
             value: '저장', 
-            onClick: () => {}, 
-            isHighlighted: true 
-          },
-          { 
-            value: '삭제', 
             onClick: () => {}, 
             isHighlighted: true 
           },
@@ -588,7 +648,12 @@ const IssueSuggestPage = () => {
               >
                 전체 이슈 확정
               </ButtonBase>
-              <ButtonBase $isHighlighted>전체 이슈 재요청</ButtonBase>
+              <ButtonBase $isHighlighted
+                onClick={() => {
+                  setIssueList([])
+                  fetchSuggestedIssues()
+                }}
+              >전체 이슈 재요청</ButtonBase>
             </Footer>
           </LeftContainer>
 
@@ -596,11 +661,11 @@ const IssueSuggestPage = () => {
           <RightContainer>
             <Typography value='이슈 목록' variant='textLG' weight='medium' color='gray900' />
             <IssueList>
-              {issueList.map((issue) => (
+              {issueList.map((issue, idx) => (
                 <IssueBox
-                  key={issue.name}
-                  $checked={selectedIssue?.name === issue.name}
-                  onClick={() => handleIssueSelect(issue)}
+                  key={`${issue.name}-${idx}`}
+                  $checked={selectedIssue === issue}
+                  onClick={() => {handleIssueSelect(issue); console.log(issue)}}
                 >
                   <Typography value={issue.title} variant='textSM' weight='medium' color='gray900' />
                   {issue.isCompleted && <CheckIcon>✓</CheckIcon>}
