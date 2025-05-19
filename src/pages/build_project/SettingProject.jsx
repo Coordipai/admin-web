@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import InputField from '@components/Edit/InputField'
 import styled from 'styled-components'
 import Typography from '@components/Edit/Typography'
@@ -6,11 +6,14 @@ import DropDown from '@components/Edit/DropDown'
 import FileTable from '@components/Edit/FileTable'
 import Button from '@components/Common/Button'
 import { HorizontalDivider, MainBox } from '@styles/globalStyle'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import SearchInputField from '@components/Edit/SearchInputField'
 import UserTable from '@components/Edit/UserTable'
 import { DatePicker } from '@components/Edit/DatePicker'
 import Header from '@components/Header'
+import dayjs from 'dayjs'
+import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
+import { useAccessTokenStore, useRefreshTokenStore, useUserStore } from '@store/useUserStore'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -30,7 +33,7 @@ const Fieldset = styled.div`
 `
 
 const TableWrapper = styled.div`
-	min-height: 300px;
+	min-height: fit-content;
 	width: 100%;
 	overflow-y: auto;
 	scrollbar-width: none;
@@ -67,61 +70,152 @@ const DropDownWrapper = styled.div`
 `
 
 export const SettingProject = () => {
-  // buildproject (BuildProject.jsx) 관련 state
-  const [projectName, setProjectName] = useState('')
-  const [sprint, setSprint] = useState('')
-  const [github, setGithub] = useState('')
-  const [discord, setDiscord] = useState('')
+  const { projectId } = useParams()
+  const navigate = useNavigate()
+  const inputRef = useRef(null)
+	const isSearching = useRef(false)
+  const { Get, Put, Delete } = useFetchWithTokenRefresh()
+  const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
+	const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
+	const setUser = useUserStore(state => state.setUser)
+	const accessToken = useAccessTokenStore(state => state.accessToken)
+	const refreshToken = useRefreshTokenStore(state => state.refreshToken)
+
+  // form 상태로 통합 관리
+  const [form, setForm] = useState({
+    projectName: '',
+    sprint: '',
+    github: '',
+    discord: '',
+    deadline: '',
+    design_docs: [],
+    files: [],
+    members: [],
+    startDate: ''
+  })
   const [error, setError] = useState({})
-  const [deadline, setDeadline] = useState('')
-
-  // buildproject2 (BuildProject2.jsx) 관련 state
-  const [files, setFiles] = useState([])
-
-  // buildproject3 (BuildProject3.jsx) 관련 state
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      name: '홍길동',
-      githubId: 'hong-gildong',
-      profileImg: 'https://avatars.githubusercontent.com/u/66457807?v=4',
-      field: 'frontend'
-    },
-    {
-      id: 2,
-      name: '김철수',
-      githubId: 'kimcs',
-      profileImg: '',
-      field: ''
-    },
-    {
-      id: 3,
-      name: '이영희',
-      githubId: 'lee-younghee',
-      profileImg: '',
-      field: ''
-    }
-  ])
   const [search, setSearch] = useState('')
-  const searchOptions = [
-    { value: 'apple', label: '사과' },
-    { value: 'apple1', label: '사과1' },
-    { value: 'apple2', label: '사과2' },
-    { value: 'apple3', label: '사과3' },
-    { value: 'apple4', label: '사과4' },
-    { value: 'apple5', label: '사과5' },
-    { value: 'apple6', label: '사과6' },
-    { value: 'apple7', label: '사과7' },
-    { value: 'apple8', label: '사과8' },
-    { value: 'apple9', label: '사과9' },
-    { value: 'banana', label: '바나나' },
-    { value: 'orange', label: '오렌지' },
-    { value: 'grape', label: '포도' },
-    { value: 'melon', label: '멜론' }
+
+  const [searchOptions, setSearchOptions] = useState([])
+  const [searchResults, setSearchResults] = useState([])
+
+
+  // 스프린트 옵션 (숫자값)
+  const sprintOptions = [
+    { value: '', label: 'Select team member' },
+    { value: 7, label: '1주' },
+    { value: 14, label: '2주' },
+    { value: 30, label: '1개월' }
   ]
 
-  const navigate = useNavigate()
+  // 프로젝트 정보 불러오기
+  useEffect(() => {
+    if (!projectId) return
+    const fetchProject = async () => {
+      try {
+        const res = await Get(`/project/${projectId}`)
+        // res가 useFetchWithTokenRefresh의 Get이므로 바로 data
+        console.log(res)
+        setForm({
+          projectName: res.name || '',
+          github: res.repo_fullname || '',
+          deadline: res.end_date ? dayjs(res.end_date).format('YYYY-MM-DD') : '',
+          sprint: res.sprint_unit || '',
+          discord: res.discord_channel_id || '',
+          files: [], // 파일 정보는 별도 처리 필요시 추가
+          design_docs: res.design_docs || [],
+          members: (res.members || []).map(m => ({
+            id: m.id||1,
+            name: m.name,
+            githubId: m.github_name,
+            profileImg: m.profile_img,
+            field: m.role || '',
+          })),
+          startDate: res.start_date || ''
+        })
+      } catch {
+        alert('프로젝트 정보를 불러오지 못했습니다.')
+      }
+    }
+    fetchProject()
+  }, [projectId])
 
+
+  // 검색어가 변경될 때마다 API 호출
+  useEffect(() => {
+    const searchUsers = async () => {
+      if (!search) {
+        setSearchOptions([])
+        setSearchResults([])
+        return
+      }
+      try {
+        const response = await Get('/user/search', {
+          params: { user_name: search }
+        })
+        const res = response.length > 0 ? response : []
+        setSearchResults(res)
+        setSearchOptions(res.map(user => ({
+          value: user.id.toString(),
+          label: user.name
+        })))
+      } catch (error) {
+        console.error('검색 중 오류 발생:', error)
+        setSearchOptions([])
+        setSearchResults([])
+      }
+    }
+
+    searchUsers()
+  }, [search])
+
+  // 완료 버튼 클릭 시 PUT
+  const handleUpdate = async () => {
+    const sprintMap = { '1주': 7, '2주': 14, '1개월': 30 }
+    const sprint_unit = typeof form.sprint === 'number' ? form.sprint : sprintMap[form.sprint] || 7
+    const endDate = form.deadline ? `${form.deadline}T00:00:00Z` : ''
+    
+    const members = form.members.map(row => ({
+      id: row.id,
+      role: row.field || 'member'
+    }))
+
+    console.log(form.members)
+
+    const projectReq = {
+      name: form.projectName,
+      repo_fullname: form.github,
+      start_date: form.startDate,
+      end_date: endDate,
+      sprint_unit,
+      discord_channel_id: form.discord,
+      members,
+      design_docs: form.design_docs
+    }
+
+    try {
+      console.log(form.files)
+      console.log(projectReq)
+
+        const formData = new FormData()
+        formData.append('project_req', JSON.stringify(projectReq))
+        form.files.forEach(file => {
+          formData.append('files', file)
+      })
+      await Put(`/project/${projectId}`, formData)
+      navigate('/')
+    } catch {
+      alert('프로젝트 수정 실패')
+    }
+  }
+  const handleDelete = async () => {
+    try {
+      await Delete(`/project/${projectId}`)
+      navigate('/')
+    } catch {
+      alert('프로젝트 삭제 실패') 
+    }
+  }
   return (
     <MainBox>
       <Header text='프로젝트 설정' />
@@ -130,9 +224,9 @@ export const SettingProject = () => {
           <InputField
             label='프로젝트 명 입력'
             placeholder='입력하세요'
-            value={projectName}
+            value={form.projectName}
             onChange={e => {
-							  setProjectName(e.target.value)
+              setForm(f => ({ ...f, projectName: e.target.value }))
               if (error.projectName && e.target.value) setError(prev => ({ ...prev, projectName: false }))
             }}
             require
@@ -143,11 +237,11 @@ export const SettingProject = () => {
               <DatePicker
                 label='마감기한 설정'
                 require
-                paramYear={deadline ? Number(deadline.split('-')[0]) : undefined}
-                paramMonth={deadline ? Number(deadline.split('-')[1]) : undefined}
-                paramDate={deadline ? Number(deadline.split('-')[2]) : undefined}
+                paramYear={form.deadline ? Number(form.deadline.split('-')[0]) : undefined}
+                paramMonth={form.deadline ? Number(form.deadline.split('-')[1]) : undefined}
+                paramDate={form.deadline ? Number(form.deadline.split('-')[2]) : undefined}
                 setPickedDate={date => {
-									  setDeadline(date)
+                  setForm(f => ({ ...f, deadline: date }))
                   if (error.deadline && date) setError(prev => ({ ...prev, deadline: false }))
                 }}
                 error={error.deadline}
@@ -156,17 +250,12 @@ export const SettingProject = () => {
             <DropDown
               label='스프린트 단위'
               placeholder='Select team member'
-              value={sprint}
+              value={form.sprint}
               onChange={v => {
-								  setSprint(v)
+                setForm(f => ({ ...f, sprint: v }))
                 if (error.sprint && v !== '') setError(prev => ({ ...prev, sprint: false }))
               }}
-              options={[
-								  { value: '', label: 'Select team member' },
-								  { value: '1주', label: '1주' },
-								  { value: '2주', label: '2주' },
-								  { value: '1개월', label: '1개월' }
-              ]}
+              options={sprintOptions}
               require
               error={error.sprint}
             />
@@ -174,9 +263,9 @@ export const SettingProject = () => {
           <InputField
             label='Github Repo 주소 입력'
             placeholder='입력하세요'
-            value={github}
+            value={form.github}
             onChange={e => {
-							  setGithub(e.target.value)
+              setForm(f => ({ ...f, github: e.target.value }))
               if (error.github && e.target.value) setError(prev => ({ ...prev, github: false }))
             }}
             require
@@ -185,38 +274,65 @@ export const SettingProject = () => {
           <InputField
             label='Discord 서버 ID 입력'
             placeholder='입력하세요'
-            value={discord}
+            value={form.discord}
             onChange={e => {
-							  setDiscord(e.target.value)
+              setForm(f => ({ ...f, discord: e.target.value }))
               if (error.discord && e.target.value) setError(prev => ({ ...prev, discord: false }))
             }}
             require
             error={error.discord}
           />
-          {/* buildproject2 (파일 테이블) */}
           <TableWrapper>
-            <FileTable files={files} setFiles={setFiles} />
+            <FileTable
+              files={[...form.design_docs, ...form.files]}
+              setFiles={files => setForm(f => ({
+                ...f,
+                design_docs: files.filter(f => typeof f === 'string'),
+                files: files.filter(f => f instanceof File)
+              }))}
+            />
           </TableWrapper>
-          {/* buildproject3 (팀원 검색 및 테이블) */}
           <SearchInputField
+
             label='팀원 검색'
             value={search}
             onChange={e => setSearch(e.target.value)}
             options={searchOptions}
-            onSelect={(val, label) => {
-						  setSearch(label)
+            onSelect={(value, label) => {
+              setSearch('')
+              const selectedUser = searchResults.find(user => user.id.toString() === value)
+              if (form.members.some(member => member.id.toString() === value)) {
+                alert('이미 추가된 팀원입니다')
+                return
+              }
+              setForm(prev => ({
+                ...prev,
+                members: [...prev.members, {
+                  id: value,
+                  name: label,
+                  githubId: selectedUser?.github_name || '',
+                  profileImg: selectedUser?.profile_img || '',
+                  field: ''
+                }]
+              }))
             }}
             placeholder='팀원을 검색하세요'
+            ref={inputRef}
           />
+
           <TableWrapper>
-            <UserTable rows={rows} setRows={setRows} />
+            <UserTable rows={form.members} setRows={rows => setForm(f => ({ ...f, members: rows }))} />
           </TableWrapper>
           <ButtonGroup>
-            <Button text='취소' type='button' onClick={() => navigate(-1)} />
-            <Button text='완료' type='button' onClick={() => navigate('/')} />
+            <Button variant='contained' onClick={handleDelete}>삭제</Button>
+            <Button variant='outlined'  onClick={() => navigate(-1)} >취소</Button>
+            <Button variant='contained'  onClick={handleUpdate} >완료</Button>
           </ButtonGroup>
         </Fieldset>
       </Section>
     </MainBox>
   )
 }
+
+
+

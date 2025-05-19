@@ -59,10 +59,8 @@ function App () {
           <Route path='/issueModalTest' element={<PrivateRoute element={<IssueModalTest />} />} />
           <Route path='/projectTest' element={<PrivateRoute element={<ProjectTest/>} />} />
 
-
           {/* BuildProject Page */}
           <Route path='/buildproject' element={<PrivateRoute element={<BuildProject />} />} />
-
           {/* Project Page */}
 
           <Route path='/project/:projectId' element={<PrivateRoute element={<Project />} />} />
