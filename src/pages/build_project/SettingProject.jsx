@@ -95,8 +95,10 @@ export const SettingProject = () => {
   })
   const [error, setError] = useState({})
   const [search, setSearch] = useState('')
+
   const [searchOptions, setSearchOptions] = useState([])
   const [searchResults, setSearchResults] = useState([])
+
 
   // 스프린트 옵션 (숫자값)
   const sprintOptions = [
@@ -137,6 +139,7 @@ export const SettingProject = () => {
     }
     fetchProject()
   }, [projectId])
+
 
   // 검색어가 변경될 때마다 API 호출
   useEffect(() => {
@@ -213,7 +216,6 @@ export const SettingProject = () => {
       alert('프로젝트 삭제 실패') 
     }
   }
-
   return (
     <MainBox>
       <Header text='프로젝트 설정' />
@@ -291,6 +293,7 @@ export const SettingProject = () => {
             />
           </TableWrapper>
           <SearchInputField
+
             label='팀원 검색'
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -316,6 +319,7 @@ export const SettingProject = () => {
             placeholder='팀원을 검색하세요'
             ref={inputRef}
           />
+
           <TableWrapper>
             <UserTable rows={form.members} setRows={rows => setForm(f => ({ ...f, members: rows }))} />
           </TableWrapper>
