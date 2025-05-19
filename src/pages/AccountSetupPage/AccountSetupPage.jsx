@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
@@ -8,6 +8,9 @@ import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -75,33 +78,40 @@ export default function AccountSetupPage () {
 
     setError(newError)
 
-      if (Object.keys(newError).length === 0) {
-        const payload = {
-          name: username,
-          discord_id: discordId,
-          category: fieldOptions[selectedField].title || '',
-          career: career,
-        }
-        try {
-          const response = await axios.post(
-            'https://coordipai-web-server.knuassignx.site/auth/register',
-            payload,
-            {
-              withCredentials: true, // access_token 쿠키 포함
-            }
-          )
+    if (Object.keys(newError).length === 0) {
+      const payload = {
+        name: username,
+        discord_id: discordId,
+        category: fieldOptions[selectedField].title || '',
+        career: career,
+      }
 
-          console.log('회원가입 성공:', response.data.content.data)
-          useUserStore.getState().setUser(response.data.content.data.user)
-          useAccessTokenStore.getState().setAccessToken(response.data.content.data.access_token)
-          useRefreshTokenStore.getState().setRefreshToken(response.data.content.data.refresh_token)
-          navigate(`/repositorycheckpage/${githubId}`, { state: payload })
-        } catch (error) {
-            console.error('회원가입 실패:', error.response?.data || error.message)
-            alert('회원가입 중 오류가 발생했습니다.')
+      try {
+        const accessToken = useAccessTokenStore.getState().accessToken // ✅ accessToken 가져오기
+
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/auth/register`, // ✅ BASE_URL 사용
+          payload,
+          {
+            withCredentials: true, // ✅ 쿠키도 함께 포함
+            headers: {
+              Authorization: `Bearer ${accessToken}`, // ✅ accessToken을 헤더로 명시
+            },
+          }
+        )
+
+        console.log('회원가입 성공:', response.data.content.data)
+        useUserStore.getState().setUser(response.data.content.data.user)
+        useAccessTokenStore.getState().setAccessToken(response.data.content.data.access_token)
+        useRefreshTokenStore.getState().setRefreshToken(response.data.content.data.refresh_token)
+        navigate(`/repositorycheckpage/${githubId}`, { state: payload })
+      } catch (error) {
+        console.error('회원가입 실패:', error.response?.data || error.message)
+        alert('회원가입 중 오류가 발생했습니다.')
       }
     }
   }
+
 
   return (
     <FormWrapper>
