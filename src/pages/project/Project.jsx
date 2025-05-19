@@ -6,6 +6,7 @@ import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox, ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
+import { useProjectStore } from '@store/useProjectStore'
 import Button from '@components/Common/Button'
 
 const HeaderSection = styled.div`
@@ -138,6 +139,10 @@ export const Project = () => {
     return hash === 'request' ? 'request' : 'issue'
   })
 
+  const { project } = useProjectStore()
+  console.log('project', project)
+
+
   // URL 해시에 따라 탭 상태 설정
   useEffect(() => {
     const hash = location.hash.replace('#', '')
@@ -170,7 +175,6 @@ export const Project = () => {
         const issueResponse = await Get(`/issue`,{
           params: { project_id: projectId }
         })
-        console.log(issueResponse)
         setIssueRows(issueResponse)
         const requestResponse = await Get(`/issue-reschedule/${projectId}`)
         setRequestRows(requestResponse)
@@ -243,7 +247,7 @@ export const Project = () => {
                 <Button variant='outlined' color='gray700' onClick={() => navigate(`${location.pathname}/issue/new`)} >
                   이슈 추가
                 </Button>
-                <Button variant='contained' color='brand500' onClick={() => navigate(`/project/${projectId}/issuesuggest`)} >
+                <Button variant='contained' color='brand500' onClick={() => navigate(`/project/${projectId}/issuesuggest#confirm`)} >
                   이슈 자동 생성
                 </Button>
               </ButtonGroup>

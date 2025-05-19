@@ -22,8 +22,9 @@ import NotFoundPage from '@pages/NotFoundPage'
 import IssueSuggestPage from '@pages/issue/IssueSuggestPage'
 import ProjectTest from '@pages/test/ProjectTest'
 
-
+import useLoadingStore from '@store/useLoadingStore'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
+import { Loading } from '@components/Loading'
 
 /*
   route 설정 시, PrivateRoute를 사용하여,
@@ -36,43 +37,43 @@ import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/
 */
 function App () {
   return (
-    <BrowserRouter>
-      <ToastContainer />
-      <Routes>
-        <Route path='/' element={<PrivateRoute element={<Home />} />} />
+    <>
+      <GlobalLoading />
+      <BrowserRouter>
+        <ToastContainer />
+        <Routes>
+          <Route path='/' element={<PrivateRoute element={<Home />} />} />
 
-        <Route path='/login' element={<LoginPage />} />
-        <Route path="/register/:githubId" element={<FirstAccountPage />} />
-        <Route path="/repositorycheckpage/:githubId" element={<RepositoryCheckPage />} />
-        <Route path="/userform/:githubId" element={<PrivateRoute element={<UserForm />} />} />
+          <Route path='/login' element={<LoginPage />} />
+          <Route path="/register/:githubId" element={<FirstAccountPage />} />
+          <Route path="/repositorycheckpage/:githubId" element={<RepositoryCheckPage />} />
+          <Route path="/userform/:githubId" element={<PrivateRoute element={<UserForm />} />} />
 
-        <Route path='/repositorycheckpage' element={<RepositoryCheckPage />} />
+          <Route path='/repositorycheckpage' element={<RepositoryCheckPage />} />
 
-        {/* Sidebar */}
-        <Route path='/user' element={<PrivateRoute element={<UserForm />} />} />
+          {/* Sidebar */}
+          <Route path='/user' element={<PrivateRoute element={<UserForm />} />} />
 
-        {/* Test Page */}
+          {/* Test Page */}
+          <Route path='/components' element={<PrivateRoute element={<ComponentTest />} />} />
+          <Route path='/issueModalTest' element={<PrivateRoute element={<IssueModalTest />} />} />
+          <Route path='/projectTest' element={<PrivateRoute element={<ProjectTest/>} />} />
 
-        <Route path='/components' element={<PrivateRoute element={<ComponentTest />} />} />
-        <Route path='/issueModalTest' element={<PrivateRoute element={<IssueModalTest />} />} />
-        <Route path='/projectTest' element={<PrivateRoute element={<ProjectTest/>} />} />
+          {/* BuildProject Page */}
+          <Route path='/buildproject' element={<PrivateRoute element={<BuildProject />} />} />
+          {/* Project Page */}
 
+          <Route path='/project/:projectId' element={<PrivateRoute element={<Project />} />} />
+          <Route path='/project/:projectId/issue/:issueNumber' element={<PrivateRoute element={<IssueDetailPage />} />} />
+          <Route path='/project/:projectId/issuesuggest' element={<PrivateRoute element={<IssueSuggestPage />} />} />
+          <Route path='/project/:projectId/edit' element={<PrivateRoute element={<SettingProject />} />} />
+          <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={<IssueRequestPage />} />} />
 
-
-        {/* BuildProject Page */}
-        <Route path='/buildproject' element={<PrivateRoute element={<BuildProject />} />} />
-
-        {/* Project Page */}
-
-        <Route path='/project/:projectId' element={<PrivateRoute element={<Project />} />} />
-        <Route path='/project/:projectId/issue/:issueId' element={<PrivateRoute element={<IssueDetailPage />} />} />
-        <Route path='/project/:projectId/edit' element={<PrivateRoute element={<SettingProject />} />} />
-        <Route path='/project/:projectId/request/:requestId' element={<PrivateRoute element={<IssueRequestPage />} />} />
-
-        {/* Not Found Page */}
-        <Route path='*' element={<NotFoundPage />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Not Found Page */}
+          <Route path='*' element={<NotFoundPage />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   )
 }
 
@@ -122,5 +123,10 @@ PrivateRoute.propTypes = {
   element: PropTypes.element.isRequired,
   hasSideBar: PropTypes.bool
 }
+
+const GlobalLoading = () => {
+  const { isLoading } = useLoadingStore();
+  return <Loading isLoading={isLoading} />;
+};
 
 export default App

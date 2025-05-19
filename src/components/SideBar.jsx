@@ -196,7 +196,7 @@ FormAccount.propTypes = {
   image: PropTypes.string
 }
 
-const NavBodySection = ({ projectName, iteration, issues, categories }) => {
+const NavBodySection = ({ projectName, iteration, issueSummary, categories }) => {
   return (
     <NavBox>
       <NavProjectHeaderText>{projectName}</NavProjectHeaderText>
@@ -211,7 +211,7 @@ const NavBodySection = ({ projectName, iteration, issues, categories }) => {
         <ListIcon />
         <NavProjectItemTextContainer>
           <NavProjectItemHeaderText>Issues</NavProjectItemHeaderText>
-          <NavProjectItemSubText>{issues}</NavProjectItemSubText>
+          <NavProjectItemSubText>{issueSummary.openedIssues}개 진행중 / {issueSummary.allIssues}개</NavProjectItemSubText>
         </NavProjectItemTextContainer>
       </NavProjectItemBox>
 
@@ -236,11 +236,14 @@ const NavBodySection = ({ projectName, iteration, issues, categories }) => {
 
 NavBodySection.propTypes = {
   projectName: PropTypes.string.isRequired,
-  iteration: PropTypes.shape({
+  nowIteration: PropTypes.shape({
     sprint: PropTypes.string.isRequired,
     period: PropTypes.string.isRequired
   }).isRequired,
-  issues: PropTypes.number.isRequired,
+  issueSummary: PropTypes.shape({
+    openedIssues: PropTypes.number.isRequired,
+    allIssues: PropTypes.number.isRequired
+  }).isRequired,
   categories: PropTypes.arrayOf(
     PropTypes.shape({
       categoryName: PropTypes.string.isRequired,
@@ -279,8 +282,8 @@ const SideBar = ({
         {currentProject && (
           <NavBodySection
             projectName={currentProject.repo_fullname}
-            iteration={currentProject.iteration}
-            issues={currentProject.issues}
+            iteration={currentProject.nowIteration}
+            issueSummary={currentProject.issueSummary}
             categories={currentProject.categories}
           />
         )}
@@ -304,7 +307,7 @@ const SideBar = ({
 }
 
 SideBar.propTypes = {
-  brandIcon: PropTypes.elementType.isRequired,
+  brandIcon: PropTypes.string.isRequired,
   brandTitle: PropTypes.string.isRequired,
   titleOnClick: PropTypes.func.isRequired,
   userOnClick: PropTypes.func,

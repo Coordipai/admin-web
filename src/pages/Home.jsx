@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
 import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
+import { set } from 'date-fns'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -187,8 +188,7 @@ export const Home = () => {
                 selected={selectedId === project.id}
                 onClick={() => {
                   setSelectedId(project.id)
-                  // setProject(project)
-                  //setProject(project.id)
+                  setProject(project.id)
                   navigate(`/project/${project.id}#issue`)
                 }}
               />
