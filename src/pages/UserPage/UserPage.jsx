@@ -98,6 +98,8 @@ const TextButton = styled(ButtonBase)`
   }
 `
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 export default function UserPage () {
   const navigate = useNavigate()
   //const { githubId } = useParams() // 여기서 param으로 받아오기
@@ -141,16 +143,14 @@ useEffect(() => {
   const fetchRepos = async () => {
     try {
       // 🔹 선택된 레포 불러오기
-      const selectedRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo', {
+      const selectedRes = await axios.get(`${BASE_URL}/user-repo`, {
         headers: { Authorization: `Bearer ${accessToken}` },
-        withCredentials: true,
       })
       const selected = selectedRes.data.content.data.map((r) => r.repo_fullname)
 
       // 🔹 GitHub의 전체 레포 불러오기
-      const allRes = await axios.get('https://coordipai-web-server.knuassignx.site/user-repo/github', {
+      const allRes = await axios.get(`${BASE_URL}/user-repo/github`, {
         headers: { Authorization: `Bearer ${accessToken}` },
-        withCredentials: true,
       })
       const all = allRes.data.content.data.map((r) => r.repo_fullname)
 
@@ -175,13 +175,19 @@ useEffect(() => {
 
   const [field, setField] = useState(-1)
 
+  
   const handleSave = async () => {
     const payload = {
       name: username,
       github_id: githubId,
       github_name: githubName,
       discord_id: discordId,
+      name: username,
+      github_id: githubId,
+      github_name: githubName,
+      discord_id: discordId,
       career,
+      category: fieldOptions[field]?.title || '',
       category: fieldOptions[field]?.title || '',
       repositories: selectedRepos
     }
@@ -189,9 +195,8 @@ useEffect(() => {
     console.log('보낼 데이터:', payload)
 
     try {
-      const response = await axios.patch(
-        'https://coordipai-web-server.knuassignx.site/auth/user/update', // ⚠️ 임의의 엔드포인트
-        //TODO: 실제 엔드포인트로 교체
+      const response = await axios.put(
+        `${BASE_URL}/auth/update`,
         payload,
         {
           headers: {
@@ -209,45 +214,14 @@ useEffect(() => {
     }
   }
 
-  const handleWithdraw = async () => {
-    const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
-    if (!confirmed) return
 
-    try {
-      const response = await axios.delete(
-        'https://coordipai-web-server.knuassignx.site/auth/user/delete', // ❗ 임시 엔드포인트
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-          data: {
-            github_id: githubId, // 서버에서 식별자 요구 시
-          },
-        }
-      )
-
-      console.log('✅ 탈퇴 성공:', response.data)
-      alert('탈퇴가 완료되었습니다.')
-
-      // 상태 초기화 후 로그인 페이지로 이동
-      useUserStore.getState().clearUser()
-      useAccessTokenStore.getState().clearAccessToken()
-      navigate('/login')
-    } catch (error) {
-      console.error('❌ 탈퇴 실패:', error)
-      alert('탈퇴 중 오류가 발생했습니다.')
-    }
-  }
-
-const handleEvaluationRequest = async () => {
-  const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
+ const handleWithdraw = async () => {
+  const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
   if (!confirmed) return
 
   try {
-    const response = await axios.post(
-      'https://coordipai-web-server.knuassignx.site/evaluation/request', // ⚠️ 임시 평가 요청 엔드포인트
-      {},
+    const response = await axios.delete(
+      `${BASE_URL}/auth/unregister`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -256,14 +230,47 @@ const handleEvaluationRequest = async () => {
       }
     )
 
-    console.log('✅ 평가요청 성공:', response.data)
-    alert('평가 요청이 완료되었습니다.')
+    console.log('✅ 탈퇴 성공:', response.data)
+    alert('탈퇴가 완료되었습니다.')
+
+    useUserStore.getState().clearUser()
+    useAccessTokenStore.getState().clearAccessToken()
+    navigate('/login')
+  } catch (error) {
+    console.error('❌ 탈퇴 실패:', error)
+    alert('탈퇴 중 오류가 발생했습니다.')
+  }
+}
+
+
+const handleEvaluationRequest = async () => {
+
+  const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
+    //console.log('selectedRepos:', selectedRepos)
+    if (!confirmed) return
+
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/agent/assess_stat`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      )
+
+      const result = response.data.content
+      console.log('✅ 평가 결과:', result)
+      alert(`평가가 완료되었습니다!\n\n점수: ${result.evaluation_score}\n분야: ${result.field}`)
+
     } catch (error) {
-      console.error('❌ 평가요청 실패:', error)
+      console.error('❌ 평가 요청 실패:', error)
       alert('평가 요청 중 오류가 발생했습니다.')
     }
   }
-
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
@@ -283,6 +290,9 @@ const handleEvaluationRequest = async () => {
             <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
               setUsername(v)
             }} />
+            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
+              setUsername(v)
+            }} />
           </FieldWrapper>
 
           <FieldWrapper>
@@ -290,12 +300,16 @@ const handleEvaluationRequest = async () => {
             <FormInput
               placeholder='깃허브 계정'
               value={githubName}
+              value={githubName}
               readOnly
             />
           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>Discord ID</LabelText>
+            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
+              setDiscordId(v)
+            }} />
             <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
               setDiscordId(v)
             }} />
@@ -310,11 +324,15 @@ const handleEvaluationRequest = async () => {
               handleChange={(v) => {
                 setField(v)
             }}
+              handleChange={(v) => {
+                setField(v)
+            }}
             />
           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>간단한 경력을 입력해주세요.</LabelText>
+            <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} onChange={setCareer} />
             <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} onChange={setCareer} />
           </FieldWrapper>
 
