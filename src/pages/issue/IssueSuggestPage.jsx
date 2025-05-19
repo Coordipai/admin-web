@@ -1,27 +1,30 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import styled from 'styled-components'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
+
 import Badge from '@components/Edit/Badge'
 import InputField from '@components/Edit/InputField'
 import Typography from '@components/Edit/Typography'
 import Header from '@components/Header'
 import { DropDownItem, DropDownMenu } from '@components/Edit/DropDown'
 import Modal from '@components/ConfirmModal'
-import styled from 'styled-components'
+import FormTextarea from '@components/FormTextarea'
 import {
   MainBox,
   ContainerBox,
   styledIcon,
   ButtonBase
 } from '@styles/globalStyle'
-import FormTextarea from '@components/FormTextarea'
 import { Plus, X } from '@untitled-ui/icons-react'
+import loadingSvg from "@assets/icons/loading-indicator.svg";
+import { showSuccessToastMsg, showWarningToastMsg, showErrorToastMsg } from '@utils/showToastMsg'
 
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+
 import { useProjectStore } from '@store/useProjectStore'
 import { useAccessTokenStore } from '@store/useUserStore'
 import { postAssignIssues } from '@api/agentApi'
-import loadingSvg from "@assets/icons/loading-indicator.svg";
-import { showSuccessToastMsg, showWarningToastMsg, showErrorToastMsg } from '@utils/showToastMsg'
+import { createIssue } from '@api/issueApi'
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -401,34 +404,40 @@ const IssueSuggestPage = () => {
   }, [badgeDropdownOpen, iterationDropdownOpen, assigneeDropdownOpen, labelDropdownOpen])
 
   const renderAssigneeText = () => {
-    if (assignees.length === 0) return '배정하기'
-    const ordered = assigneeOptions.filter(name => assignees.includes(name))
-    return ordered.join(', ')
+    if (!assignees || assignees.length === 0) return '배정하기';
+    const ordered = assigneeOptions.filter(name => assignees.includes(name));
+    return ordered.join(', ');
   }
 
   const handleLabelClick = (label) => {
-    setSelectedLabels(prev =>
-      prev.includes(label)
-        ? prev.filter(l => l !== label)
-        : [...prev, label]
-    )
-    setLabelDropdownOpen(false)
+    const updatedLabels = selectedLabels.includes(label)
+      ? selectedLabels.filter((l) => l !== label)
+      : [...selectedLabels, label];
+    setSelectedLabels(updatedLabels);
+    updateSelectedIssueField('labels', updatedLabels);
+    setLabelDropdownOpen(false);
   }
+
 
   const handleIssueSelect = (issue) => {
     setSelectedIssue(issue)
     setIssueTitle(issue.title)
     setIssueContent(issue.content)
     setPriority(issue.priority || 'M')
-
     setSprintIndex(issue.sprint)
-
     setSelectedLabels(issue.labels || [])
     setAssignees(issue.assignees || [])
     setIsCompleted(issue.isCompleted || false)
   }
 
   const handleStateToggle = () => {
+    if (step === 'assign') {
+      if (assignees.length === 0) {
+        showWarningToastMsg('담당자를 먼저 선택해주세요.')
+        return
+      }
+    }
+
     setIsCompleted(prev => !prev)
     if (selectedIssue) {
       setIssueList(prev => 
@@ -439,6 +448,15 @@ const IssueSuggestPage = () => {
         )
       )
     }
+  }
+
+  const updateSelectedIssueField = (key, value) => {
+    if (!selectedIssue) return
+    setIssueList(prev =>
+      prev.map(issue =>
+        issue.name === selectedIssue.name ? { ...issue, [key]: value } : issue
+      )
+    )
   }
 
   return (
@@ -465,16 +483,23 @@ const IssueSuggestPage = () => {
                     const response = await postAssignIssues(projectId, issueList);
 
                     const updatedIssues = issueList.map(issue => {
-                      const matched = response.issues.find(res => res.issue === issue.title);
+                      const matched = response.issues.find(res => res.issue === issue.title)
+                      const assigneesArray = matched?.assignee
+                        ? matched.assignee.split(',').map(name => name.trim())
+                        : []
+
                       return {
                         ...issue,
-                        assignee: matched?.assignee ?? issue.assignee,
-                        isCompleted: false
+                        assignees: assigneesArray,
+                        isCompleted: false,
                       }
                     })
-
                     setIssueList(updatedIssues)
-                    setSelectedIssue(null)
+                    const firstUpdatedIssue = updatedIssues.find(
+                      issue => issue.title === selectedIssue?.title
+                    )
+                    setSelectedIssue(firstUpdatedIssue ?? null)
+                    setAssignees(firstUpdatedIssue?.assignees ?? [])
                     setIsCompleted(false)
                     navigate(`${location.pathname}#assign`)
                   } catch (error) {
@@ -485,7 +510,19 @@ const IssueSuggestPage = () => {
               }
             : {
                 value: '완료',
-                onClick: () => window.history.back(),
+                onClick: () => {
+
+
+                  if (!isAllCompleted) { 
+                    showWarningToastMsg('모든 이슈를 확정해주세요.')
+                    return
+                  }
+
+                  // issueList 정제
+                  // 반복문으로 issue CreateIssue API 호출
+                  // createIssue(issueList)
+
+                },
                 isHighlighted: true,
               },
           { value: '취소', onClick: () => window.history.back() }
@@ -494,8 +531,25 @@ const IssueSuggestPage = () => {
         <SplitContainer>
           <LeftContainer>
             <ContentWrapper>
-              <InputField disabled={!isIssueSelected} label='이슈 타이틀' placeholder='이슈를 먼저 선택해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
-              <FormTextarea disabled={!isIssueSelected} label='이슈 내용' placeholder='이슈를 먼저 선택해주세요.' value={issueContent} onChange={setIssueContent} />
+              <InputField 
+                disabled={!isIssueSelected} 
+                label='이슈 타이틀' 
+                placeholder='이슈를 먼저 선택해주세요.' 
+                value={issueTitle} 
+                onChange={(e) => {
+                  const newTitle = e.target.value
+                  setIssueTitle(newTitle)
+                  updateSelectedIssueField('title', newTitle)
+                }}/>
+              <FormTextarea 
+                disabled={!isIssueSelected} 
+                label='이슈 내용' 
+                placeholder='이슈를 먼저 선택해주세요.' 
+                value={issueContent} 
+                onChange={(text) => {
+                  setIssueContent(text)
+                  updateSelectedIssueField('content', text)
+                }} />
               <Row>
                 <Typography value='Priority' variant='textSM' weight='medium' color='gray900' />
                 <div 
@@ -520,6 +574,7 @@ const IssueSuggestPage = () => {
                           selected={isSelected}
                           onClick={() => {
                             setPriority(opt.value)
+                            updateSelectedIssueField('priority', opt.value)
                             setBadgeDropdownOpen(false)
                           }}
                           role='option'
@@ -584,6 +639,7 @@ const IssueSuggestPage = () => {
                               selected={isSelected}
                               onClick={() => {
                                 setSprintIndex(index)
+                                updateSelectedIssueField('sprint', index)
                                 setIterationDropdownOpen(false)
                               }}
                               role='option'
@@ -669,7 +725,7 @@ const IssueSuggestPage = () => {
                     }}
                   >
                     <Typography
-                      value={renderAssigneeText()}
+                      value={renderAssigneeText() || '배정하기'}
                       variant='textSM'
                       weight='regular'
                       color={assignees.length > 0 ? 'gray900' : 'gray400'}
@@ -685,11 +741,15 @@ const IssueSuggestPage = () => {
                             key={index}
                             selected={isSelected}
                             onClick={() => {
-                              if (!isIssueSelected) return
+                              if (!isIssueSelected) return;
                               if (isSelected) {
-                                setAssignees(prev => prev.filter(a => a !== name))
+                                const updated = assignees.filter((a) => a !== name);
+                                setAssignees(updated);
+                                updateSelectedIssueField('assignees', updated);
                               } else {
-                                setAssignees(prev => [...prev, name])
+                                const updated = [...assignees, name];
+                                setAssignees(updated);
+                                updateSelectedIssueField('assignees', updated);
                               }
                             }}
                             role='option'
@@ -724,9 +784,15 @@ const IssueSuggestPage = () => {
 
             <Footer>
               <ButtonBase
+                disabled={step === 'assign' || isAllCompleted}
                 onClick={() => {
                   const updated = issueList.map(issue => ({ ...issue, isCompleted: true }))
                   setIssueList(updated)
+                  setIsCompleted(true)
+                }}
+                style={{
+                  cursor: step === 'assign' || isAllCompleted ? 'not-allowed' : 'pointer',
+                  opacity: step === 'assign' || isAllCompleted ? 0.5 : 1
                 }}
               >
                 전체 이슈 확정
@@ -734,6 +800,16 @@ const IssueSuggestPage = () => {
               <ButtonBase $isHighlighted
                 onClick={() => {
                   if (isFetching) return
+
+                  navigate(`${location.pathname}#confirm`)
+                  setIssueTitle('이슈를 선택해주세요')
+                  setIssueContent('이슈를 선택해주세요')
+                  setPriority('M')
+                  setSprintIndex(null)
+                  setSelectedLabels([])
+                  setAssignees([])
+                  setIsCompleted(false)
+                  setSelectedIssue(null)
                   setIssueList([])
                   fetchSuggestedIssues()
                 }}
@@ -757,7 +833,7 @@ const IssueSuggestPage = () => {
                   {issue.isCompleted && <CheckIcon>✓</CheckIcon>}
                 </IssueBox>
               ))}
-              { isFetching && (
+              {isFetching && (
                 <div style={{ display: 'flex', justifyContent: 'center'}} >
                   <img src={loadingSvg} alt="로딩 중" style={{ width: '2rem'}} />
                 </div>
