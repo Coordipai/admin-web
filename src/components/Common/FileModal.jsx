@@ -227,12 +227,7 @@ const FileModal = ({ open, onClose, onAttach }) => {
           </UploadIcon>
           <div>
             <UploadAction>
-              <Button
-                text='Click to upload'
-                type='button'
-                variant='text'
-                onClick={handleUploadClick}
-              />
+              <Typography variant='textMD' weight='medium' color='brand500' onClick={handleUploadClick} value='Click to upload' />
               <input
                 ref={fileInputRef}
                 id='file-upload-modal'
@@ -247,7 +242,7 @@ const FileModal = ({ open, onClose, onAttach }) => {
               variant='textSM'
               weight='regular'
               color='gray500'
-              value='SVG, PNG, JPG or PDF (max. 800x400px)'
+              value='JSON, DOCX or PDF (max. 4GB)'
             />
           </div>
         </UploadBox>
@@ -269,13 +264,13 @@ const FileModal = ({ open, onClose, onAttach }) => {
                       style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                       value={f.name}
                     />
-                    <Typography
+                    {/* <Typography
                       as='div'
                       variant='textSM'
                       weight='regular'
                       color='gray500'
                       value={formatFileSize(f.size)}
-                    />
+                    /> */}
                   </FileItemInfo>
                   <IconButton
                     icon={<img src='/src/assets/icons/trash-icon.svg' alt='Delete' />}
@@ -288,21 +283,21 @@ const FileModal = ({ open, onClose, onAttach }) => {
           )}
         </FileQueueContainer>
         <ModalActions>
-          <Button text='Cancel' type='button' onClick={onClose} />
-          <Button text='Attach files' type='button' onClick={handleAttach} />
+          <Button variant='outlined' color='brand500' onClick={onClose} >Cancel</Button>
+          <Button variant='contained' color='brand500' onClick={handleAttach} >Attach files</Button>
         </ModalActions>
       </ModalBox>
     </Overlay>
   )
 }
-// 파일 크기 변환 함수 (FileModal에서 사용한 것과 동일하게 복사)
-function formatFileSize (bytes) {
-  const n = Number(bytes)
-  if (isNaN(n) || n < 0) return '0 B'
-  if (n < 1024) return `${n} B`
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
-  if (n < 1024 * 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`
-  return `${(n / 1024 / 1024 / 1024).toFixed(1)} GB`
-}
+// // 파일 크기 변환 함수 (FileModal에서 사용한 것과 동일하게 복사)
+// function formatFileSize (bytes) {
+//   const n = Number(bytes)
+//   if (isNaN(n) || n < 0) return '0 B'
+//   if (n < 1024) return `${n} B`
+//   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
+//   if (n < 1024 * 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`
+//   return `${(n / 1024 / 1024 / 1024).toFixed(1)} GB`
+// }
 
 export default FileModal

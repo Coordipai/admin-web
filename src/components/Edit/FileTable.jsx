@@ -175,12 +175,17 @@ const FileTable = ({ files, setFiles }) => {
 
   // 파일 삭제
   const handleDelete = (name, size) => {
-    setFiles(files.filter((f) => !(f.name === name && f.size === size)))
+    setFiles(files.filter((f) => {
+      if (typeof f === 'string') {
+        return f !== name
+      } else {
+        return !(f.name === name && f.size === size)
+      }
+    }))
   }
 
   // 파일 첨부(모달에서 Attach 클릭)
   const handleAttach = (newFiles) => {
-    // newFiles는 File 객체 배열임
     setFiles([
       ...files,
       ...newFiles
@@ -197,14 +202,15 @@ const FileTable = ({ files, setFiles }) => {
       />
       <TableWrapper>
         <TableHeader>
-          <Typography variant='displayMD' weight='medium' value='프로젝트 자료' />
+          <Typography variant='displaySM' weight='medium' value='프로젝트 자료' />
+          
           <Button
-            text='Upload'
             icon={<img src='/src/assets/icons/upload-icon.svg' alt='Upload' />}
-            variant='default'
-            type='button'
+            variant='contained'
+            color='brand500'
             onClick={() => setModalOpen(true)}
-          />
+          >Upload
+          </Button>
         </TableHeader>
         <Table>
           <TableHeaderRow>
@@ -213,44 +219,37 @@ const FileTable = ({ files, setFiles }) => {
             </TableHeaderCell>
           </TableHeaderRow>
           <TableRowContainer>
-            {files.map((file, index) => (
-              <TableRow key={file.name + file.size + index} $isEven={index % 2 === 0}>
-                <FileIconCell>
-                  <FileIcon>
-                    <img
-                      src={'/src/assets/icons/file-icon.svg'}
-                      alt='file'
+            {files.map((file, index) => {
+              const fileName = typeof file === 'string' ? file : file.name
+              const fileSize = typeof file === 'string' ? undefined : file.size
+              return (
+                <TableRow key={fileName + fileSize + index} $isEven={index % 2 === 0}>
+                  <FileIconCell>
+                    <FileIcon>
+                      <img
+                        src={'/src/assets/icons/file-icon.svg'}
+                        alt='file'
+                      />
+                    </FileIcon>
+                  </FileIconCell>
+                  <FileInfoCell>
+                    <Typography variant='textSM' weight='medium' value={fileName} />
+                  </FileInfoCell>
+                  <ActionCell>
+                    <IconButton
+                      icon={<img src='/src/assets/icons/trash-icon.svg' alt='Delete' />}
+                      type='button'
+                      onClick={() => handleDelete(fileName, fileSize)}
                     />
-                  </FileIcon>
-                </FileIconCell>
-                <FileInfoCell>
-                  <Typography variant='textSM' weight='medium' value={file.name} />
-                  <Typography variant='textSM' weight='regular' color='gray500' value={typeof file.size === 'number' ? formatFileSize(file.size) : file.size} />
-                </FileInfoCell>
-                <ActionCell>
-                  <IconButton
-                    icon={<img src='/src/assets/icons/trash-icon.svg' alt='Delete' />}
-                    type='button'
-                    onClick={() => handleDelete(file.name, file.size)}
-                  />
-                </ActionCell>
-              </TableRow>
-            ))}
+                  </ActionCell>
+                </TableRow>
+              )
+            })}
           </TableRowContainer>
         </Table>
       </TableWrapper>
     </>
   )
-}
-
-// 파일 크기 변환 함수 (FileModal에서 사용한 것과 동일하게 복사)
-function formatFileSize (bytes) {
-  const n = Number(bytes)
-  if (isNaN(n) || n < 0) return '0 B'
-  if (n < 1024) return `${n} B`
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
-  if (n < 1024 * 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`
-  return `${(n / 1024 / 1024 / 1024).toFixed(1)} GB`
 }
 
 export default FileTable
