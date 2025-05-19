@@ -143,39 +143,8 @@ export const getReadStat = async (userId) => {
  * 
  *  @param {string} projectId
  *  @param {object} data 
- * example: {
- *    "user_names": [
- *       "string"
- *    ],
- *    "issues": {
- *       "issues": [
- *          {
- *               "type": "string",
- *               "name": "string",
- *               "description": "string",
- *               "title": "string",
- *               "labels": [
- *                  "string"
- *               ],
- *               "body": [
- *                  "string"
- *               ]
- *          }
- *       ]
- * }
  *  @returns {object} 
- * example: {
- *    "issues": [
- *       {
- *         "issue": "string",
- *         "assignee": "string",
- *         "description": [
- *            "string"
- *         ]
- *      }
- *   ]
- * }
- * 
+ *
  */
 export const postAssignIssues = async (projectId, data) => {
     try {
@@ -183,13 +152,36 @@ export const postAssignIssues = async (projectId, data) => {
         if (!token) {
             throw new Error('Access token is not available')
         }
-        const response = await api.post('/agent/assign_issues', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
-            params: { project_id: projectId },
-            body: data
-        })
+
+        const issues = data.map(issue => ({
+            type: issue.type,
+            name: issue.name,
+            description: issue.description || issue.content || '',
+            title: issue.title,
+            labels: issue.labels || [],
+            body: Array.isArray(issue.body)
+                ? issue.body
+                : typeof issue.body === 'string'
+                ? [issue.body]
+                : [],
+        }))
+
+        const requestBody = {
+            issues: {
+                issues,
+            }
+        }
+        console.log('requestBody', requestBody)
+
+        const response = await api.post(`/agent/recommend_assignees/${projectId}`,
+            requestBody,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
         showSuccessToastMsg('이슈 할당 완료');
         return response.data.content.data;
     } catch (error) {

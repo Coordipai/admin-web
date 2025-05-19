@@ -19,8 +19,9 @@ import { Plus, X } from '@untitled-ui/icons-react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useProjectStore } from '@store/useProjectStore'
 import { useAccessTokenStore } from '@store/useUserStore'
+import { postAssignIssues } from '@api/agentApi'
 import loadingSvg from "@assets/icons/loading-indicator.svg";
-import { showWarningToastMsg } from '@utils/showToastMsg'
+import { showSuccessToastMsg, showWarningToastMsg, showErrorToastMsg } from '@utils/showToastMsg'
 
 const PlusIcon = styledIcon({ icon: Plus, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
 const CancelIcon = styledIcon({ icon: X, strokeColor: '9E77ED', style: { width: '1.5rem', height: '1.5rem' } })
@@ -199,11 +200,13 @@ const IssueSuggestPage = () => {
   const [iteration, setIteration] = useState(iterationOptions[0])
   const [selectedLabels, setSelectedLabels] = useState([])
   const [assignees, setAssignees] = useState([])
-  const [selectedIssue, setSelectedIssue] = useState(null)
-  const [issueList, setIssueList] = useState([])
   const [isCompleted, setIsCompleted] = useState(false)
+
+  // issue 목록
+  const [selectedIssue, setSelectedIssue] = useState(null)
   const isIssueSelected = !!selectedIssue
-  const isAllCompleted = issueList.every(issue => issue.isCompleted);
+  const [issueList, setIssueList] = useState([])
+  const isAllCompleted = issueList.every(issue => issue.isCompleted)
 
   const fetchProject = useCallback(async () => {
     try {
@@ -219,6 +222,7 @@ const IssueSuggestPage = () => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSuggestedIssues = useCallback(async () => {
+    showSuccessToastMsg('프로젝트 정보를 바탕으로 자동으로 생성합니다...')
     setIsFetching(true);
     const token = useAccessTokenStore.getState().accessToken;
     if (!token) {
@@ -241,7 +245,6 @@ const IssueSuggestPage = () => {
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
-          // 남은 마지막 JSON 처리
           if (buffer.trim() !== '') {
             try {
               const lastIssue = JSON.parse(buffer);
@@ -269,8 +272,11 @@ const IssueSuggestPage = () => {
           buffer = buffer.substring(boundary + 1);
           boundary = buffer.indexOf('}{');
         }
-      }
+        showSuccessToastMsg('자동 이슈 생성중...')
+      }        
+      showSuccessToastMsg('자동 이슈 생성 완료');
     } catch (error) {
+      showErrorToastMsg(error);
       console.error('Failed to fetch issue list:', error);
       setIssueList([]);
     } finally {
@@ -294,10 +300,11 @@ const IssueSuggestPage = () => {
       const content = `📌 기능 설명\n${description}\n\n✅ 구현 단계 (TODO)\n${todos}\n\n👤 희망 담당자 정보\n${assigneeInfo}`;
       return { ...issue, content };
     }
-  }, [projectId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [projectId])
 
 
   useEffect(() => {
+    if (issueList.length > 0) return
     const init = async () => {
       setIsFetching(true)
       try {
@@ -444,37 +451,30 @@ const IssueSuggestPage = () => {
           step === 'confirm'
             ? {
                 value: '다음',
-                onClick: () => {
-                  // fetch(`/api/issues`, {
-                  //   method: 'POST',
-                  //   headers: { 'Content-Type': 'application/json' },
-                  //   body: JSON.stringify(issueList),
-                  // })
-                  //   .then(res => res.json())
-                  //   .then((confirmedIssues) => {
-                  //     setIssueList(confirmedIssues)
-                  //     navigate(`${location.pathname}#assign`, { replace: true })
-                  //   })
-                  //   .catch(err => console.error('POST 실패', err))
-
+                onClick: async () => {
                   if (issueList.length <= 0 || isFetching === true) {
                     showWarningToastMsg('이슈가 자동으로 생성될때까지 기다려주세요.')
                     return
                   }
-
                   if (!isAllCompleted) { 
                     showWarningToastMsg('모든 이슈를 확정해주세요.')
                     return
                   }
-                  
-                  const resetIssues = issueList.map(issue => ({
-                    ...issue,
-                    isCompleted: false
-                  }));
-                  setIssueList(resetIssues)
-                  setSelectedIssue(null)
-                  setIsCompleted(false)
-                  navigate(`${location.pathname}#assign`)
+
+                   try {
+                    await postAssignIssues(projectId, issueList);
+
+                    const resetIssues = issueList.map(issue => ({
+                      ...issue,
+                      isCompleted: false
+                    }));
+                    setIssueList(resetIssues);
+                    setSelectedIssue(null);
+                    setIsCompleted(false);
+                    navigate(`${location.pathname}#assign`);
+                  } catch (error) {
+                    console.error('이슈 할당 실패:', error);
+                  }
                 },
                 isHighlighted: true,
               }
