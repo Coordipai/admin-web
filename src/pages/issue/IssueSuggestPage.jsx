@@ -226,11 +226,11 @@ const IssueSuggestPage = () => {
 
   const fetchSuggestedIssues = useCallback(async () => {
     showSuccessToastMsg('프로젝트 정보를 바탕으로 자동으로 생성합니다...')
-    setIsFetching(true);
-    const token = useAccessTokenStore.getState().accessToken;
+    setIsFetching(true)
+    const token = useAccessTokenStore.getState().accessToken
     if (!token) {
-      console.error('Access token is not available');
-      return;
+      console.error('Access token is not available')
+      return
     }
 
     try {
@@ -239,69 +239,70 @@ const IssueSuggestPage = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-      let buffer = '';
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder('utf-8')
+      let buffer = ''
 
       while (true) {
-        const { done, value } = await reader.read();
+        const { done, value } = await reader.read()
         if (done) {
           if (buffer.trim() !== '') {
             try {
-              const lastIssue = JSON.parse(buffer);
-              const processed = appendContentInline(lastIssue);
-              setIssueList(prev => [...prev, processed]);
+              const lastIssue = JSON.parse(buffer)
+              const processed = appendContentInline(lastIssue)
+              setIssueList(prev => [...prev, processed])
             } catch (err) {
-              console.error('마지막 이슈 파싱 실패:', err, buffer);
+              console.error('마지막 이슈 파싱 실패:', err, buffer)
             }
           }
-          break;
+          break
         }
 
-        buffer += decoder.decode(value, { stream: true });
+        buffer += decoder.decode(value, { stream: true })
 
-        let boundary = buffer.indexOf('}{');
+        let boundary = buffer.indexOf('}{')
         while (boundary !== -1) {
-          const jsonString = buffer.substring(0, boundary + 1);
+          const jsonString = buffer.substring(0, boundary + 1)
           try {
-            const parsed = JSON.parse(jsonString);
-            const processed = appendContentInline(parsed);
-            setIssueList(prev => [...prev, processed]);
+            const parsed = JSON.parse(jsonString)
+            const processed = appendContentInline(parsed)
+            setIssueList(prev => [...prev, processed])
           } catch (err) {
-            console.error('JSON 파싱 실패:', err, jsonString);
+            console.error('JSON 파싱 실패:', err, jsonString)
           }
-          buffer = buffer.substring(boundary + 1);
-          boundary = buffer.indexOf('}{');
+          buffer = buffer.substring(boundary + 1)
+          boundary = buffer.indexOf('}{')
         }
         showSuccessToastMsg('자동 이슈 생성중...')
       }        
-      showSuccessToastMsg('자동 이슈 생성 완료');
+      showSuccessToastMsg('자동 이슈 생성 완료')
     } catch (error) {
-      showErrorToastMsg(error);
-      console.error('Failed to fetch issue list:', error);
-      setIssueList([]);
+      showErrorToastMsg(error)
+      console.error('Failed to fetch issue list:', error)
+      setIssueList([])
     } finally {
-      setIsFetching(false);
+      setIsFetching(false)
     }
 
     function appendContentInline(issue) {
+      issue.priority = 'M'  // TODO: 수정 필요
       if (!issue.body || !Array.isArray(issue.body)) {
-        return { ...issue, content: '' };
+        return { ...issue, content: '' }
       }
 
       const findValueById = (id) => {
-        const item = issue.body.find((field) => field.id === id);
-        return item?.attributes?.value || '';
-      };
+        const item = issue.body.find((field) => field.id === id)
+        return item?.attributes?.value || ''
+      }
 
-      const description = findValueById('description');
-      const todos = findValueById('todos');
-      const assigneeInfo = findValueById('wish-assignee-info');
+      const description = findValueById('description')
+      const todos = findValueById('todos')
+      const assigneeInfo = findValueById('wish-assignee-info')
 
-      const content = `📌 기능 설명\n${description}\n\n✅ 구현 단계 (TODO)\n${todos}\n\n👤 희망 담당자 정보\n${assigneeInfo}`;
-      return { ...issue, content };
+      const content = `📌 기능 설명\n${description}\n\n✅ 구현 단계 (TODO)\n${todos}\n\n👤 희망 담당자 정보\n${assigneeInfo}`
+      return { ...issue, content }
     }
   }, [projectId])
 
@@ -510,22 +511,41 @@ const IssueSuggestPage = () => {
               }
             : {
                 value: '완료',
-                onClick: () => {
-
-
-                  if (!isAllCompleted) { 
-                    showWarningToastMsg('모든 이슈를 확정해주세요.')
-                    return
+                onClick: async () => {
+                  if (!isAllCompleted) {
+                    showWarningToastMsg('모든 이슈를 확정해주세요.');
+                    return;
                   }
+                  try {
+                    for (const issue of issueList) {
+                        const filteredAssignees = (issue.assignees || []).filter(name =>
+                          assigneeOptions.includes(name)
+                        )
 
-                  // issueList 정제
-                  // 반복문으로 issue CreateIssue API 호출
-                  // createIssue(issueList)
+                        const issueData = {
+                          project_id: Number(projectId),
+                          title: issue.title,
+                          body: issue.content,
+                          assignees: filteredAssignees,
+                          priority: issue.priority,
+                          iteration: Number(issue.sprint),
+                          labels: issue.labels,
+                        }
+                        await createIssue(issueData)
+                    }
 
+                    showSuccessToastMsg('모든 이슈가 성공적으로 생성되었습니다!');
+                    navigate(`/project/${projectId}`);
+                  } catch (err) {
+                    console.error('이슈 생성 중 오류 발생:', err);
+                  }
                 },
                 isHighlighted: true,
               },
-          { value: '취소', onClick: () => window.history.back() }
+          step === 'confirm'
+            ? 
+            { value: '취소', onClick: () => window.history.back() } :
+            { value: '뒤로', onClick: () => window.history.back() }
         ]}
       />
         <SplitContainer>

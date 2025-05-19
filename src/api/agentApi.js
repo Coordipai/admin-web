@@ -131,8 +131,11 @@ export const postAssignIssues = async (projectId, data) => {
             title: issue.title,
             labels: issue.labels,
             sprint: issue.sprint,
+            priority: issue.priority,
             body: issue.body,
         }))
+
+        console.log('issues', issues)
 
         const requestBody = {
             issues: {
