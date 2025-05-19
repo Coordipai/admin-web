@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
 import InputField from '@components/Edit/InputField'
-import { createPortal } from 'react-dom'
 import searchIcon from '@assets/icons/search-icon.svg'
 
 // DropDownMenu, DropDownItem 스타일 재사용
@@ -31,7 +30,6 @@ const SearchInputField = ({
   ...props
 }) => {
   const [open, setOpen] = useState(false)
-  const [filtered, setFiltered] = useState(options)
   const ref = useRef()
   const menuRef = useRef()
   const inputRef = useRef()
@@ -41,24 +39,18 @@ const SearchInputField = ({
     if (open && inputRef.current) {
       const rect = inputRef.current.getBoundingClientRect()
       setMenuStyle({
-        position: 'absolute',
+        position: 'fixed',
         top: rect.bottom + window.scrollY,
         left: rect.left + window.scrollX,
         width: rect.width,
-        zIndex: 9999
+        zIndex: 9999,
+        backgroundColor: 'white',
+        border: '1px solid #e2e8f0',
+        borderRadius: '4px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
       })
     }
   }, [open])
-
-  useEffect(() => {
-    if (!open) return
-    if (!options || options.length === 0) return
-    setFiltered(
-      value
-        ? options.filter(opt => opt.label.includes(value) || opt.value.includes(value))
-        : options
-    )
-  }, [value, options, open])
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -82,14 +74,14 @@ const SearchInputField = ({
         value={value}
         onChange={e => {
           onChange(e)
-          setOpen(true)
+          setOpen(!!e.target.value)
         }}
         placeholder={placeholder}
         helperText={helperText}
         error={error}
         disabled={disabled}
         ref={inputRef}
-        onFocus={() => setOpen(true)}
+        onFocus={() => setOpen(!!value)}
         icon={searchIcon}
         onKeyDown={e => {
 
@@ -102,34 +94,31 @@ const SearchInputField = ({
         }}
         {...Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'onKeyDown'))}
       />
-      {open && value && filtered.length > 0 && createPortal(
-        <DropDownMenu
-          ref={menuRef}
-          role='listbox'
-          style={{
-            ...menuStyle,
-            maxHeight: filtered.length > 5 ? 'calc(2.5rem * 5)' : undefined, // 5개 높이(각 2.5rem)
-            overflowY: filtered.length > 5 ? 'auto' : undefined
-          }}
-        >
-          {filtered.map(opt => (
-            <DropDownItem
-              key={opt.value}
-              selected={false}
-              disabled={opt.disabled}
-              onClick={() => {
-                if (opt.disabled) return
-                onChange && onChange({ target: { value: opt.label } })
-                onSelect && onSelect(opt.value, opt.label)
-                setOpen(false)
-              }}
-            >
-              {opt.label}
-            </DropDownItem>
-          ))}
-        </DropDownMenu>,
-        document.body
-      )}
+      {open && value && options.length > 0 && <DropDownMenu
+        ref={menuRef}
+        role='listbox'
+        style={{
+          ...menuStyle,
+          maxHeight: options.length > 5 ? 'calc(2.5rem * 5)' : undefined,
+          overflowY: options.length > 5 ? 'auto' : undefined,
+          display: 'block'
+        }}
+      >
+        {options.map(opt => (
+          <DropDownItem
+            key={opt.value}
+            selected={false}
+            disabled={opt.disabled}
+            onClick={() => {
+              if (opt.disabled) return
+              onSelect && onSelect(opt.value, opt.label)
+              setOpen(false)
+            }}
+          >
+            {opt.label}
+          </DropDownItem>
+        ))}
+      </DropDownMenu>}
     </div>
   )
 }
