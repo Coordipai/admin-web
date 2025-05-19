@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import InputField from '@components/Edit/InputField'
 import styled from 'styled-components'
 import Typography from '@components/Edit/Typography'
@@ -13,6 +13,8 @@ import { DatePicker } from '@components/Edit/DatePicker'
 import Header from '@components/Header'
 import dayjs from 'dayjs'
 import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
+import { useAccessTokenStore, useRefreshTokenStore, useUserStore } from '@store/useUserStore'
+import { api } from '../../hooks/useAxios'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -71,7 +73,14 @@ const DropDownWrapper = styled.div`
 export const SettingProject = () => {
   const { projectId } = useParams()
   const navigate = useNavigate()
+  const inputRef = useRef(null)
+	const isSearching = useRef(false)
   const { Get, Put, Delete } = useFetchWithTokenRefresh()
+  const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
+	const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
+	const setUser = useUserStore(state => state.setUser)
+	const accessToken = useAccessTokenStore(state => state.accessToken)
+	const refreshToken = useRefreshTokenStore(state => state.refreshToken)
 
   // form 상태로 통합 관리
   const [form, setForm] = useState({
@@ -113,11 +122,11 @@ export const SettingProject = () => {
           files: [], // 파일 정보는 별도 처리 필요시 추가
           design_docs: res.design_docs || [],
           members: (res.members || []).map(m => ({
-            id: m.github_id,
+            id: m.id||1,
             name: m.name,
             githubId: m.github_name,
             profileImg: m.profile_img,
-            field: m.role || ''
+            field: m.role || '',
           })),
           startDate: res.start_date || ''
         })
@@ -133,10 +142,14 @@ export const SettingProject = () => {
     const sprintMap = { '1주': 7, '2주': 14, '1개월': 30 }
     const sprint_unit = typeof form.sprint === 'number' ? form.sprint : sprintMap[form.sprint] || 7
     const endDate = form.deadline ? `${form.deadline}T00:00:00Z` : ''
+    
     const members = form.members.map(row => ({
       id: row.id,
       role: row.field || 'member'
     }))
+
+    console.log(form.members)
+
     const projectReq = {
       name: form.projectName,
       repo_fullname: form.github,
@@ -171,6 +184,89 @@ export const SettingProject = () => {
       alert('프로젝트 삭제 실패') 
     }
   }
+  const handleSearchKeyDown = async (e) => {
+		if (e.key !== 'Enter') return;
+
+		if (isSearching.current) return;
+		isSearching.current = true;
+		e.preventDefault();
+		const keyword = e.target.value;
+		if (!keyword) {
+			isSearching.current = false;
+			return;
+		}
+		let res;
+		try {
+			res = await api.get('/user/search', {
+				headers: {
+					Authorization: `Bearer ${accessToken}`
+				},
+				params: { user_name: keyword }
+			})
+		} catch (err) {
+			if (err.response && err.response.status === 401 && refreshToken) {
+				try {
+					const refreshRes = await api.post('/auth/refresh', {
+						refresh_token: refreshToken
+					})
+					const refreshData = refreshRes.data?.content?.data
+					if (refreshData) {
+						setUser(refreshData.user)
+						setAccessToken(refreshData.access_token)
+						setRefreshToken(refreshData.refresh_token)
+						res = await api.get('/user/search', {
+							headers: {
+								Authorization: `Bearer ${refreshData.access_token}`
+							},
+							params: { user_name: keyword }
+						})
+					} else {
+						alert('인증이 만료되었습니다. 다시 로그인 해주세요.')
+						isSearching.current = false;
+						return;
+					}
+				} catch {
+					alert('인증이 만료되었습니다. 다시 로그인 해주세요.')
+					isSearching.current = false;
+					return;
+				}
+			} else {
+				alert('존재하지 않는 사용자입니다')
+				isSearching.current = false;
+				return;
+			}
+		}
+		const users = res.data?.content?.data || []
+		if (users.length === 0) {
+			alert('존재하지 않는 사용자입니다')
+			isSearching.current = false;
+			return;
+		}
+		const userInfo = users[0]
+		if (form.members.some(member => member.id === userInfo.id)) {
+			alert('이미 추가된 팀원입니다')
+			isSearching.current = false;
+			return;
+		}
+
+		setForm(f => ({
+			...f,
+			members: [
+				...f.members,
+				{
+					id: userInfo.id,
+					name: userInfo.name,
+					githubId: userInfo.github_name,
+					profileImg: userInfo.profile_img,
+					field: ''
+				}
+			]
+		}))
+		setSearch('')
+
+		isSearching.current = false;
+
+	}
 
   return (
     <MainBox>
@@ -249,15 +345,16 @@ export const SettingProject = () => {
             />
           </TableWrapper>
           <SearchInputField
-            label='팀원 검색'
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            options={[]}
-            onSelect={(val, label) => {
-              setSearch(label)
-            }}
-            placeholder='팀원을 검색하세요'
-          />
+						label='팀원 검색'
+						value={search}
+						onChange={e => setSearch(e.target.value)}
+
+						options={[]}
+
+						onKeyDown={handleSearchKeyDown}
+						placeholder='팀원을 검색하세요'
+						ref={inputRef}
+					/>
           <TableWrapper>
             <UserTable rows={form.members} setRows={rows => setForm(f => ({ ...f, members: rows }))} />
           </TableWrapper>
