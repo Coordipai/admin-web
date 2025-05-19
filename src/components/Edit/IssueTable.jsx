@@ -179,7 +179,7 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
                           : ''}
                       </Td>
                       <Td><Badge priority={row.priority} /></Td>
-                      <Td>Iteration {row.iteration}</Td>
+                      <Td>{row.iteration === -1 ? 'Unassigned' : `Iteration ${row.iteration}`}</Td>
                     </Tr>
                   ))
                 )}
@@ -189,7 +189,8 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
       <PaginationWrapper>
         <Button
           icon={<img src={ArrowLeftIcon} alt='이전' />}
-          color='white'
+          variant='outlined'
+          color='gray300'
           style={{ minWidth: 32 }}
           onClick={() => onPageChange && onPageChange(page - 1)}
           disabled={page <= 1}
@@ -197,7 +198,8 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
         <Typography variant='textSM' color='gray700' value={`Page ${page} of ${total}`} />
         <Button
           icon={<img src={ArrowRightIcon} alt='다음' />}
-          color='white'
+          variant='outlined'
+          color='gray300'
           style={{ minWidth: 32 }}
           onClick={() => onPageChange && onPageChange(page + 1)}
           disabled={page >= total}

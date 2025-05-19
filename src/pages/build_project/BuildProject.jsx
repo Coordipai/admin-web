@@ -11,9 +11,9 @@ import UserTable from '@components/Edit/UserTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox } from '@styles/globalStyle'
 import { api } from '../../hooks/useAxios'
-import dayjs from 'dayjs'
-import { useAccessTokenStore, useRefreshTokenStore, useUserStore } from '@store/useUserStore'
+import { useAccessTokenStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
+import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
 
 
 const Fieldset = styled.div`
@@ -54,12 +54,7 @@ const sprintOptions = [
 ]
 
 const BuildProject = () => {
-
-	const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
-	const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
-	const setUser = useUserStore(state => state.setUser)
 	const accessToken = useAccessTokenStore(state => state.accessToken)
-	const refreshToken = useRefreshTokenStore(state => state.refreshToken)
 
 	const [step, setStep] = useState(1)
 	const [form, setForm] = useState({
@@ -73,11 +68,40 @@ const BuildProject = () => {
 	})
 	const [error, setError] = useState({})
 	const [search, setSearch] = useState('')
+	const [searchOptions, setSearchOptions] = useState([])
+	const [searchResults, setSearchResults] = useState([])
+	const { Get } = useFetchWithTokenRefresh()
 
 	const inputRef = useRef(null)
-	const isSearching = useRef(false)
 	const navigate = useNavigate()
 
+	// 검색어가 변경될 때마다 API 호출
+	useEffect(() => {
+		const searchUsers = async () => {
+			if (!search) {
+				setSearchOptions([])
+				setSearchResults([])
+				return
+			}
+			try {
+				const response = await Get('/user/search', {
+					params: { user_name: search }
+				})
+				const res = response.length > 0 ? response : []
+				setSearchResults(res)
+				setSearchOptions(res.map(user => ({
+					value: user.id.toString(),
+					label: user.name
+				})))
+			} catch (error) {
+				console.error('검색 중 오류 발생:', error)
+				setSearchOptions([])
+				setSearchResults([])
+			}
+		}
+
+		searchUsers()
+	}, [search])
 
 	// hash로 단계 관리
 	useEffect(() => {
@@ -210,90 +234,6 @@ const BuildProject = () => {
 	)
 
 	// 3단계: 팀원 관리 및 제출
-	const handleSearchKeyDown = async (e) => {
-		if (e.key !== 'Enter') return;
-
-		if (isSearching.current) return;
-		isSearching.current = true;
-		e.preventDefault();
-		const keyword = e.target.value;
-		if (!keyword) {
-			isSearching.current = false;
-			return;
-		}
-		let res;
-		try {
-			res = await api.get('/user/search', {
-				headers: {
-					Authorization: `Bearer ${accessToken}`
-				},
-				params: { user_name: keyword }
-			})
-		} catch (err) {
-			if (err.response && err.response.status === 401 && refreshToken) {
-				try {
-					const refreshRes = await api.post('/auth/refresh', {
-						refresh_token: refreshToken
-					})
-					const refreshData = refreshRes.data?.content?.data
-					if (refreshData) {
-						setUser(refreshData.user)
-						setAccessToken(refreshData.access_token)
-						setRefreshToken(refreshData.refresh_token)
-						res = await api.get('/user/search', {
-							headers: {
-								Authorization: `Bearer ${refreshData.access_token}`
-							},
-							params: { user_name: keyword }
-						})
-					} else {
-						alert('인증이 만료되었습니다. 다시 로그인 해주세요.')
-						isSearching.current = false;
-						return;
-					}
-				} catch {
-					alert('인증이 만료되었습니다. 다시 로그인 해주세요.')
-					isSearching.current = false;
-					return;
-				}
-			} else {
-				alert('존재하지 않는 사용자입니다')
-				isSearching.current = false;
-				return;
-			}
-		}
-		const users = res.data?.content?.data || []
-		if (users.length === 0) {
-			alert('존재하지 않는 사용자입니다')
-			isSearching.current = false;
-			return;
-		}
-		const userInfo = users[0]
-		if (form.members.some(member => member.id === userInfo.id)) {
-			alert('이미 추가된 팀원입니다')
-			isSearching.current = false;
-			return;
-		}
-
-		setForm(f => ({
-			...f,
-			members: [
-				...f.members,
-				{
-					id: userInfo.id,
-					name: userInfo.name,
-					githubId: userInfo.github_name,
-					profileImg: userInfo.profile_img,
-					field: ''
-				}
-			]
-		}))
-		setSearch('')
-
-		isSearching.current = false;
-
-	}
-
 	const renderStep3 = () => (
 		<MainBox>
 			<Header text='프로젝트 생성' />
@@ -303,10 +243,25 @@ const BuildProject = () => {
 						label='팀원 검색'
 						value={search}
 						onChange={e => setSearch(e.target.value)}
-
-						options={[]}
-
-						onKeyDown={handleSearchKeyDown}
+						options={searchOptions}
+						onSelect={(value, label) => {
+							setSearch('')
+							const selectedUser = searchResults.find(user => user.id.toString() === value)
+							if (form.members.some(member => member.id.toString() === value)) {
+								alert('이미 추가된 팀원입니다')
+								return
+							}
+							setForm(prev => ({
+								...prev,
+								members: [...prev.members, {
+									id: value,
+									name: label,
+									githubId: selectedUser?.github_name || '',
+									profileImg: selectedUser?.profile_img || '',
+									field: ''
+								}]
+							}))
+						}}
 						placeholder='팀원을 검색하세요'
 						ref={inputRef}
 					/>

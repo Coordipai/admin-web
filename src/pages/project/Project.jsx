@@ -238,6 +238,7 @@ export const Project = () => {
                   placeholder='이슈를 검색하세요'
                 />
               </div>
+
               <ButtonGroup>
                 <Button variant='outlined' color='gray700' onClick={() => navigate(`${location.pathname}/issue/new`)} >
                   이슈 추가
