@@ -11,6 +11,7 @@ const useFetchWithTokenRefresh = () => {
   const accessToken = useAccessTokenStore(state => state.accessToken)
   const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
   const refreshToken = useRefreshTokenStore(state => state.refreshToken)
+  const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
 
   // 내부에서 직접 토큰 갱신
   const refreshAccessToken = async () => {
@@ -19,8 +20,10 @@ const useFetchWithTokenRefresh = () => {
         refresh_token: refreshToken
       })
       const newAccessToken = response.data?.content?.data?.access_token
-      if (newAccessToken) {
+      const newRefreshToken = response.data?.content?.data?.refresh_token
+      if (newAccessToken&&newRefreshToken) {
         setAccessToken(newAccessToken)
+        setRefreshToken(newRefreshToken)
         return newAccessToken
       } else {
         setAccessToken(null)
@@ -57,6 +60,8 @@ const useFetchWithTokenRefresh = () => {
       if (error.response && error.response.status === 401) {
         const refreshResult = await refreshAccessToken()
         if (refreshResult instanceof Error) {
+          setRefreshToken(null)
+          setAccessToken(null)
           navigate('/login')
           return
         }

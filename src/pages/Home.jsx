@@ -12,7 +12,7 @@ import { extractDate } from '@utils/dateUtils'
 
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
-import { api } from '../hooks/useAxios'
+import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 
 const Fieldset = styled.div`
@@ -96,106 +96,58 @@ export const Home = () => {
   const theme = useTheme()
   const navigate = useNavigate()
   const { setProject, clearProject } = useProjectStore();
-  const accessToken = useAccessTokenStore(state => state.accessToken)
   const setUser = useUserStore(state => state.setUser)
   const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
   const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
   const refreshToken = useRefreshTokenStore(state => state.refreshToken)
+  const { Get, Post } = useFetchWithTokenRefresh()
+  const [isLoggedIn,setIsLoggedIn] = useState(false)
 
   const [projects, setProjects] = useState([])  // 프로젝트 목록 
 
+  // 로그인 처리
   useEffect(() => {
-    const loginAndFetchProjects = async () => {
+    const login = async () => {
       try {
-        // 1. 로그인 요청 (쿠키 기반)
-        let loginData = null
-        try {
-          const loginRes = await api.post('/auth/login', {}, { withCredentials: true })
-          loginData = loginRes.data?.content?.data
-          if (loginData) {
-            setUser(loginData.user)
-            setAccessToken(loginData.access_token)
-            setRefreshToken(loginData.refresh_token)
-          }
-        } catch {
-          // 로그인 실패 시 refresh 시도
-          if (refreshToken) {
-            try {
-              const refreshRes = await api.post('/auth/refresh', {
-                refresh_token: refreshToken
-              })
-              const refreshData = refreshRes.data?.content?.data
-              if (refreshData) {
-                setUser(refreshData.user)
-                setAccessToken(refreshData.access_token)
-                setRefreshToken(refreshData.refresh_token)
-                loginData = refreshData
-              } else {
-                navigate('/login')
-                return
-              }
-            } catch {
-              navigate('/login')
-              return
-            }
-          } else {
-            navigate('/login')
-            return
-          }
+        const loginRes = await Post('/auth/login', {}, { withCredentials: true })
+        console.log('login response:', loginRes)
+        
+        if (!loginRes) {
+          throw new Error('Login failed')
         }
 
-        // 2. 프로젝트 목록 요청 (로그인/리프레시 후 토큰 사용)
-        let tokenToUse = loginData?.access_token || accessToken
-        let projectRes
-        try {
-          projectRes = await api.get('/project', {
-            headers: {
-              Authorization: `Bearer ${tokenToUse}`
-            }
-          })
-        } catch (err) {
-          // 401 에러 시 토큰 갱신
-          if (err.response && err.response.status === 401 && refreshToken) {
-            try {
-              const refreshRes = await api.post('/auth/refresh', {
-                refresh_token: refreshToken
-              })
-              const refreshData = refreshRes.data?.content?.data
-              if (refreshData) {
-                setUser(refreshData.user)
-                setAccessToken(refreshData.access_token)
-                setRefreshToken(refreshData.refresh_token)
-                // 갱신된 토큰으로 재요청
-                projectRes = await api.get('/project', {
-                  headers: {
-                    Authorization: `Bearer ${refreshData.access_token}`
-                  }
-                })
-              } else {
-                navigate('/login')
-                return
-              }
-            } catch {
-              navigate('/login')
-              return
-            }
-          } else {
-            navigate('/login')
-            return
-          }
-        }
-        const data = projectRes?.data?.content?.data || []
-        setProjects(data)
-
-        console.log(data)
-      } catch {
+        setUser(loginRes.user)
+        setAccessToken(loginRes.access_token)
+        setRefreshToken(loginRes.refresh_token)
+      } catch (error) {
+        console.error('Error:', error)
         navigate('/login')
       }
     }
-    loginAndFetchProjects()
-  }, [])
+    if(!refreshToken){
+      login()
+      setIsLoggedIn(true)
+    }
+      
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
-  
+  // 로그인 성공 후 프로젝트 목록 요청
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!refreshToken) return
+
+      try {
+        const data = await Get('/project')
+        console.log(data)
+        setProjects(data || [])
+      } catch (error) {
+        console.error('Error fetching projects:', error)
+        navigate('/login')
+      }
+    }
+    fetchProjects()
+  }, [isLoggedIn])  // eslint-disable-line react-hooks/exhaustive-deps
+
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState(null)
 
@@ -236,6 +188,7 @@ export const Home = () => {
                 onClick={() => {
                   setSelectedId(project.id)
                   // setProject(project)
+                  //setProject(project.id)
                   navigate(`/project/${project.id}#issue`)
                 }}
               />
