@@ -816,8 +816,14 @@ const IssueSuggestPage = () => {
                 }}
               >
                 전체 이슈 확정
-              </ButtonBase>
-              <ButtonBase $isHighlighted
+              </ButtonBase>              
+              <ButtonBase 
+                $isHighlighted
+                disabled={isFetching}
+                style={{
+                  cursor: step === 'assign' || isAllCompleted ? 'not-allowed' : 'pointer',
+                  opacity: step === 'assign' || isAllCompleted ? 0.5 : 1
+                }}
                 onClick={() => {
                   if (isFetching) return
 

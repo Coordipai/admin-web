@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import Badge from '@components/Edit/Badge'
 import InputField from '@components/Edit/InputField'
 import Typography from '@components/Edit/Typography'
@@ -61,6 +61,7 @@ const LabelBadge = styled.div`
 
 const IssueDetailPage = () => {
   const { projectId, issueNumber } = useParams()
+  const navigate = useNavigate()
   const { isLoading, setLoading } = useLoadingStore()
   const { project } = useProjectStore()
 
@@ -469,6 +470,7 @@ const IssueDetailPage = () => {
               })
 
               createIssue(issueData)
+              navigate(`/project/${projectId}`)
             } else {
               if (isEdit) {
                 const issueData = {
@@ -483,12 +485,14 @@ const IssueDetailPage = () => {
                 }
                 console.log(issueData)
                 updateIssue(issueData)
+                navigate(`/project/${projectId}`)
               } else {
                 const issueData = {
                   project_id: projectId,
                   issue_number: issueNumber
                 }
                 deleteIssue(issueData)
+                navigate(`/project/${projectId}`)
               }
             }
             // window.history.back()
