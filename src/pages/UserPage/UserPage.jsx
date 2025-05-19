@@ -99,6 +99,7 @@ const TextButton = styled(ButtonBase)`
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+
 export default function UserPage () {
   const navigate = useNavigate()
   //const { githubId } = useParams() // 여기서 param으로 받아오기
@@ -175,6 +176,8 @@ export default function UserPage () {
   const [field, setField] = useState(-1)
 
   
+
+  
   const handleSave = async () => {
     const payload = {
       name: username,
@@ -208,10 +211,10 @@ export default function UserPage () {
     }
   }
 
-
  const handleWithdraw = async () => {
   const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
   if (!confirmed) return
+
 
   try {
     const response = await axios.delete(
@@ -226,7 +229,7 @@ export default function UserPage () {
 
     console.log('✅ 탈퇴 성공:', response.data)
     alert('탈퇴가 완료되었습니다.')
-
+ 
     useUserStore.getState().clearUser()
     useAccessTokenStore.getState().clearAccessToken()
     navigate('/login')
@@ -237,11 +240,14 @@ export default function UserPage () {
 }
 
 
+
 const handleEvaluationRequest = async () => {
+
 
   const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
     //console.log('selectedRepos:', selectedRepos)
     if (!confirmed) return
+
 
     try {
       const response = await axios.post(
@@ -265,7 +271,6 @@ const handleEvaluationRequest = async () => {
       alert('평가 요청 중 오류가 발생했습니다.')
     }
   }
-
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
