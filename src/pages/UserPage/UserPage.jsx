@@ -6,10 +6,9 @@ import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import axios from 'axios'
-import { set } from 'date-fns'
 
 const PageContainer = styled.div`
   display: flex;
@@ -100,6 +99,7 @@ const TextButton = styled(ButtonBase)`
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+
 export default function UserPage () {
   const navigate = useNavigate()
   //const { githubId } = useParams() // 여기서 param으로 받아오기
@@ -120,14 +120,14 @@ export default function UserPage () {
   console.log("accessToken before fetch:", accessToken) // 🔍 이게 undefined면 문제
 
   // fetchRepos 실행
-}, [user, accessToken])
+  }, [user, accessToken])
 
-useEffect(() => {
-  if (!user || !accessToken) {
-    alert('로그인이 필요합니다.')
-    navigate('/login')
-    return
-  }
+  useEffect(() => {
+    if (!user || !accessToken) {
+      alert('로그인이 필요합니다.')
+      navigate('/login')
+      return
+    }
 
   setGithubName(user.github_name|| '')
   setGithubId(user.github_id || '')
@@ -176,18 +176,15 @@ useEffect(() => {
   const [field, setField] = useState(-1)
 
   
+
+  
   const handleSave = async () => {
     const payload = {
       name: username,
       github_id: githubId,
       github_name: githubName,
       discord_id: discordId,
-      name: username,
-      github_id: githubId,
-      github_name: githubName,
-      discord_id: discordId,
       career,
-      category: fieldOptions[field]?.title || '',
       category: fieldOptions[field]?.title || '',
       repositories: selectedRepos
     }
@@ -214,10 +211,10 @@ useEffect(() => {
     }
   }
 
-
  const handleWithdraw = async () => {
   const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
   if (!confirmed) return
+
 
   try {
     const response = await axios.delete(
@@ -232,7 +229,7 @@ useEffect(() => {
 
     console.log('✅ 탈퇴 성공:', response.data)
     alert('탈퇴가 완료되었습니다.')
-
+ 
     useUserStore.getState().clearUser()
     useAccessTokenStore.getState().clearAccessToken()
     navigate('/login')
@@ -243,11 +240,14 @@ useEffect(() => {
 }
 
 
+
 const handleEvaluationRequest = async () => {
+
 
   const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
     //console.log('selectedRepos:', selectedRepos)
     if (!confirmed) return
+
 
     try {
       const response = await axios.post(
@@ -264,8 +264,8 @@ const handleEvaluationRequest = async () => {
 
       const result = response.data.content
       console.log('✅ 평가 결과:', result)
-      alert(`평가가 완료되었습니다!\n\n점수: ${result.evaluation_score}\n분야: ${result.field}`)
-
+      //alert(`평가가 완료되었습니다!\n\n점수: ${result.evaluation_score}\n분야: ${result.field}`)
+      alert('평가 요청이 완료되었습니다!')
     } catch (error) {
       console.error('❌ 평가 요청 실패:', error)
       alert('평가 요청 중 오류가 발생했습니다.')
@@ -290,16 +290,12 @@ const handleEvaluationRequest = async () => {
             <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
               setUsername(v)
             }} />
-            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
-              setUsername(v)
-            }} />
-          </FieldWrapper>
+            </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>GitHub 계정이름</LabelText>
             <FormInput
               placeholder='깃허브 계정'
-              value={githubName}
               value={githubName}
               readOnly
             />
@@ -310,10 +306,7 @@ const handleEvaluationRequest = async () => {
             <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
               setDiscordId(v)
             }} />
-            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
-              setDiscordId(v)
-            }} />
-          </FieldWrapper>
+           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>분야 선택</LabelText>
@@ -324,15 +317,11 @@ const handleEvaluationRequest = async () => {
               handleChange={(v) => {
                 setField(v)
             }}
-              handleChange={(v) => {
-                setField(v)
-            }}
             />
           </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>간단한 경력을 입력해주세요.</LabelText>
-            <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} onChange={setCareer} />
             <FormTextarea placeholder='ex. 사이드 프로젝트 2회 경험' value={career} onChange={setCareer} />
           </FieldWrapper>
 
@@ -342,7 +331,6 @@ const handleEvaluationRequest = async () => {
             <CheckboxList>
               {repoList.map((repo) => {
                 const isChecked = selectedRepos.includes(repo)
-
                 return (
                   <RepositoryBox key={repo} $checked={isChecked} onClick={() => toggleRepo(repo)}>
                     <input
@@ -368,6 +356,7 @@ const handleEvaluationRequest = async () => {
               평가요청
             </Button>
           </ButtonWrapper>
+
         </FormWrapper>
       </ContentArea>
     </PageContainer>

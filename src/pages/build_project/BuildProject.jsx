@@ -316,7 +316,7 @@ const BuildProject = () => {
 					<Button variant='outlined' onClick={() => (window.location.hash = '#step2')} >취소</Button>
 					<Button variant='contained' onClick={async () => {
 						// 날짜를 ISO 8601로 변환
-						const startDate = form.deadline ? new Date().toISOString() : dayjs().format('YYYY-MM-DDT00:00:00[Z]')
+						const startDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString()
 						const endDate = form.deadline ? `${form.deadline}T00:00:00Z` : ''
 
 						const members = form.members.map(row => ({
