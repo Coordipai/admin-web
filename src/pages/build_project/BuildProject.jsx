@@ -15,6 +15,7 @@ import dayjs from 'dayjs'
 import { useAccessTokenStore, useRefreshTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
 
+
 const Fieldset = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -53,11 +54,13 @@ const sprintOptions = [
 ]
 
 const BuildProject = () => {
+
 	const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
 	const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
 	const setUser = useUserStore(state => state.setUser)
 	const accessToken = useAccessTokenStore(state => state.accessToken)
 	const refreshToken = useRefreshTokenStore(state => state.refreshToken)
+
 	const [step, setStep] = useState(1)
 	const [form, setForm] = useState({
 		projectName: '',
@@ -70,9 +73,11 @@ const BuildProject = () => {
 	})
 	const [error, setError] = useState({})
 	const [search, setSearch] = useState('')
+
 	const inputRef = useRef(null)
 	const isSearching = useRef(false)
 	const navigate = useNavigate()
+
 
 	// hash로 단계 관리
 	useEffect(() => {
@@ -159,8 +164,8 @@ const BuildProject = () => {
 					/>
 				</Fieldset>
 				<ButtonGroup>
-					<Button text='취소' type='button' onClick={() => (window.location.href = '/')} />
-					<Button text='다음' type='button' onClick={() => {
+					<Button variant='outlined'onClick={() => (window.location.href = '/')} >취소</Button>
+					<Button variant='contained'  onClick={() => {
 						const newError = {}
 						if (!form.projectName) newError.projectName = true
 						if (!form.deadline) newError.deadline = true
@@ -171,7 +176,7 @@ const BuildProject = () => {
 						if (Object.keys(newError).length === 0) {
 							window.location.hash = '#step2'
 						}
-					}} />
+					}} >다음</Button>
 				</ButtonGroup>
 			</Section>
 		</MainBox>
@@ -183,6 +188,7 @@ const BuildProject = () => {
 			<Header text='프로젝트 생성' />
 			<Section>
 				<Fieldset>
+
 					<FileTable
 						files={form.files}
 						setFiles={newFiles => {
@@ -193,10 +199,11 @@ const BuildProject = () => {
 							}))
 						}}
 					/>
+
 				</Fieldset>
 				<ButtonGroup>
-					<Button text='취소' type='button' onClick={() => (window.location.hash = '#step1')} />
-					<Button text='다음' type='button' onClick={() => (window.location.hash = '#step3')} />
+					<Button variant='outlined' onClick={() => (window.location.hash = '#step1')} >취소</Button>
+					<Button variant='contained' onClick={() => (window.location.hash = '#step3')} >다음</Button>
 				</ButtonGroup>
 			</Section>
 		</MainBox>
@@ -205,6 +212,7 @@ const BuildProject = () => {
 	// 3단계: 팀원 관리 및 제출
 	const handleSearchKeyDown = async (e) => {
 		if (e.key !== 'Enter') return;
+
 		if (isSearching.current) return;
 		isSearching.current = true;
 		e.preventDefault();
@@ -266,6 +274,7 @@ const BuildProject = () => {
 			isSearching.current = false;
 			return;
 		}
+
 		setForm(f => ({
 			...f,
 			members: [
@@ -280,7 +289,9 @@ const BuildProject = () => {
 			]
 		}))
 		setSearch('')
+
 		isSearching.current = false;
+
 	}
 
 	const renderStep3 = () => (
@@ -292,7 +303,9 @@ const BuildProject = () => {
 						label='팀원 검색'
 						value={search}
 						onChange={e => setSearch(e.target.value)}
+
 						options={[]}
+
 						onKeyDown={handleSearchKeyDown}
 						placeholder='팀원을 검색하세요'
 						ref={inputRef}
@@ -300,23 +313,23 @@ const BuildProject = () => {
 					<UserTable rows={form.members} setRows={rows => setForm(f => ({ ...f, members: rows }))} />
 				</Fieldset>
 				<ButtonGroup>
-					<Button text='취소' type='button' onClick={() => (window.location.hash = '#step2')} />
-					<Button text='완료' type='submit' onClick={async () => {
-						const sprintMap = { '1주': 1, '2주': 2, '1개월': 4 }
-						const sprint_unit = sprintMap[form.sprint] || 1
+					<Button variant='outlined' onClick={() => (window.location.hash = '#step2')} >취소</Button>
+					<Button variant='contained' onClick={async () => {
 						// 날짜를 ISO 8601로 변환
-						const startDate = form.deadline ? new Date().toISOString() : dayjs().format('YYYY-MM-DDT00:00:00[Z]')
+						const startDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString()
 						const endDate = form.deadline ? `${form.deadline}T00:00:00Z` : ''
+
 						const members = form.members.map(row => ({
 							id: row.id,
 							role: row.field || 'member'
 						}))
+
 						const projectReq = {
 							name: form.projectName,
 							repo_fullname: form.github,
 							start_date: startDate,
 							end_date: endDate,
-							sprint_unit: Number(sprint_unit),
+							sprint_unit: Number(form.sprint),
 							discord_channel_id: String(form.discord),
 							members
 						}
@@ -337,8 +350,9 @@ const BuildProject = () => {
 						} catch (error) {
 							alert('프로젝트 생성 실패')
 							console.log('프로젝트 생성 실패:', error)
+
 						}
-					}} />
+					}} >완료</Button>
 				</ButtonGroup>
 			</Section>
 		</MainBox>
