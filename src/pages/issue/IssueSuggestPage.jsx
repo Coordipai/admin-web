@@ -197,7 +197,7 @@ const IssueSuggestPage = () => {
   const [issueTitle, setIssueTitle] = useState('')
   const [issueContent, setIssueContent] = useState('')
   const [priority, setPriority] = useState(priorityOptions[0].value)
-  const [iteration, setIteration] = useState(iterationOptions[0])
+  const [sprintIndex, setSprintIndex] = useState(null)
   const [selectedLabels, setSelectedLabels] = useState([])
   const [assignees, setAssignees] = useState([])
   const [isCompleted, setIsCompleted] = useState(false)
@@ -214,9 +214,9 @@ const IssueSuggestPage = () => {
       setAssigneeOptions(project.assigneeOptions)
     } catch (error) {
       console.error('Failed to get project data:', error)
+
       // 기본값 설정
       setIterationOptions([{ title: '선택해주세요', period: '' }])
-      setIteration({ title: '선택해주세요', period: '' })
       setAssigneeOptions([])
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -396,7 +396,6 @@ const IssueSuggestPage = () => {
       if (assigneeDropdownOpen && !assigneeRef.current?.contains(e.target) && !assigneeMenuRef.current?.contains(e.target)) setAssigneeDropdownOpen(false)
       if (labelDropdownOpen && !labelRef.current?.contains(e.target) && !labelMenuRef.current?.contains(e.target)) setLabelDropdownOpen(false)
     }
-
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [badgeDropdownOpen, iterationDropdownOpen, assigneeDropdownOpen, labelDropdownOpen])
@@ -418,11 +417,12 @@ const IssueSuggestPage = () => {
 
   const handleIssueSelect = (issue) => {
     setSelectedIssue(issue)
-    // Update form fields with selected issue data
     setIssueTitle(issue.title)
     setIssueContent(issue.content)
     setPriority(issue.priority || 'M')
-    setIteration(issue.iteration || iterationOptions[0])
+
+    setSprintIndex(issue.sprint)
+
     setSelectedLabels(issue.labels || [])
     setAssignees(issue.assignees || [])
     setIsCompleted(issue.isCompleted || false)
@@ -461,19 +461,24 @@ const IssueSuggestPage = () => {
                     return
                   }
 
-                   try {
-                    await postAssignIssues(projectId, issueList);
+                  try {
+                    const response = await postAssignIssues(projectId, issueList);
 
-                    const resetIssues = issueList.map(issue => ({
-                      ...issue,
-                      isCompleted: false
-                    }));
-                    setIssueList(resetIssues);
-                    setSelectedIssue(null);
-                    setIsCompleted(false);
-                    navigate(`${location.pathname}#assign`);
+                    const updatedIssues = issueList.map(issue => {
+                      const matched = response.issues.find(res => res.issue === issue.title);
+                      return {
+                        ...issue,
+                        assignee: matched?.assignee ?? issue.assignee,
+                        isCompleted: false
+                      }
+                    })
+
+                    setIssueList(updatedIssues)
+                    setSelectedIssue(null)
+                    setIsCompleted(false)
+                    navigate(`${location.pathname}#assign`)
                   } catch (error) {
-                    console.error('이슈 할당 실패:', error);
+                    console.error('이슈 할당 실패:', error)
                   }
                 },
                 isHighlighted: true,
@@ -530,7 +535,7 @@ const IssueSuggestPage = () => {
 
               <Row>
                 <Typography value='Iteration' variant='textSM' weight='medium' color='gray900' />
-                {iteration && (
+                {sprintIndex && (
                   <>
                     <div
                       ref={iterationRef}
@@ -544,20 +549,41 @@ const IssueSuggestPage = () => {
                       }}
                     >
                       <IterationBox>
-                        <Typography value={iteration.title} variant='textSM' weight='regular' color='gray900' />
-                        <Typography value={iteration.period} variant='textXS' weight='regular' color='gray500' />
+                        <IterationBox>
+                          <Typography
+                            value={
+                              sprintIndex !== null && iterationOptions[sprintIndex]
+                                ? iterationOptions[sprintIndex].title
+                                : 'Iteration을 선택해주세요'
+                            }
+                            variant='textSM'
+                            weight='regular'
+                            color={sprintIndex !== null && iterationOptions[sprintIndex] ? 'gray900' : 'gray400'}
+                          />
+                          <Typography
+                            value={
+                              sprintIndex !== null && iterationOptions[sprintIndex]
+                                ? iterationOptions[sprintIndex].period
+                                : ''
+                            }
+                            variant='textXS'
+                            weight='regular'
+                            color='gray500'
+                          />
+                        </IterationBox>
+
                       </IterationBox>
                     </div>
                     {iterationDropdownOpen && isIssueSelected && createPortal(
                       <DropDownMenu ref={iterationMenuRef} style={iterationMenuStyle}>
                         {iterationOptions.map((opt, index) => {
-                          const isSelected = iteration.title === opt.title
+                          const isSelected = sprintIndex === index
                           return (
                             <DropDownItem
                               key={index}
                               selected={isSelected}
                               onClick={() => {
-                                setIteration(opt)
+                                setSprintIndex(index)
                                 setIterationDropdownOpen(false)
                               }}
                               role='option'
@@ -707,10 +733,13 @@ const IssueSuggestPage = () => {
               </ButtonBase>
               <ButtonBase $isHighlighted
                 onClick={() => {
+                  if (isFetching) return
                   setIssueList([])
                   fetchSuggestedIssues()
                 }}
-              >전체 이슈 재요청</ButtonBase>
+              >
+                전체 이슈 재요청
+              </ButtonBase>
             </Footer>
           </LeftContainer>
 

@@ -1,6 +1,7 @@
 import { api } from '@hooks/useAxios'
 import { showSuccessToastMsg, showErrorToastMsg } from '@utils/showToastMsg';
 import { useAccessTokenStore } from '@store/useUserStore'
+import useLoadingStore from '@store/useLoadingStore'
 
 /**
  * 1. 이슈 자동 생성 요청하기 (Streaming 방식)
@@ -57,25 +58,7 @@ export const getGeneratedIssues = async (projectId, onChunk) => {
  * 2. 역량 평가 요청하기 (Post)
  * 
  * @param {object} data
- * example: {
- *    "selected_repos": [
- *        "string"
- *   ]
- * }
- * 
  * @returns {object} assessData
- * example: {
- *     "name": "string",
- *     "field": "string",
- *     "experience": "string",
- *     "evaluation_scores": {
- *        "additionalProp1": {}
- *     },
- *     "implemented_features": [
- *        "string"
- *     ],
- *     "timestamp": "string"
- * }
  * 
  */
 export const postAssessStat = async (data) => {
@@ -102,20 +85,7 @@ export const postAssessStat = async (data) => {
  * 3. 평가된 역량 정보 가져오기 (Get)
  * 
  * @param {string} userId 
- * 
  * @returns {object}
- * example: {
- *     "name": "string",
- *     "field": "string",
- *     "experience": "string",
- *     "evaluation_scores": {
- *        "additionalProp1": {}
- *     },
- *     "implemented_features": [
- *        "string"
- *     ],
- *     "timestamp": "string"
- * }
  * 
  */
 export const getReadStat = async (userId) => {
@@ -148,6 +118,7 @@ export const getReadStat = async (userId) => {
  */
 export const postAssignIssues = async (projectId, data) => {
     try {
+        useLoadingStore.getState().setLoading(true)
         const token = useAccessTokenStore.getState().accessToken
         if (!token) {
             throw new Error('Access token is not available')
@@ -156,14 +127,11 @@ export const postAssignIssues = async (projectId, data) => {
         const issues = data.map(issue => ({
             type: issue.type,
             name: issue.name,
-            description: issue.description || issue.content || '',
+            description: issue.description,
             title: issue.title,
-            labels: issue.labels || [],
-            body: Array.isArray(issue.body)
-                ? issue.body
-                : typeof issue.body === 'string'
-                ? [issue.body]
-                : [],
+            labels: issue.labels,
+            sprint: issue.sprint,
+            body: issue.body,
         }))
 
         const requestBody = {
@@ -182,10 +150,13 @@ export const postAssignIssues = async (projectId, data) => {
                 }
             }
         )
+        console.log('response', response.data.content.data)
         showSuccessToastMsg('이슈 할당 완료');
         return response.data.content.data;
     } catch (error) {
         showErrorToastMsg(error);
         throw error;
+    } finally {
+        useLoadingStore.getState().setLoading(false)
     }
 }
