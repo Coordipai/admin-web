@@ -119,8 +119,6 @@ export default function AccountSetupPage () {
           withCredentials: true,
         }
       )
-
-      console.log('레포 등록 성공: ', res.data)
       const combinedData = {
         name: '', // 필요 시 localStorage 등에서 복구
         githubId, // ← param으로 받은 githubId 사용
