@@ -1,4 +1,4 @@
-import { api } from '@hooks/useAxios'
+import  api  from '@hooks/useAxios'
 import { showSuccessToastMsg, showErrorToastMsg } from '@utils/showToastMsg';
 import { useAccessTokenStore } from '@store/useUserStore'
 
@@ -14,14 +14,12 @@ export const fetchAllIssues = async (projectId) => {
     }
 
     const response = await api.get('/issue', { 
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
+
       params: { 
         project_id: projectId 
       } 
     });
-    return response.data.content.data;
+    return response;
   } catch (error) {
     showErrorToastMsg(error);
     throw error;
@@ -40,15 +38,13 @@ export const fetchIssueDetail = async (projectId, issueNumber) => {
       throw new Error('Access token is not available')
     }
     const response = await api.get('/issue/detail', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
+    
       params: {
         project_id: projectId,
         issue_number: issueNumber
       }
     })
-    return response.data.content.data;
+    return response;
   } catch (error) {
     showErrorToastMsg(error);
     throw error;
@@ -65,11 +61,7 @@ export const createIssue = async (issueData) => {
       throw new Error('Access token is not available')
     }
 
-    const response = await api.post('/issue', issueData, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    const response = await api.post('/issue', issueData)
     showSuccessToastMsg('성공적으로 이슈가 생성되었습니다.')
     return response.data
   } catch (error) {
@@ -89,11 +81,7 @@ export const updateIssue = async (issueData) => {
       throw new Error('Access token is not available')
     }
 
-    const response = await api.put('/issue', issueData, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    const response = await api.put('/issue', issueData)
     showSuccessToastMsg('성공적으로 이슈가 수정되었습니다.')
     return response.data
   } catch (error) {
@@ -113,11 +101,7 @@ export const deleteIssue = async (issueData) => {
       throw new Error('Access token is not available')
     }
 
-    const response = await api.patch('/issue', issueData, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    const response = await api.patch('/issue', issueData)
     showSuccessToastMsg('성공적으로 이슈가 닫혔습니다.')
     return response.data
   } catch (error) {
@@ -139,14 +123,12 @@ export const fetchIssueSummary = async (projectId) => {
     }
 
     const response = await api.get('/issue/summary', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
+    
       params: {
         project_id: projectId
       }
     })
-    return response.data.content.data;
+    return response;
   } catch (error) {
     showErrorToastMsg(error);
     throw error;

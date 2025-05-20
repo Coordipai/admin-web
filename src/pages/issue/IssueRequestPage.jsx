@@ -11,7 +11,7 @@ import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
 import { useProjectStore } from '@store/useProjectStore'
 import { useAccessTokenStore } from '@store/useUserStore'
-import axios from 'axios'
+import api from '@hooks/useAxios'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
@@ -96,8 +96,8 @@ export default function IssueRequestPage () {
 useEffect(() => {
   const fetchIssueData = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/issue-reschedule/${projectId}`);
-      const issues = res.data?.content?.data || [];
+      const res = await api.get(`/issue-reschedule/${projectId}`);
+      const issues = res || [];
 
       const matched = issues.find(issue => issue.issue_number === Number(requestId));
 
@@ -133,8 +133,8 @@ useEffect(() => {
   useEffect(() => {
     const fetchProjectMembers = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/project/${projectId}`)
-        const members = res.data?.content?.data?.members || []
+        const res = await api.get(`/project/${projectId}`)
+        const members = res.members || []
 
         const mappedOptions = members.map((member) => ({
           title: member.name || member.github_id // 혹은 github_name
@@ -191,8 +191,6 @@ useEffect(() => {
 
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
-  const accessToken = useAccessTokenStore((state) => state.accessToken);
-
   const handleDecision = async (isApproved) => {
     const type = isApproved ? 'Approve' : 'Disapprove'
     const confirmMessage = isApproved ? '정말로 변경을 승인하시겠습니까?' : '정말로 반려하시겠습니까?'
@@ -200,11 +198,10 @@ useEffect(() => {
     if (!window.confirm(confirmMessage)) return
 
     try {
-      const res = await axios.delete(`${BASE_URL}/issue-reschedule/${requestId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+      const res = await api.delete(`/issue-reschedule/${requestId}`, {
         params: { type },
       })
-      console.log(`${type} 완료:`, res.data)
+      console.log(`${type} 완료:`, res)
       alert(`${isApproved ? '승인' : '반려'} 처리되었습니다.`)
     } catch (error) {
       console.error(`${type} 실패:`, error);

@@ -6,8 +6,8 @@ import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
-import axios from 'axios'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
+import  api  from '@hooks/useAxios'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -87,23 +87,12 @@ export default function AccountSetupPage () {
       }
 
       try {
-        const accessToken = useAccessTokenStore.getState().accessToken // ✅ accessToken 가져오기
+        const response = await api.post(`/auth/register`,payload)
 
-        const response = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/auth/register`, // ✅ BASE_URL 사용
-          payload,
-          {
-            withCredentials: true, // ✅ 쿠키도 함께 포함
-            headers: {
-              Authorization: `Bearer ${accessToken}`, // ✅ accessToken을 헤더로 명시
-            },
-          }
-        )
-
-        console.log('회원가입 성공:', response.data.content.data)
-        useUserStore.getState().setUser(response.data.content.data.user)
-        useAccessTokenStore.getState().setAccessToken(response.data.content.data.access_token)
-        useRefreshTokenStore.getState().setRefreshToken(response.data.content.data.refresh_token)
+        console.log('회원가입 성공:', response)
+        useUserStore.getState().setUser(response.user)
+        useAccessTokenStore.getState().setAccessToken(response.access_token)
+        useRefreshTokenStore.getState().setRefreshToken(response.refresh_token)
         navigate(`/repositorycheckpage/${githubId}`, { state: payload })
       } catch (error) {
         console.error('회원가입 실패:', error.response?.data || error.message)

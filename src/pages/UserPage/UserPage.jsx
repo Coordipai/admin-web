@@ -7,9 +7,7 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
-import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
-
-import axios from 'axios'
+import  api  from '@hooks/useAxios'
 
 const PageContainer = styled.div`
   display: flex;
@@ -111,7 +109,7 @@ export default function UserPage () {
   const [career, setCareer] = useState('')
   const [selectedRepos, setSelectedRepos] = useState([])
   const accessToken = useAccessTokenStore((state) => state.accessToken)
-  const { Get } = useFetchWithTokenRefresh()
+
 
  const user = useUserStore((state) => state.user)
 
@@ -139,16 +137,23 @@ export default function UserPage () {
     )
   )
 
-      const fetchRepos = async () => {
-      try {
-        const selected = await Get('/user-repo')
-        const all = await Get('/user-repo/github')
-        setRepoList(all.map((r) => r.repo_fullname))
-        setSelectedRepos(selected.map((r) => r.repo_fullname))
-      } catch (error) {
-        console.error('레포지토리 불러오기 실패:', error)
-      }
+  const fetchRepos = async () => {
+    try {
+      // 🔹 선택된 레포 불러오기
+      const selectedRes = await api.get(`/user-repo`)
+      const selected = selectedRes.map((r) => r.repo_fullname)
+
+      // 🔹 GitHub의 전체 레포 불러오기
+      const allRes = await api.get(`/user-repo/github`)
+      const all = allRes.map((r) => r.repo_fullname)
+
+      // 상태에 반영
+      setRepoList(all)
+      setSelectedRepos(selected)
+    } catch (error) {
+      console.error('레포지토리 불러오기 실패:', error)
     }
+  }
 
     fetchRepos()
   }, [user, accessToken])
@@ -178,16 +183,9 @@ export default function UserPage () {
     }
 
     try {
-      await axios.put(
-        `${BASE_URL}/auth/update`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
-      )
+      const response = await api.put(`/auth/update`,payload)
+
+      console.log('✅ 저장 성공:', response)
       alert('정보가 성공적으로 저장되었습니다!')
     } catch (error) {
       console.error('❌ 저장 실패:', error)
@@ -201,15 +199,10 @@ export default function UserPage () {
 
 
   try {
-    await axios.delete(
-      `${BASE_URL}/auth/unregister`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        withCredentials: true,
-      }
-    )
+    const response = await api.delete(`/auth/unregister`)
+
+
+    console.log('✅ 탈퇴 성공:', response.data)
     alert('탈퇴가 완료되었습니다.')
  
     useUserStore.getState().clearUser()
@@ -231,18 +224,9 @@ const handleEvaluationRequest = async () => {
 
 
     try {
-      await axios.post(
-        `${BASE_URL}/agent/assess_stat`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }
-      )
-
+      const response = await api.post(`/agent/assess_stat`,{})
+      console.log('✅ 평가 결과:', response)
+      //alert(`평가가 완료되었습니다!\n\n점수: ${result.evaluation_score}\n분야: ${result.field}`)
       alert('평가 요청이 완료되었습니다!')
     } catch (error) {
       console.error('❌ 평가 요청 실패:', error)
