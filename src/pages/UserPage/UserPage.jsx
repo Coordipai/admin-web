@@ -118,8 +118,6 @@ export default function UserPage () {
  useEffect(() => {
   if (!user || !accessToken) return
 
-  console.log("accessToken before fetch:", accessToken) // 🔍 이게 undefined면 문제
-
   // fetchRepos 실행
   }, [user, accessToken])
 
@@ -179,8 +177,6 @@ export default function UserPage () {
       repositories: selectedRepos
     }
 
-    console.log('보낼 데이터:', payload)
-
     try {
       const response = await axios.put(
         `${BASE_URL}/auth/update`,
@@ -192,8 +188,7 @@ export default function UserPage () {
           withCredentials: true,
         }
       )
-
-      console.log('✅ 저장 성공:', response.data)
+      
       alert('정보가 성공적으로 저장되었습니다!')
     } catch (error) {
       console.error('❌ 저장 실패:', error)
@@ -216,8 +211,6 @@ export default function UserPage () {
         withCredentials: true,
       }
     )
-
-    console.log('✅ 탈퇴 성공:', response.data)
     alert('탈퇴가 완료되었습니다.')
  
     useUserStore.getState().clearUser()
@@ -235,7 +228,6 @@ const handleEvaluationRequest = async () => {
 
 
   const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
-    //console.log('selectedRepos:', selectedRepos)
     if (!confirmed) return
 
 
@@ -252,9 +244,6 @@ const handleEvaluationRequest = async () => {
         }
       )
 
-      const result = response.data.content
-      console.log('✅ 평가 결과:', result)
-      //alert(`평가가 완료되었습니다!\n\n점수: ${result.evaluation_score}\n분야: ${result.field}`)
       alert('평가 요청이 완료되었습니다!')
     } catch (error) {
       console.error('❌ 평가 요청 실패:', error)
