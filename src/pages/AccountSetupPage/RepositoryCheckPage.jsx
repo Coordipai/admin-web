@@ -109,7 +109,7 @@ export default function AccountSetupPage () {
 
     try{
       const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
-      const res = await axios.post(
+      await axios.post(
         `${BASE_URL}/user-repo`,
         payload,
         {
