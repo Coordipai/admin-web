@@ -175,7 +175,8 @@ export const Project = () => {
         const issueResponse = await Get(`/issue`,{
           params: { project_id: projectId }
         })
-        setIssueRows(issueResponse)
+        setIssueRows(issueResponse.filter(issue => issue.closed === false))
+
         const requestResponse = await Get(`/issue-reschedule/${projectId}`)
         setRequestRows(requestResponse)
       } catch (error) {
