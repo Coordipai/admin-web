@@ -10,8 +10,7 @@ import Header from '@components/Header'
 import UserTable from '@components/Edit/UserTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox } from '@styles/globalStyle'
-import { api } from '../../hooks/useAxios'
-import { useAccessTokenStore } from '@store/useUserStore'
+import api from '@hooks/useAxios'
 import { useNavigate } from 'react-router-dom'
 
 
