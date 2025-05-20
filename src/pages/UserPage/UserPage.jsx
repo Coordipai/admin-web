@@ -7,6 +7,7 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
+import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
 
 import axios from 'axios'
 
@@ -99,7 +100,6 @@ const TextButton = styled(ButtonBase)`
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-
 export default function UserPage () {
   const navigate = useNavigate()
   //const { githubId } = useParams() // 여기서 param으로 받아오기
@@ -111,6 +111,7 @@ export default function UserPage () {
   const [career, setCareer] = useState('')
   const [selectedRepos, setSelectedRepos] = useState([])
   const accessToken = useAccessTokenStore((state) => state.accessToken)
+  const { Get } = useFetchWithTokenRefresh()
 
  const user = useUserStore((state) => state.user)
 
@@ -140,31 +141,20 @@ export default function UserPage () {
     )
   )
 
-  const fetchRepos = async () => {
-    try {
-      // 🔹 선택된 레포 불러오기
-      const selectedRes = await axios.get(`${BASE_URL}/user-repo`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      const selected = selectedRes.data.content.data.map((r) => r.repo_fullname)
-
-      // 🔹 GitHub의 전체 레포 불러오기
-      const allRes = await axios.get(`${BASE_URL}/user-repo/github`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      const all = allRes.data.content.data.map((r) => r.repo_fullname)
-
-      // 상태에 반영
-      setRepoList(all)
-      setSelectedRepos(selected)
-    } catch (error) {
-      console.error('레포지토리 불러오기 실패:', error)
+      const fetchRepos = async () => {
+      try {
+        const selected = await Get('/user-repo')
+        const all = await Get('/user-repo/github')
+        setRepoList(all.map((r) => r.repo_fullname))
+        setSelectedRepos(selected.map((r) => r.repo_fullname))
+      } catch (error) {
+        console.error('레포지토리 불러오기 실패:', error)
+      }
     }
-  }
 
-  fetchRepos()
-}, [user, accessToken, navigate])
-
+    fetchRepos()
+  }, [user, accessToken])
+  
   const fieldOptions = [
     { title: '프론트엔드' },
     { title: '백엔드' },
