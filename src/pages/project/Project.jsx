@@ -5,10 +5,9 @@ import IssueTable from '@components/Edit/IssueTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox, ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
-import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
 import { useProjectStore } from '@store/useProjectStore'
 import Button from '@components/Common/Button'
-
+import  api  from '@hooks/useAxios'
 const HeaderSection = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -133,7 +132,6 @@ export const Project = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { projectId } = useParams()
-  const { Get } = useFetchWithTokenRefresh()
   const [activeTab, setActiveTab] = useState(() => {
     const hash = location.hash.replace('#', '')
     return hash === 'request' ? 'request' : 'issue'
@@ -172,12 +170,12 @@ export const Project = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const issueResponse = await Get(`/issue`,{
+        const issueResponse = await api.get(`/issue`,{
           params: { project_id: projectId }
         })
         setIssueRows(issueResponse.filter(issue => issue.closed === false))
 
-        const requestResponse = await Get(`/issue-reschedule/${projectId}`)
+        const requestResponse = await api.get(`/issue-reschedule/${projectId}`)
         setRequestRows(requestResponse)
       } catch (error) {
         console.error('Error fetching issues:', error)

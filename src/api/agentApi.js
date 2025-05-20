@@ -1,4 +1,4 @@
-import { api } from '@hooks/useAxios'
+import  api  from '@hooks/useAxios'
 import { showSuccessToastMsg, showErrorToastMsg } from '@utils/showToastMsg';
 import { useAccessTokenStore } from '@store/useUserStore'
 import useLoadingStore from '@store/useLoadingStore'
@@ -68,12 +68,9 @@ export const postAssessStat = async (data) => {
             throw new Error('Access token is not available')
         }
         const response = await api.post('/agent/assess_stat', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             body: data
         })
-        return response.data.content.data;
+        return response;
     } catch (error) {
         showErrorToastMsg(error);
         throw error;
@@ -95,12 +92,9 @@ export const getReadStat = async (userId) => {
             throw new Error('Access token is not available')
         }
         const response = await api.get('/agent/read_stat', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
             params: { user_id: userId }
         })
-        return response.data.content.data;
+        return response;
     } catch (error) {
         showErrorToastMsg(error);
         throw error;
@@ -148,14 +142,13 @@ export const postAssignIssues = async (projectId, data) => {
             requestBody,
             {
                 headers: {
-                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             }
         )
-        console.log('response', response.data.content.data)
+        console.log('response', response)
         showSuccessToastMsg('이슈 할당 완료');
-        return response.data.content.data;
+        return response;
     } catch (error) {
         showErrorToastMsg(error);
         throw error;

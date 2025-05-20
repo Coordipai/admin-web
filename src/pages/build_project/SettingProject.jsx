@@ -12,8 +12,8 @@ import UserTable from '@components/Edit/UserTable'
 import { DatePicker } from '@components/Edit/DatePicker'
 import Header from '@components/Header'
 import dayjs from 'dayjs'
-import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
 import { useAccessTokenStore, useRefreshTokenStore, useUserStore } from '@store/useUserStore'
+import  api  from '@hooks/useAxios'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -74,7 +74,6 @@ export const SettingProject = () => {
   const navigate = useNavigate()
   const inputRef = useRef(null)
 	const isSearching = useRef(false)
-  const { Get, Put, Delete } = useFetchWithTokenRefresh()
   const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
 	const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
 	const setUser = useUserStore(state => state.setUser)
@@ -113,8 +112,8 @@ export const SettingProject = () => {
     if (!projectId) return
     const fetchProject = async () => {
       try {
-        const res = await Get(`/project/${projectId}`)
-        // res가 useFetchWithTokenRefresh의 Get이므로 바로 data
+        const res = await api.get(`/project/${projectId}`)
+        
         console.log(res)
         setForm({
           projectName: res.name || '',
@@ -150,7 +149,7 @@ export const SettingProject = () => {
         return
       }
       try {
-        const response = await Get('/user/search', {
+        const response = await api.get('/user/search', {
           params: { user_name: search }
         })
         const res = response.length > 0 ? response : []
@@ -202,7 +201,7 @@ export const SettingProject = () => {
         form.files.forEach(file => {
           formData.append('files', file)
       })
-      await Put(`/project/${projectId}`, formData)
+      await api.put(`/project/${projectId}`, formData)
       navigate('/')
     } catch {
       alert('프로젝트 수정 실패')
@@ -210,7 +209,7 @@ export const SettingProject = () => {
   }
   const handleDelete = async () => {
     try {
-      await Delete(`/project/${projectId}`)
+      await api.delete(`/project/${projectId}`)
       navigate('/')
     } catch {
       alert('프로젝트 삭제 실패') 
