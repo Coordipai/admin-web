@@ -13,7 +13,7 @@ import { MainBox } from '@styles/globalStyle'
 import { api } from '../../hooks/useAxios'
 import { useAccessTokenStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
-import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
+
 
 
 const Fieldset = styled.div`
@@ -54,7 +54,6 @@ const sprintOptions = [
 ]
 
 const BuildProject = () => {
-	const accessToken = useAccessTokenStore(state => state.accessToken)
 
 	const [step, setStep] = useState(1)
 	const [form, setForm] = useState({
@@ -70,7 +69,6 @@ const BuildProject = () => {
 	const [search, setSearch] = useState('')
 	const [searchOptions, setSearchOptions] = useState([])
 	const [searchResults, setSearchResults] = useState([])
-	const { Get } = useFetchWithTokenRefresh()
 
 	const inputRef = useRef(null)
 	const navigate = useNavigate()
@@ -84,7 +82,7 @@ const BuildProject = () => {
 				return
 			}
 			try {
-				const response = await Get('/user/search', {
+				const response = await api.get('/user/search', {
 					params: { user_name: search }
 				})
 				const res = response.length > 0 ? response : []
@@ -297,9 +295,7 @@ const BuildProject = () => {
 							formData.append('files', file)
 						})
 						try {
-							await api.post('/project', formData, {
-								headers: { Authorization: `Bearer ${accessToken}` }
-							})
+							await api.post('/project', formData)
 							
 							navigate('/')
 						} catch (error) {

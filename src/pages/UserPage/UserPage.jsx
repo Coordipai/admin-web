@@ -7,8 +7,7 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
-
-import axios from 'axios'
+import  api  from '@hooks/useAxios'
 
 const PageContainer = styled.div`
   display: flex;
@@ -143,16 +142,12 @@ export default function UserPage () {
   const fetchRepos = async () => {
     try {
       // 🔹 선택된 레포 불러오기
-      const selectedRes = await axios.get(`${BASE_URL}/user-repo`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      const selected = selectedRes.data.content.data.map((r) => r.repo_fullname)
+      const selectedRes = await api.get(`/user-repo`)
+      const selected = selectedRes.map((r) => r.repo_fullname)
 
       // 🔹 GitHub의 전체 레포 불러오기
-      const allRes = await axios.get(`${BASE_URL}/user-repo/github`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      const all = allRes.data.content.data.map((r) => r.repo_fullname)
+      const allRes = await api.get(`/user-repo/github`)
+      const all = allRes.map((r) => r.repo_fullname)
 
       // 상태에 반영
       setRepoList(all)
@@ -192,18 +187,9 @@ export default function UserPage () {
     console.log('보낼 데이터:', payload)
 
     try {
-      const response = await axios.put(
-        `${BASE_URL}/auth/update`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
-      )
+      const response = await api.put(`/auth/update`,payload)
 
-      console.log('✅ 저장 성공:', response.data)
+      console.log('✅ 저장 성공:', response)
       alert('정보가 성공적으로 저장되었습니다!')
     } catch (error) {
       console.error('❌ 저장 실패:', error)
@@ -217,15 +203,8 @@ export default function UserPage () {
 
 
   try {
-    const response = await axios.delete(
-      `${BASE_URL}/auth/unregister`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        withCredentials: true,
-      }
-    )
+    const response = await api.delete(`/auth/unregister`)
+
 
     console.log('✅ 탈퇴 성공:', response.data)
     alert('탈퇴가 완료되었습니다.')
@@ -250,20 +229,8 @@ const handleEvaluationRequest = async () => {
 
 
     try {
-      const response = await axios.post(
-        `${BASE_URL}/agent/assess_stat`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }
-      )
-
-      const result = response.data.content
-      console.log('✅ 평가 결과:', result)
+      const response = await api.post(`/agent/assess_stat`,{})
+      console.log('✅ 평가 결과:', response)
       //alert(`평가가 완료되었습니다!\n\n점수: ${result.evaluation_score}\n분야: ${result.field}`)
       alert('평가 요청이 완료되었습니다!')
     } catch (error) {

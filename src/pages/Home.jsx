@@ -1,20 +1,16 @@
 import { useEffect, useState } from 'react'
-import InputField from '@components/Edit/InputField'
 import styled, { useTheme } from 'styled-components'
 import Typography from '@components/Edit/Typography'
-import DropDown from '@components/Edit/DropDown'
-import FileTable from '@components/Edit/FileTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import Button from '@components/Common/Button'
-import { HorizontalDivider, MainBox } from '@styles/globalStyle'
+import { MainBox } from '@styles/globalStyle'
 import { useProjectStore } from '@store/useProjectStore'
 import { extractDate } from '@utils/dateUtils'
 
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
-import useFetchWithTokenRefresh from '@api/useFetchWithTokenRefresh'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
-import { set } from 'date-fns'
+import  api  from '@hooks/useAxios'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -101,7 +97,6 @@ export const Home = () => {
   const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
   const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
   const refreshToken = useRefreshTokenStore(state => state.refreshToken)
-  const { Get, Post } = useFetchWithTokenRefresh()
   const [isLoggedIn,setIsLoggedIn] = useState(false)
 
   const [projects, setProjects] = useState([])  // 프로젝트 목록 
@@ -110,7 +105,7 @@ export const Home = () => {
   useEffect(() => {
     const login = async () => {
       try {
-        const loginRes = await Post('/auth/login', {}, { withCredentials: true })
+        const loginRes = await api.post('/auth/login')
         console.log('login response:', loginRes)
         
         if (!loginRes) {
@@ -138,7 +133,7 @@ export const Home = () => {
       if (!refreshToken) return
 
       try {
-        const data = await Get('/project')
+        const data = await api.get('/project')
         console.log(data)
         setProjects(data || [])
       } catch (error) {

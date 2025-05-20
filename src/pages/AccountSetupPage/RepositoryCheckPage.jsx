@@ -6,7 +6,7 @@ import FormDropdown from '@components/FormDropdown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
-import axios from 'axios'
+import  api  from '@hooks/useAxios'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -77,15 +77,8 @@ export default function AccountSetupPage () {
     const fetchRepos = async () => {
       try {
         // zustand에서 access_token 꺼내기
-        // const userResponse = useAccessTokenStore.getState().user || JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.user
-        const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
-        const res = await axios.get(`${BASE_URL}/user-repo/github`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        })
-        const repos = res.data.content.data.map((item) => item.repo_fullname).filter(Boolean)
+        const res = await api.get(`/user-repo/github`)
+        const repos = res.map((item) => item.repo_fullname).filter(Boolean)
         setRepoList(repos)
       } catch (error) {
         console.error('레포지토리 불러오기 실패: ', error)
@@ -105,22 +98,12 @@ export default function AccountSetupPage () {
   }
 
   const handleCreateAccount = async () => {
-    const payload = selectedRepos.map((repo) => ({repo_fullname: repo}))
 
     try{
-      const token = JSON.parse(window.localStorage.getItem('access-token-storage'))?.state?.accessToken
-      const res = await axios.post(
-        `${BASE_URL}/user-repo`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
+      
+      const res = await api.post(`/user-repo`)
 
-      console.log('레포 등록 성공: ', res.data)
+      console.log('레포 등록 성공: ', res)
       const combinedData = {
         name: '', // 필요 시 localStorage 등에서 복구
         githubId, // ← param으로 받은 githubId 사용
@@ -128,7 +111,7 @@ export default function AccountSetupPage () {
       }
       navigate(`/userform/${githubId}`, { state: combinedData })
     } catch (error) {
-        console.error('레포 등록 실패: ', error.response?.data || error.message)
+        console.error('레포 등록 실패: ', error.response || error.message)
         alert('레포 등록 중 오류가 발생했습니다.')
         }
     }
