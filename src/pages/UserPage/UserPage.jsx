@@ -178,7 +178,7 @@ export default function UserPage () {
     }
 
     try {
-      const response = await axios.put(
+      await axios.put(
         `${BASE_URL}/auth/update`,
         payload,
         {
@@ -188,7 +188,6 @@ export default function UserPage () {
           withCredentials: true,
         }
       )
-      
       alert('정보가 성공적으로 저장되었습니다!')
     } catch (error) {
       console.error('❌ 저장 실패:', error)
@@ -202,7 +201,7 @@ export default function UserPage () {
 
 
   try {
-    const response = await axios.delete(
+    await axios.delete(
       `${BASE_URL}/auth/unregister`,
       {
         headers: {
@@ -232,7 +231,7 @@ const handleEvaluationRequest = async () => {
 
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${BASE_URL}/agent/assess_stat`,
         {},
         {
