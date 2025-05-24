@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
-import FormDropdown from '@components/FormDropdown'
+import DropDown from '@components/Edit/DropDown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
@@ -113,6 +113,15 @@ export default function UserPage () {
 
  const user = useUserStore((state) => state.user)
 
+
+ const fieldOptions = [
+  { value: '', label: '분야 선택' },
+  { value: 'WEB_FE', label: '웹 프론트엔드' },
+  { value: 'WEB_BE', label: '웹 백엔드' },
+  { value: 'AI', label: 'AI' },
+  { value: 'MOBLIE_APP', label: '모바일 앱' },
+];
+
  useEffect(() => {
   if (!user || !accessToken) return
 
@@ -133,11 +142,7 @@ export default function UserPage () {
   setUsername(user.name || '')
   setDiscordId(user.discord_id || '')
   setCareer(user.career || '')
-  setField(
-    ['프론트엔드', '백엔드', '기획', '디자인', '기타'].findIndex(
-      (f) => f === user.category
-    )
-  )
+  setField(user.category || '')
 
   const fetchRepos = async () => {
     try {
@@ -160,15 +165,8 @@ export default function UserPage () {
   fetchRepos()
 }, [user, accessToken, navigate])
 
-  const fieldOptions = [
-    { title: '프론트엔드' },
-    { title: '백엔드' },
-    { title: '기획' },
-    { title: '디자인' },
-    { title: '기타' }
-  ]
 
-  const [field, setField] = useState(-1)
+  const [field, setField] = useState('')
 
   
 
@@ -180,7 +178,7 @@ export default function UserPage () {
       github_name: githubName,
       discord_id: discordId,
       career,
-      category: fieldOptions[field]?.title || '',
+      category: field || '',
       repositories: selectedRepos
     }
 
@@ -277,11 +275,11 @@ const handleEvaluationRequest = async () => {
 
           <FieldWrapper>
             <LabelText>분야 선택</LabelText>
-            <FormDropdown
+            <DropDown
               placeholder='분야 선택'
-              menus={fieldOptions}
-              selectedMenu={field}
-              handleChange={(v) => {
+              options={fieldOptions}
+              value={field}
+              onChange={(v) => {
                 setField(v)
             }}
             />
