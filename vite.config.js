@@ -21,6 +21,7 @@ export default defineConfig({
       '@utils': path.resolve(__dirname, 'src/utils'),
       '@store': path.resolve(__dirname, 'src/store'),
       '@mocks': path.resolve(__dirname, 'src/mocks'),
+      '@constant': path.resolve(__dirname, 'src/constant'),
     }
   }
 })

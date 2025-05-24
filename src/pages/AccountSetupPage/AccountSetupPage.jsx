@@ -2,13 +2,13 @@ import { useState } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
-import FormDropdown from '@components/FormDropdown'
+import DropDown from '@components/Edit/DropDown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 import  api  from '@hooks/useAxios'
-
+import { categoryOptions } from '@constant/options'
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 
@@ -56,25 +56,16 @@ export default function AccountSetupPage () {
   const [username, setUsername] = useState('')
   const [discordId, setDiscordId] = useState('')
   const [career, setCareer] = useState('')
-  const [selectedField, setSelectedField] = useState(-1)
+  const [selectedField, setSelectedField] = useState('')
   const [error, setError] = useState({})
   const navigate = useNavigate()
-
-  const fieldOptions = [
-    { title: '프론트엔드' },
-    { title: '백엔드' },
-    { title: '기획' },
-    { title: '디자인' },
-    { title: '기타' }
-  ]
-
 
   const handleNext = async () => {
     const newError = {}
     if (!username.trim()) newError.username = true
     if (!discordId.trim()) newError.discordId = true
     if (!career.trim()) newError.career = true
-    if (selectedField === -1) newError.selectedField = true
+    if (!selectedField) newError.selectedField = true
 
     setError(newError)
 
@@ -82,14 +73,13 @@ export default function AccountSetupPage () {
       const payload = {
         name: username,
         discord_id: discordId,
-        category: fieldOptions[selectedField].title || '',
+        category: selectedField || '',
         career: career,
       }
 
       try {
         const response = await api.post(`/auth/register`,payload)
 
-        console.log('회원가입 성공:', response)
         useUserStore.getState().setUser(response.user)
         useAccessTokenStore.getState().setAccessToken(response.access_token)
         useRefreshTokenStore.getState().setRefreshToken(response.refresh_token)
@@ -141,11 +131,11 @@ export default function AccountSetupPage () {
 
       <FieldWrapper>
         <LabelText>분야 선택</LabelText>
-        <FormDropdown
+        <DropDown
           placeholder='분야 선택'
-          menus={fieldOptions}
-          selectedMenu={selectedField}
-          handleChange={(v) => {
+          options={categoryOptions}
+          value={selectedField}
+          onChange={(v) => {
             setSelectedField(v)
             if (error.selectedField) setError((prev) => ({ ...prev, selectedField: false }))
           }}

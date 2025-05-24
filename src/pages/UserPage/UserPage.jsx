@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
-import FormDropdown from '@components/FormDropdown'
+import DropDown from '@components/Edit/DropDown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
 import  api  from '@hooks/useAxios'
-
+import { categoryOptions } from '@constant/options'
 const PageContainer = styled.div`
   display: flex;
   width: 100%;
@@ -133,11 +133,7 @@ export default function UserPage () {
   setUsername(user.name || '')
   setDiscordId(user.discord_id || '')
   setCareer(user.career || '')
-  setField(
-    ['프론트엔드', '백엔드', '기획', '디자인', '기타'].findIndex(
-      (f) => f === user.category
-    )
-  )
+  setField(user.category || '')
 
   const fetchRepos = async () => {
     try {
@@ -160,15 +156,8 @@ export default function UserPage () {
   fetchRepos()
 }, [user, accessToken, navigate])
 
-  const fieldOptions = [
-    { title: '프론트엔드' },
-    { title: '백엔드' },
-    { title: '기획' },
-    { title: '디자인' },
-    { title: '기타' }
-  ]
 
-  const [field, setField] = useState(-1)
+  const [field, setField] = useState('')
 
   
 
@@ -180,7 +169,7 @@ export default function UserPage () {
       github_name: githubName,
       discord_id: discordId,
       career,
-      category: fieldOptions[field]?.title || '',
+      category: field || '',
       repositories: selectedRepos
     }
 
@@ -277,11 +266,11 @@ const handleEvaluationRequest = async () => {
 
           <FieldWrapper>
             <LabelText>분야 선택</LabelText>
-            <FormDropdown
+            <DropDown
               placeholder='분야 선택'
-              menus={fieldOptions}
-              selectedMenu={field}
-              handleChange={(v) => {
+              options={categoryOptions}
+              value={field}
+              onChange={(v) => {
                 setField(v)
             }}
             />
