@@ -8,7 +8,7 @@ import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
 import  api  from '@hooks/useAxios'
-
+import { categoryOptions } from '@constant/options'
 const PageContainer = styled.div`
   display: flex;
   width: 100%;
@@ -112,15 +112,6 @@ export default function UserPage () {
   const accessToken = useAccessTokenStore((state) => state.accessToken)
 
  const user = useUserStore((state) => state.user)
-
-
- const fieldOptions = [
-  { value: '', label: '분야 선택' },
-  { value: 'WEB_FE', label: '웹 프론트엔드' },
-  { value: 'WEB_BE', label: '웹 백엔드' },
-  { value: 'AI', label: 'AI' },
-  { value: 'MOBLIE_APP', label: '모바일 앱' },
-];
 
  useEffect(() => {
   if (!user || !accessToken) return
@@ -277,7 +268,7 @@ const handleEvaluationRequest = async () => {
             <LabelText>분야 선택</LabelText>
             <DropDown
               placeholder='분야 선택'
-              options={fieldOptions}
+              options={categoryOptions}
               value={field}
               onChange={(v) => {
                 setField(v)

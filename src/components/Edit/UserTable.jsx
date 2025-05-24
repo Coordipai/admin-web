@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Typography from './Typography'
 import DropDown from './DropDown'
 import IconButton from '@components/Common/IconButton'
-
+import { roleOptions } from '@constant/options'
 const TableWrapper = styled.div`
   box-sizing: border-box;
   width: 100%;
@@ -102,14 +102,6 @@ const TableRowContainer = styled.div`
   }
 `
 
-const fieldOptions = [
-  { value: '', label: '분야 선택' },
-  { value: 'WEB_FE', label: '웹 프론트엔드' },
-  { value: 'WEB_BE', label: '웹 백엔드' },
-  { value: 'AI', label: 'AI' },
-  { value: 'MOBLIE_APP', label: '모바일 앱' },
-];
-
 const UserTable = ({ rows, setRows }) => {
   const handleFieldChange = (id, value) => {
     setRows(rows.map(row => row.id === id ? { ...row, field: value } : row))
@@ -148,7 +140,7 @@ const UserTable = ({ rows, setRows }) => {
                 <DropDown
                   value={row.field}
                   onChange={v => handleFieldChange(row.id, v)}
-                  options={fieldOptions}
+                  options={roleOptions}
                   placeholder='분야 선택'
                 />
               </FieldCell>
