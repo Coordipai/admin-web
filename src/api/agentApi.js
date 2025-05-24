@@ -1,7 +1,7 @@
 import  api  from '@hooks/useAxios'
-import { showSuccessToastMsg, showErrorToastMsg } from '@utils/showToastMsg';
 import { useAccessTokenStore } from '@store/useUserStore'
 import useLoadingStore from '@store/useLoadingStore'
+import Toast from '@utils/Toast'
 
 /**
  * 1. 이슈 자동 생성 요청하기 (Streaming 방식)
@@ -44,11 +44,11 @@ export const getGeneratedIssues = async (projectId, onChunk) => {
     
       onChunk(chunk);
     }
-
-    showSuccessToastMsg('자동 이슈 생성 완료');
+    Toast('자동 이슈 생성 완료', 'success');
     return result;
   } catch (error) {
-    showErrorToastMsg(error);
+    Toast(error,'error')
+    //showErrorToastMsg(error);
     throw error;
   }
 };
@@ -72,7 +72,8 @@ export const postAssessStat = async (data) => {
         })
         return response;
     } catch (error) {
-        showErrorToastMsg(error);
+        Toast(error,'error')
+        //showErrorToastMsg(error);
         throw error;
     }
 }
@@ -96,7 +97,8 @@ export const getReadStat = async (userId) => {
         })
         return response;
     } catch (error) {
-        showErrorToastMsg(error);
+        Toast(error,'error')
+        //showErrorToastMsg(error);
         throw error;
     }
 }
@@ -147,10 +149,11 @@ export const postAssignIssues = async (projectId, data) => {
             }
         )
         console.log('response', response)
-        showSuccessToastMsg('이슈 할당 완료');
+        Toast('이슈 할당 완료','success')
         return response;
     } catch (error) {
-        showErrorToastMsg(error);
+        Toast(error,'error')
+        //showErrorToastMsg(error);
         throw error;
     } finally {
         useLoadingStore.getState().setLoading(false)

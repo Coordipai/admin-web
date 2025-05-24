@@ -9,6 +9,9 @@ import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
 import  api  from '@hooks/useAxios'
 import { categoryOptions } from '@constant/options'
+import Toast from '@utils/Toast'
+import ConfirmModal from '@components/ConfirmModal'
+
 const PageContainer = styled.div`
   display: flex;
   width: 100%;
@@ -123,7 +126,7 @@ export default function UserPage () {
 
   useEffect(() => {
     if (!user || !accessToken) {
-      alert('로그인이 필요합니다.')
+      Toast('로그인이 필요합니다.', 'warning')
       navigate('/login')
       return
     }
@@ -158,6 +161,7 @@ export default function UserPage () {
 
 
   const [field, setField] = useState('')
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false)
 
   
 
@@ -179,54 +183,39 @@ export default function UserPage () {
       const response = await api.put(`/auth/update`,payload)
 
       console.log('✅ 저장 성공:', response)
-      alert('정보가 성공적으로 저장되었습니다!')
+      Toast('정보가 성공적으로 저장되었습니다!', 'success')
     } catch (error) {
       console.error('❌ 저장 실패:', error)
-      alert('저장 중 오류가 발생했습니다.')
+      Toast('저장 중 오류가 발생했습니다.', 'error')
     }
   }
 
  const handleWithdraw = async () => {
-  const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
-  if (!confirmed) return
-
-
-  try {
-    const response = await api.delete(`/auth/unregister`)
-
-
-    console.log('✅ 탈퇴 성공:', response.data)
-    alert('탈퇴가 완료되었습니다.')
- 
-    useUserStore.getState().clearUser()
-    useAccessTokenStore.getState().clearAccessToken()
-    navigate('/login')
-  } catch (error) {
-    console.error('❌ 탈퇴 실패:', error)
-    alert('탈퇴 중 오류가 발생했습니다.')
-  }
-}
+   try {
+     const response = await api.delete(`/auth/unregister`)
+     console.log('✅ 탈퇴 성공:', response.data)
+     Toast('탈퇴가 완료되었습니다.', 'success')
+     useUserStore.getState().clearUser()
+     useAccessTokenStore.getState().clearAccessToken()
+     navigate('/login')
+   } catch (error) {
+     console.error('❌ 탈퇴 실패:', error)
+     Toast('탈퇴 중 오류가 발생했습니다.', 'error')
+   }
+ }
 
 
 
 const handleEvaluationRequest = async () => {
-
-
-  const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
-    //console.log('selectedRepos:', selectedRepos)
-    if (!confirmed) return
-
-
-    try {
-      const response = await api.post(`/agent/assess_stat`,{})
-      console.log('✅ 평가 결과:', response)
-      //alert(`평가가 완료되었습니다!\n\n점수: ${result.evaluation_score}\n분야: ${result.field}`)
-      alert('평가 요청이 완료되었습니다!')
-    } catch (error) {
-      console.error('❌ 평가 요청 실패:', error)
-      alert('평가 요청 중 오류가 발생했습니다.')
-    }
+  try {
+    const response = await api.post(`/agent/asess_stat`,{})
+    console.log('✅ 평가 결과:', response)
+    Toast('평가 요청이 완료되었습니다!', 'success')
+  } catch (error) {
+    console.error('❌ 평가 요청 실패:', error)
+    Toast('평가 요청 중 오류가 발생했습니다.', 'error')
   }
+}
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
@@ -302,7 +291,7 @@ const handleEvaluationRequest = async () => {
           </FieldWrapper>
 
           <ButtonWrapper>
-            <TextButton $isHighlighted onClick={handleWithdraw}>
+            <TextButton $isHighlighted onClick={() => setShowWithdrawModal(true)}>
               탈퇴하기
             </TextButton>
             <Button $isHighlighted onClick={handleSave}>
@@ -315,6 +304,13 @@ const handleEvaluationRequest = async () => {
 
         </FormWrapper>
       </ContentArea>
+      {showWithdrawModal && (
+        <ConfirmModal
+          text='정말로 탈퇴하시겠습니까?'
+          setShowModal={setShowWithdrawModal}
+          handleConfirm={handleWithdraw}
+        />
+      )}
     </PageContainer>
   )
 }
