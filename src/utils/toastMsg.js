@@ -9,7 +9,7 @@ import { toast, Bounce } from 'react-toastify'
  * @example
  * // App.jsx 등 최상위 컴포넌트에 ToastContainer를 반드시 추가해야 합니다.
  * import { ToastContainer } from 'react-toastify'
- * import Toast from '@utils/Toast'
+ * import toastMsg from '@utils/toastMsg'
  *
  * function App() {
  *   return (
@@ -21,18 +21,18 @@ import { toast, Bounce } from 'react-toastify'
  * }
  *
  * // 성공 메시지
- * Toast('성공!', 'success')
+ * toastMsg('성공!', 'success')
  *
  * // 에러 메시지 (문자열)
- * Toast('상세 메시지', 'error')
+ * toastMsg('상세 메시지', 'error')
  *
  * // 에러 메시지 (error 객체)
- * Toast(error, 'error')
+ * toastMsg(error, 'error')
  *
  * // 경고 메시지
- * Toast('경고!', 'warning')
+ * toastMsg('경고!', 'warning')
  */
-export default function Toast(message, variant = 'success') {
+export default function toastMsg(message, variant = 'success') {
   const options = {
     position: 'top-right',
     autoClose: 1000,

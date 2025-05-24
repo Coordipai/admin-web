@@ -9,7 +9,7 @@ import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
 import  api  from '@hooks/useAxios'
 import { categoryOptions } from '@constant/options'
-import Toast from '@utils/Toast'
+import toastMsg from '@utils/toastMsg'
 import ConfirmModal from '@components/ConfirmModal'
 
 const PageContainer = styled.div`
@@ -126,7 +126,7 @@ export default function UserPage () {
 
   useEffect(() => {
     if (!user || !accessToken) {
-      Toast('로그인이 필요합니다.', 'warning')
+      toastMsg('로그인이 필요합니다.', 'warning')
       navigate('/login')
       return
     }
@@ -183,10 +183,10 @@ export default function UserPage () {
       const response = await api.put(`/auth/update`,payload)
 
       console.log('✅ 저장 성공:', response)
-      Toast('정보가 성공적으로 저장되었습니다!', 'success')
+      toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
     } catch (error) {
       console.error('❌ 저장 실패:', error)
-      Toast('저장 중 오류가 발생했습니다.', 'error')
+      toastMsg('저장 중 오류가 발생했습니다.', 'error')
     }
   }
 
@@ -194,13 +194,13 @@ export default function UserPage () {
    try {
      const response = await api.delete(`/auth/unregister`)
      console.log('✅ 탈퇴 성공:', response.data)
-     Toast('탈퇴가 완료되었습니다.', 'success')
+     toastMsg('탈퇴가 완료되었습니다.', 'success')
      useUserStore.getState().clearUser()
      useAccessTokenStore.getState().clearAccessToken()
      navigate('/login')
    } catch (error) {
      console.error('❌ 탈퇴 실패:', error)
-     Toast('탈퇴 중 오류가 발생했습니다.', 'error')
+     toastMsg('탈퇴 중 오류가 발생했습니다.', 'error')
    }
  }
 
@@ -208,12 +208,12 @@ export default function UserPage () {
 
 const handleEvaluationRequest = async () => {
   try {
-    const response = await api.post(`/agent/asess_stat`,{})
+    const response = await api.post(`/agent/assess_stat`,{})
     console.log('✅ 평가 결과:', response)
-    Toast('평가 요청이 완료되었습니다!', 'success')
+    toastMsg('평가 요청이 완료되었습니다!', 'success')
   } catch (error) {
     console.error('❌ 평가 요청 실패:', error)
-    Toast('평가 요청 중 오류가 발생했습니다.', 'error')
+    toastMsg('평가 요청 중 오류가 발생했습니다.', 'error')
   }
 }
 

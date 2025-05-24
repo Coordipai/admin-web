@@ -13,7 +13,7 @@ import { DatePicker } from '@components/Edit/DatePicker'
 import Header from '@components/Header'
 import dayjs from 'dayjs'
 import  api  from '@hooks/useAxios'
-import Toast from '@utils/Toast'
+import toastMsg from '@utils/toastMsg'
 import ConfirmModal from '@components/ConfirmModal'
 
 const Fieldset = styled.div`
@@ -130,7 +130,7 @@ export const SettingProject = () => {
           startDate: res.start_date || ''
         })
       } catch {
-        Toast('프로젝트 정보를 불러오지 못했습니다.','error')
+        toastMsg('프로젝트 정보를 불러오지 못했습니다.','error')
       }
     }
     fetchProject()
@@ -201,7 +201,7 @@ export const SettingProject = () => {
       await api.put(`/project/${projectId}`, formData)
       navigate('/')
     } catch {
-      Toast('프로젝트 수정 실패','error')
+      toastMsg('프로젝트 수정 실패','error')
     }
   }
   const handleDelete = async () => {
@@ -209,7 +209,7 @@ export const SettingProject = () => {
       await api.delete(`/project/${projectId}`)
       navigate('/')
     } catch {
-      Toast('프로젝트 삭제 실패','error')
+      toastMsg('프로젝트 삭제 실패','error')
     }
   }
   return (
@@ -298,7 +298,7 @@ export const SettingProject = () => {
               setSearch('')
               const selectedUser = searchResults.find(user => user.id.toString() === value)
               if (form.members.some(member => member.id.toString() === value)) {
-                Toast('이미 추가된 팀원입니다','error')
+                toastMsg('이미 추가된 팀원입니다','error')
                 return
               }
               setForm(prev => ({

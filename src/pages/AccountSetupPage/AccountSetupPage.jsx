@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 import  api  from '@hooks/useAxios'
 import { categoryOptions } from '@constant/options'
-import Toast from '@utils/Toast'
+import toastMsg from '@utils/toastMsg'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -88,7 +88,7 @@ export default function AccountSetupPage () {
         navigate(`/repositorycheckpage/${githubId}`, { state: payload })
       } catch (error) {
         console.error('회원가입 실패:', error.response?.data || error.message)
-        Toast('회원가입 중 오류가 발생했습니다.', 'error')
+        toastMsg('회원가입 중 오류가 발생했습니다.', 'error')
       }
     }
   }
