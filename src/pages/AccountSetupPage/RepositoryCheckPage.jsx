@@ -101,7 +101,8 @@ export default function AccountSetupPage () {
 
     try{
       
-      const res = await api.post(`/user-repo`)
+      const repoPayload = selectedRepos.map(repo => ({ repo_fullname: repo }))
+      const res = await api.post(`/user-repo`, repoPayload)
 
       console.log('레포 등록 성공: ', res)
       const combinedData = {
