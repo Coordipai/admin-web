@@ -1,7 +1,6 @@
 import  api  from '@hooks/useAxios'
-import { showSuccessToastMsg, showErrorToastMsg } from '@utils/showToastMsg';
 import { useAccessTokenStore } from '@store/useUserStore'
-
+import Toast from '@utils/Toast'
 /**
  * 1. 모든 이슈 받아오기 (프로젝트별)
  * @param {number} projectId
@@ -21,7 +20,8 @@ export const fetchAllIssues = async (projectId) => {
     });
     return response;
   } catch (error) {
-    showErrorToastMsg(error);
+    Toast(error,'error')
+    //showErrorToastMsg(error);
     throw error;
   }
 }
@@ -46,7 +46,8 @@ export const fetchIssueDetail = async (projectId, issueNumber) => {
     })
     return response;
   } catch (error) {
-    showErrorToastMsg(error);
+    Toast(error,'error')
+    //showErrorToastMsg(error);
     throw error;
   }
 }
@@ -62,10 +63,11 @@ export const createIssue = async (issueData) => {
     }
 
     const response = await api.post('/issue', issueData)
-    showSuccessToastMsg('성공적으로 이슈가 생성되었습니다.')
+    Toast('성공적으로 이슈가 생성되었습니다.','success')
     return response.data
   } catch (error) {
-    showErrorToastMsg(error);
+    Toast(error,'error')
+    //showErrorToastMsg(error);
     throw error
   }
 }
@@ -82,10 +84,11 @@ export const updateIssue = async (issueData) => {
     }
 
     const response = await api.put('/issue', issueData)
-    showSuccessToastMsg('성공적으로 이슈가 수정되었습니다.')
+    Toast('성공적으로 이슈가 수정되었습니다.','success')
     return response.data
   } catch (error) {
-    showErrorToastMsg(error);
+    Toast(error,'error')
+    //showErrorToastMsg(error);
     throw error
   }
 }
@@ -102,10 +105,11 @@ export const deleteIssue = async (issueData) => {
     }
 
     const response = await api.patch('/issue', issueData)
-    showSuccessToastMsg('성공적으로 이슈가 닫혔습니다.')
+    Toast('성공적으로 이슈가 닫혔습니다.','success')
     return response.data
   } catch (error) {
-    showErrorToastMsg(error);
+    Toast(error,'error')
+    //showErrorToastMsg(error);
     throw error
   }
 }
@@ -130,7 +134,8 @@ export const fetchIssueSummary = async (projectId) => {
     })
     return response;
   } catch (error) {
-    showErrorToastMsg(error);
+    Toast(error,'error')
+    //showErrorToastMsg(error);
     throw error;
   }
 }

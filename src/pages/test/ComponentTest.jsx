@@ -3,11 +3,7 @@ import FormTextarea from '@components/FormTextArea'
 import Header from '@components/Header'
 import SideBar from '@components/SideBar'
 import Modal from '@components/ConfirmModal'
-import {
-  showSuccessToastMsg,
-  showWarningToastMsg,
-  showErrorToastMsg
-} from '@utils/showToastMsg'
+import Toast from '@utils/Toast'
 
 import { MainBox } from '@styles/globalStyle'
 
@@ -44,17 +40,17 @@ const HeaderTest = () => {
           {
             value: 'Success',
             isHighlighted: false,
-            onClick: () => showSuccessToastMsg('Success!')
+            onClick: () => Toast('Success!','success')
           },
           {
             value: 'Warning',
             isHighlighted: true,
-            onClick: () => showWarningToastMsg('Warning!')
+            onClick: () => Toast('Warning!','warning')
           },
           {
             value: 'Error',
             isHighlighted: false,
-            onClick: () => showErrorToastMsg({ error: 'Error', message: 'An error occurred!' })
+            onClick: () => Toast('An error occurred!','error')
           }
         ]}
       />

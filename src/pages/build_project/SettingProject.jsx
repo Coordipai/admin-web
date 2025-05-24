@@ -12,8 +12,9 @@ import UserTable from '@components/Edit/UserTable'
 import { DatePicker } from '@components/Edit/DatePicker'
 import Header from '@components/Header'
 import dayjs from 'dayjs'
-import { useAccessTokenStore, useRefreshTokenStore, useUserStore } from '@store/useUserStore'
 import  api  from '@hooks/useAxios'
+import Toast from '@utils/Toast'
+import ConfirmModal from '@components/ConfirmModal'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -73,12 +74,7 @@ export const SettingProject = () => {
   const { projectId } = useParams()
   const navigate = useNavigate()
   const inputRef = useRef(null)
-	const isSearching = useRef(false)
-  const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
-	const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
-	const setUser = useUserStore(state => state.setUser)
-	const accessToken = useAccessTokenStore(state => state.accessToken)
-	const refreshToken = useRefreshTokenStore(state => state.refreshToken)
+
 
   // form 상태로 통합 관리
   const [form, setForm] = useState({
@@ -98,6 +94,7 @@ export const SettingProject = () => {
   const [searchOptions, setSearchOptions] = useState([])
   const [searchResults, setSearchResults] = useState([])
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   // 스프린트 옵션 (숫자값)
   const sprintOptions = [
@@ -133,7 +130,7 @@ export const SettingProject = () => {
           startDate: res.start_date || ''
         })
       } catch {
-        alert('프로젝트 정보를 불러오지 못했습니다.')
+        Toast('프로젝트 정보를 불러오지 못했습니다.','error')
       }
     }
     fetchProject()
@@ -204,7 +201,7 @@ export const SettingProject = () => {
       await api.put(`/project/${projectId}`, formData)
       navigate('/')
     } catch {
-      alert('프로젝트 수정 실패')
+      Toast('프로젝트 수정 실패','error')
     }
   }
   const handleDelete = async () => {
@@ -212,7 +209,7 @@ export const SettingProject = () => {
       await api.delete(`/project/${projectId}`)
       navigate('/')
     } catch {
-      alert('프로젝트 삭제 실패') 
+      Toast('프로젝트 삭제 실패','error')
     }
   }
   return (
@@ -301,7 +298,7 @@ export const SettingProject = () => {
               setSearch('')
               const selectedUser = searchResults.find(user => user.id.toString() === value)
               if (form.members.some(member => member.id.toString() === value)) {
-                alert('이미 추가된 팀원입니다')
+                Toast('이미 추가된 팀원입니다','error')
                 return
               }
               setForm(prev => ({
@@ -323,12 +320,19 @@ export const SettingProject = () => {
             <UserTable rows={form.members} setRows={rows => setForm(f => ({ ...f, members: rows }))} />
           </TableWrapper>
           <ButtonGroup>
-            <Button variant='contained' onClick={handleDelete}>삭제</Button>
+            <Button variant='contained' onClick={() => setShowDeleteModal(true)}>삭제</Button>
             <Button variant='outlined'  onClick={() => navigate(-1)} >취소</Button>
             <Button variant='contained'  onClick={handleUpdate} >완료</Button>
           </ButtonGroup>
         </Fieldset>
       </Section>
+      {showDeleteModal && (
+        <ConfirmModal
+          text='정말로 프로젝트를 삭제하시겠습니까?'
+          setShowModal={setShowDeleteModal}
+          handleConfirm={handleDelete}
+        />
+      )}
     </MainBox>
   )
 }
