@@ -12,7 +12,7 @@ import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox } from '@styles/globalStyle'
 import api from '@hooks/useAxios'
 import { useNavigate } from 'react-router-dom'
-import Toast from '@utils/Toast'
+import toastMsg from '@utils/toastMsg'
 
 
 const Fieldset = styled.div`
@@ -245,7 +245,7 @@ const BuildProject = () => {
 							setSearch('')
 							const selectedUser = searchResults.find(user => user.id.toString() === value)
 							if (form.members.some(member => member.id.toString() === value)) {
-								Toast('이미 추가된 팀원입니다', 'error')
+								toastMsg('이미 추가된 팀원입니다', 'error')
 								return
 							}
 							setForm(prev => ({
@@ -298,7 +298,7 @@ const BuildProject = () => {
 							
 							navigate('/')
 						} catch (error) {
-							Toast('프로젝트 생성 실패', 'error')
+							toastMsg('프로젝트 생성 실패', 'error')
 							console.log('프로젝트 생성 실패:', error)
 
 						}

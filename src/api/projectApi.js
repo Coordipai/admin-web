@@ -1,6 +1,6 @@
 import  api  from '@hooks/useAxios'
 import { useAccessTokenStore } from '@store/useUserStore'
-import Toast from '@utils/Toast'
+import toastMsg from '@utils/toastMsg'
 
 /**
  * 1. 특정 프로젝트 가져오기
@@ -18,8 +18,8 @@ export const fetchProjectDetail = async (projectId) => {
     const response = await api.get(`/project/${projectId}`);
     return response;
   } catch (error) {
-    Toast(error,'error')
-    //showErrorToastMsg(error);
+    toastMsg(error,'error')
+    //showErrortoastMsgMsg(error);
     throw error;
   }
 }

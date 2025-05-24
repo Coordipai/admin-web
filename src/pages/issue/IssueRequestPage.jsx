@@ -11,7 +11,7 @@ import { ButtonBase, MainBox } from '@styles/globalStyle'
 import IssueDetailModal from './IssueDetailModal'
 import { useProjectStore } from '@store/useProjectStore'
 import api from '@hooks/useAxios'
-import Toast from '@utils/Toast'
+import toastMsg from '@utils/toastMsg'
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
 
@@ -101,7 +101,7 @@ useEffect(() => {
       const matched = issues.find(issue => issue.issue_number === Number(requestId));
 
       if (!matched) {
-        Toast('해당 요청을 찾을 수 없습니다.', 'error')
+        toastMsg('해당 요청을 찾을 수 없습니다.', 'error')
         return;
       }
 
@@ -201,10 +201,10 @@ useEffect(() => {
         params: { type },
       })
       console.log(`${type} 완료:`, res)
-      Toast(`${isApproved ? '승인' : '반려'} 처리되었습니다.`, 'success')
+      toastMsg(`${isApproved ? '승인' : '반려'} 처리되었습니다.`, 'success')
     } catch (error) {
       console.error(`${type} 실패:`, error);
-      Toast(`${isApproved ? '승인' : '반려'} 처리에 실패했습니다.`, 'error')
+      toastMsg(`${isApproved ? '승인' : '반려'} 처리에 실패했습니다.`, 'error')
     }
   }
 
