@@ -115,7 +115,7 @@ export default function AccountSetupPage () {
         <FormInput
           placeholder='깃허브 계정'
           value={githubId}
-          readOnly
+          disabled
         />
       </FieldWrapper>
 
