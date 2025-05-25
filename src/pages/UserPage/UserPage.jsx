@@ -167,24 +167,21 @@ export default function UserPage () {
 
   
   const handleSave = async () => {
-    const payload = {
-      name: username,
-      github_id: githubId,
-      github_name: githubName,
-      discord_id: discordId,
-      career,
-      category: field || '',
-      repositories: selectedRepos
-    }
-
-    console.log('보낼 데이터:', payload)
-
     try {
-      const response = await api.put(`/auth/update`,payload)
+      const payload = {
+        name: username,
+        discord_id: discordId,
+        career,
+        category: field || '',
+      }
+      // 기본 정보 저장
+      await api.put(`/auth/update`, payload)
 
-      console.log('✅ 저장 성공:', response)
+    const repoPayload = selectedRepos.map((repo) => ({ repo_fullname: repo }))
+    await api.post(`/user-repo`, repoPayload)
+ 
       toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
-    } catch (error) {
+    }catch (error) {
       console.error('❌ 저장 실패:', error)
       toastMsg('저장 중 오류가 발생했습니다.', 'error')
     }
