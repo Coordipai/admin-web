@@ -153,9 +153,9 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
               <Th># 이슈번호</Th>
               <Th>레포이름</Th>
               <Th>제목</Th>
-              <Th>어사이니</Th>
+              <Th>담당자</Th>
               <Th>우선순위</Th>
-              <Th>이터레이션</Th>
+              <Th>개발주기</Th>
             </TrHeader>
           </Thead>
           <tbody>

@@ -7,6 +7,7 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import  api  from '@hooks/useAxios'
+import toastMsg from '@utils/toastMsg'
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -82,7 +83,7 @@ export default function AccountSetupPage () {
         setRepoList(repos)
       } catch (error) {
         console.error('레포지토리 불러오기 실패: ', error)
-        alert('레포지토리 목록을 불러오는 데 실패했습니다.')
+        toastMsg('레포지토리 목록을 불러오는 데 실패했습니다.', 'error')
       }
     }
 
@@ -101,7 +102,8 @@ export default function AccountSetupPage () {
 
     try{
       
-      const res = await api.post(`/user-repo`)
+      const repoPayload = selectedRepos.map(repo => ({ repo_fullname: repo }))
+      const res = await api.post(`/user-repo`, repoPayload)
 
       console.log('레포 등록 성공: ', res)
       const combinedData = {
@@ -112,7 +114,7 @@ export default function AccountSetupPage () {
       navigate(`/userform/${githubId}`, { state: combinedData })
     } catch (error) {
         console.error('레포 등록 실패: ', error.response || error.message)
-        alert('레포 등록 중 오류가 발생했습니다.')
+        toastMsg('레포 등록 중 오류가 발생했습니다.', 'error')
         }
     }
 

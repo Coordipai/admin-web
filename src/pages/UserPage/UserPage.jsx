@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
 import FormInput from '@components/FormInput'
-import FormDropdown from '@components/FormDropdown'
+import DropDown from '@components/Edit/DropDown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import { useNavigate } from 'react-router-dom'
 import  api  from '@hooks/useAxios'
+import { categoryOptions } from '@constant/options'
+import toastMsg from '@utils/toastMsg'
+import ConfirmModal from '@components/ConfirmModal'
 
 const PageContainer = styled.div`
   display: flex;
@@ -121,7 +124,7 @@ export default function UserPage () {
 
   useEffect(() => {
     if (!user || !accessToken) {
-      alert('로그인이 필요합니다.')
+      toastMsg('로그인이 필요합니다.', 'warning')
       navigate('/login')
       return
     }
@@ -131,11 +134,7 @@ export default function UserPage () {
   setUsername(user.name || '')
   setDiscordId(user.discord_id || '')
   setCareer(user.career || '')
-  setField(
-    ['프론트엔드', '백엔드', '기획', '디자인', '기타'].findIndex(
-      (f) => f === user.category
-    )
-  )
+  setField(user.category || '')
 
   const fetchRepos = async () => {
     try {
@@ -155,18 +154,12 @@ export default function UserPage () {
     }
   }
 
-    fetchRepos()
-  }, [user, accessToken])
-  
-  const fieldOptions = [
-    { title: '프론트엔드' },
-    { title: '백엔드' },
-    { title: '기획' },
-    { title: '디자인' },
-    { title: '기타' }
-  ]
+  fetchRepos()
+}, [user, accessToken, navigate])
 
-  const [field, setField] = useState(-1)
+
+  const [field, setField] = useState('')
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false)
 
   
 
@@ -178,7 +171,7 @@ export default function UserPage () {
       github_name: githubName,
       discord_id: discordId,
       career,
-      category: fieldOptions[field]?.title || '',
+      category: field || '',
       repositories: selectedRepos
     }
 
@@ -186,53 +179,39 @@ export default function UserPage () {
       const response = await api.put(`/auth/update`,payload)
 
       console.log('✅ 저장 성공:', response)
-      alert('정보가 성공적으로 저장되었습니다!')
+      toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
     } catch (error) {
       console.error('❌ 저장 실패:', error)
-      alert('저장 중 오류가 발생했습니다.')
+      toastMsg('저장 중 오류가 발생했습니다.', 'error')
     }
   }
 
  const handleWithdraw = async () => {
-  const confirmed = window.confirm('정말로 탈퇴하시겠습니까?')
-  if (!confirmed) return
-
-
-  try {
-    const response = await api.delete(`/auth/unregister`)
-
-
-    console.log('✅ 탈퇴 성공:', response.data)
-    alert('탈퇴가 완료되었습니다.')
- 
-    useUserStore.getState().clearUser()
-    useAccessTokenStore.getState().clearAccessToken()
-    navigate('/login')
-  } catch (error) {
-    console.error('❌ 탈퇴 실패:', error)
-    alert('탈퇴 중 오류가 발생했습니다.')
-  }
-}
+   try {
+     const response = await api.delete(`/auth/unregister`)
+     console.log('✅ 탈퇴 성공:', response.data)
+     toastMsg('탈퇴가 완료되었습니다.', 'success')
+     useUserStore.getState().clearUser()
+     useAccessTokenStore.getState().clearAccessToken()
+     navigate('/login')
+   } catch (error) {
+     console.error('❌ 탈퇴 실패:', error)
+     toastMsg('탈퇴 중 오류가 발생했습니다.', 'error')
+   }
+ }
 
 
 
 const handleEvaluationRequest = async () => {
-
-
-  const confirmed = window.confirm('정말로 평가를 요청하시겠습니까?')
-    if (!confirmed) return
-
-
-    try {
-      const response = await api.post(`/agent/assess_stat`,{})
-      console.log('✅ 평가 결과:', response)
-      //alert(`평가가 완료되었습니다!\n\n점수: ${result.evaluation_score}\n분야: ${result.field}`)
-      alert('평가 요청이 완료되었습니다!')
-    } catch (error) {
-      console.error('❌ 평가 요청 실패:', error)
-      alert('평가 요청 중 오류가 발생했습니다.')
-    }
+  try {
+    const response = await api.post(`/agent/assess_stat`,{})
+    console.log('✅ 평가 결과:', response)
+    toastMsg('평가 요청이 완료되었습니다!', 'success')
+  } catch (error) {
+    console.error('❌ 평가 요청 실패:', error)
+    toastMsg('평가 요청 중 오류가 발생했습니다.', 'error')
   }
+}
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
@@ -272,11 +251,11 @@ const handleEvaluationRequest = async () => {
 
           <FieldWrapper>
             <LabelText>분야 선택</LabelText>
-            <FormDropdown
+            <DropDown
               placeholder='분야 선택'
-              menus={fieldOptions}
-              selectedMenu={field}
-              handleChange={(v) => {
+              options={categoryOptions}
+              value={field}
+              onChange={(v) => {
                 setField(v)
             }}
             />
@@ -308,7 +287,7 @@ const handleEvaluationRequest = async () => {
           </FieldWrapper>
 
           <ButtonWrapper>
-            <TextButton $isHighlighted onClick={handleWithdraw}>
+            <TextButton $isHighlighted onClick={() => setShowWithdrawModal(true)}>
               탈퇴하기
             </TextButton>
             <Button $isHighlighted onClick={handleSave}>
@@ -321,6 +300,13 @@ const handleEvaluationRequest = async () => {
 
         </FormWrapper>
       </ContentArea>
+      {showWithdrawModal && (
+        <ConfirmModal
+          text='정말로 탈퇴하시겠습니까?'
+          setShowModal={setShowWithdrawModal}
+          handleConfirm={handleWithdraw}
+        />
+      )}
     </PageContainer>
   )
 }

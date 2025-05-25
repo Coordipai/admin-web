@@ -46,6 +46,9 @@ api.interceptors.response.use(
       url === '/auth/register' ||
       url === '/auth/refresh'
     ) {
+      // 로컬 스토리지 값 삭제
+      useAccessTokenStore.getState().setAccessToken('')
+      useRefreshTokenStore.getState().setRefreshToken('')
       window.location.href = '/login'
       return Promise.reject(error)
     }
@@ -68,10 +71,16 @@ api.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${refreshData.access_token}`
           return api(originalRequest)
         } else {
+          // 로컬 스토리지 값 삭제
+          useAccessTokenStore.getState().setAccessToken('')
+          useRefreshTokenStore.getState().setRefreshToken('')
           window.location.href = '/login'
           return Promise.reject(error)
         }
       } catch (refreshError) {
+        // 로컬 스토리지 값 삭제
+        useAccessTokenStore.getState().setAccessToken('')
+        useRefreshTokenStore.getState().setRefreshToken('')
         window.location.href = '/login'
         return Promise.reject(refreshError)
       }

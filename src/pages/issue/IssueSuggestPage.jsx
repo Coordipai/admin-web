@@ -18,7 +18,7 @@ import {
 } from '@styles/globalStyle'
 import { Plus, X } from '@untitled-ui/icons-react'
 import loadingSvg from "@assets/icons/loading-indicator.svg";
-import { showSuccessToastMsg, showWarningToastMsg, showErrorToastMsg } from '@utils/showToastMsg'
+import toastMsg from '@utils/toastMsg'
 
 
 import { useProjectStore } from '@store/useProjectStore'
@@ -225,7 +225,7 @@ const IssueSuggestPage = () => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSuggestedIssues = useCallback(async () => {
-    showSuccessToastMsg('프로젝트 정보를 바탕으로 자동으로 생성합니다...')
+    toastMsg('프로젝트 정보를 바탕으로 자동으로 생성합니다...','success')
     setIsFetching(true)
     const token = useAccessTokenStore.getState().accessToken
     if (!token) {
@@ -275,11 +275,12 @@ const IssueSuggestPage = () => {
           buffer = buffer.substring(boundary + 1)
           boundary = buffer.indexOf('}{')
         }
-        showSuccessToastMsg('자동 이슈 생성중...')
+        toastMsg('자동 이슈 생성중...','success')
       }        
-      showSuccessToastMsg('자동 이슈 생성 완료')
+      toastMsg('자동 이슈 생성 완료','success')
     } catch (error) {
-      showErrorToastMsg(error)
+      toastMsg(error,'error')
+      //showErrortoastMsgMsg(error)
       console.error('Failed to fetch issue list:', error)
       setIssueList([])
     } finally {
@@ -434,7 +435,7 @@ const IssueSuggestPage = () => {
   const handleStateToggle = () => {
     if (step === 'assign') {
       if (assignees.length === 0) {
-        showWarningToastMsg('담당자를 먼저 선택해주세요.')
+        toastMsg('담당자를 먼저 선택해주세요.','warning')
         return
       }
     }
@@ -472,11 +473,11 @@ const IssueSuggestPage = () => {
                 value: '다음',
                 onClick: async () => {
                   if (issueList.length <= 0 || isFetching === true) {
-                    showWarningToastMsg('이슈가 자동으로 생성될때까지 기다려주세요.')
+                    toastMsg('이슈가 자동으로 생성될때까지 기다려주세요.','warning')
                     return
                   }
                   if (!isAllCompleted) { 
-                    showWarningToastMsg('모든 이슈를 확정해주세요.')
+                    toastMsg('모든 이슈를 확정해주세요.','warning')
                     return
                   }
 
@@ -513,7 +514,7 @@ const IssueSuggestPage = () => {
                 value: '완료',
                 onClick: async () => {
                   if (!isAllCompleted) {
-                    showWarningToastMsg('모든 이슈를 확정해주세요.');
+                    toastMsg('모든 이슈를 확정해주세요.','warning')
                     return;
                   }
                   try {
@@ -534,7 +535,7 @@ const IssueSuggestPage = () => {
                         await createIssue(issueData)
                     }
 
-                    showSuccessToastMsg('모든 이슈가 성공적으로 생성되었습니다!');
+                    toastMsg('모든 이슈가 성공적으로 생성되었습니다!','success')
                     navigate(`/project/${projectId}`);
                   } catch (err) {
                     console.error('이슈 생성 중 오류 발생:', err);
