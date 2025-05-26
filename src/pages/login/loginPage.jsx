@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import coordipaiLogo from '@assets/coordipaiLogo.png'
+import coordipaiLogo from '@assets/CoordiPAILogo.png'
 import githubLogo from '@assets/gitHubLogo.png'
 import CheckLineGraphic from './CheckLineGraphic'
 import LoginButton from './LoginButton'
