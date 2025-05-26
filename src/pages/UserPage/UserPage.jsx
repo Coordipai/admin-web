@@ -105,7 +105,6 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 export default function UserPage () {
   const navigate = useNavigate()
   //const { githubId } = useParams() // 여기서 param으로 받아오기
-  const [githubId, setGithubId] = useState('') // 초기값으로 사용
   const [githubName, setGithubName] = useState('')
   const [repoList, setRepoList] = useState([])
   const [username, setUsername] = useState('')
