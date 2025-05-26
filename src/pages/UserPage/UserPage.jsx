@@ -105,6 +105,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 export default function UserPage () {
   const navigate = useNavigate()
   //const { githubId } = useParams() // 여기서 param으로 받아오기
+  const [githubId, setGithubId] = useState('') // 초기값으로 사용
   const [githubName, setGithubName] = useState('')
   const [repoList, setRepoList] = useState([])
   const [username, setUsername] = useState('')
@@ -178,6 +179,17 @@ export default function UserPage () {
 
     const repoPayload = selectedRepos.map((repo) => ({ repo_fullname: repo }))
     await api.post(`/user-repo`, repoPayload)
+
+    // 저장 후 상태 갱신
+    const updatedUser = {
+      ...user,
+      name: username,
+      discord_id: discordId,
+      career,
+      category: field,
+    }
+
+    useUserStore.getState().setUser(updatedUser)
  
       toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
     }catch (error) {
