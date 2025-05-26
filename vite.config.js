@@ -23,5 +23,12 @@ export default defineConfig({
       '@mocks': path.resolve(__dirname, 'src/mocks'),
       '@constant': path.resolve(__dirname, 'src/constant'),
     }
-  }
+  },
+   server: {
+    host: true,            // 외부 접속 허용
+    port: 5173,            // 기본 포트
+    watch: {
+      usePolling: true,    // Docker 환경에서 핫리로드 지원
+    },
+  },
 })
