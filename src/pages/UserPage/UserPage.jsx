@@ -238,7 +238,7 @@ const handleEvaluationRequest = async () => {
             <FormInput
               placeholder='깃허브 계정'
               value={githubName}
-              readOnly
+              disabled
             />
           </FieldWrapper>
 
