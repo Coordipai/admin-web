@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>서버 오류</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f9fafb;
+      --text-color: #1f2937;
+      --muted-color: #6b7280;
+      --brand-500: #B692F6;
+      --brand-600: #A27CD3;
+      --card-bg: #ffffff;
+      --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #0f172a;
+        --text-color: #f1f5f9;
+        --muted-color: #94a3b8;
+        --card-bg: #1e293b;
+        --shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', system-ui, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      max-width: 480px;
+      width: 100%;
+      padding: 3rem;
+      text-align: center;
+    }
+
+    .card h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .card p {
+      color: var(--muted-color);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: var(--brand-500);
+      color: white;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--brand-600);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>서버 오류</h1>
+    <p>죄송합니다. 서버에서 문제가 발생했습니다.<br>잠시 후 다시 시도해주세요.</p>
+    <a class="btn" href="/">홈으로 돌아가기</a>
+  </div>
+</body>
+</html>

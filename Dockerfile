@@ -11,6 +11,9 @@ RUN npm ci --frozen-lockfile
 COPY . .
 RUN npm run build
 
+# 50x.html을 빌드 결과물에 복사
+COPY 50x.html ./dist/50x.html
+
 # 프로덕션 스테이지
 FROM nginx:stable-alpine
 
