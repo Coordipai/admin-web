@@ -26,6 +26,7 @@ import IssueSuggestPage from '@pages/issue/IssueSuggestPage'
 import useLoadingStore from '@store/useLoadingStore'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 import { Loading } from '@components/Loading'
+import { useProjectStore } from './store/useProjectStore'
 
 /*
   route 설정 시, PrivateRoute를 사용하여,
@@ -80,17 +81,11 @@ function App () {
 
 const PrivateRoute = ({ element, hasSideBar = true }) => {
   const navigate = useNavigate()
-  // const location = useLocation();
-  // const { authData, isAuthorized, logout, fetchAuthData } = useAuth();
-  // const { navMenus, navSubMenus, footerNavMenus } = useNav();
 
-  // useEffect(() => {
-  //   fetchAuthData(location.pathname);
-  // }, [fetchAuthData, location.pathname]);
-
-  // if (!isAuthorized) {
-  //   return <Navigate to='/login' />;
-  // }
+  const userOnClick = () => {
+    navigate('/user')
+    useProjectStore.getState().clearProject()
+  }
 
   const logout = () => {
     useUserStore.getState().clearUser()
@@ -108,7 +103,7 @@ const PrivateRoute = ({ element, hasSideBar = true }) => {
             brandIcon={brandIcon}
             brandTitle='CoordiPai'
             titleOnClick={() => navigate('/')}
-            userOnClick={() => navigate('/user')}
+            userOnClick={userOnClick}
             logout={logout}
           />
         )
