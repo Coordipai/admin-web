@@ -165,22 +165,33 @@ export default function UserPage () {
 
   
   const handleSave = async () => {
-    const payload = {
+    try {
+      const payload = {
+        name: username,
+        discord_id: discordId,
+        career,
+        category: field || '',
+      }
+      // 기본 정보 저장
+      await api.put(`/auth/update`, payload)
+
+    const repoPayload = selectedRepos.map((repo) => ({ repo_fullname: repo }))
+    await api.post(`/user-repo`, repoPayload)
+
+    // 저장 후 상태 갱신
+    const updatedUser = {
+      ...user,
       name: username,
-      github_id: githubId,
-      github_name: githubName,
       discord_id: discordId,
       career,
-      category: field || '',
-      repositories: selectedRepos
+      category: field,
     }
 
-    try {
-      const response = await api.put(`/auth/update`,payload)
 
-      console.log('✅ 저장 성공:', response)
-      toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
-    } catch (error) {
+    useUserStore.getState().setUser(updatedUser)
+ 
+    toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
+    }catch (error) {
       console.error('❌ 저장 실패:', error)
       toastMsg('저장 중 오류가 발생했습니다.', 'error')
     }
@@ -188,8 +199,7 @@ export default function UserPage () {
 
  const handleWithdraw = async () => {
    try {
-     const response = await api.delete(`/auth/unregister`)
-     console.log('✅ 탈퇴 성공:', response.data)
+     await api.delete(`/auth/unregister`)
      toastMsg('탈퇴가 완료되었습니다.', 'success')
      useUserStore.getState().clearUser()
      useAccessTokenStore.getState().clearAccessToken()
@@ -204,8 +214,7 @@ export default function UserPage () {
 
 const handleEvaluationRequest = async () => {
   try {
-    const response = await api.post(`/agent/assess_stat`,{})
-    console.log('✅ 평가 결과:', response)
+    await api.post(`/agent/assess_stat`,{})
     toastMsg('평가 요청이 완료되었습니다!', 'success')
   } catch (error) {
     console.error('❌ 평가 요청 실패:', error)
