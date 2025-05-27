@@ -16,7 +16,7 @@ import {
 import FormTextarea from '@components/FormTextarea'
 import { Plus, X } from '@untitled-ui/icons-react'
 
-import { createIssue, updateIssue, deleteIssue, fetchIssueDetail } from '@api/issueAPI'
+import { createIssue, updateIssue, deleteIssue, fetchIssueDetail } from '@api/issueApi'
 import useLoadingStore from '@store/useLoadingStore'
 import { useProjectStore } from '@store/useProjectStore'
 
