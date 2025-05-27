@@ -1,25 +1,32 @@
-# 1단계: 빌드 환경
+# 1. 빌드 단계 (Node.js를 사용하여 React 앱 빌드)
 FROM node:23.11-alpine AS build
 
 WORKDIR /app
 
-# package.json, package-lock.json 복사 후 의존성 설치
 COPY package*.json ./
 RUN npm ci
 
-# 소스 전체 복사 후 빌드
+#COPY .env ./.env
+
+ENV VITE_BASE_URL="https://coordipai-web-server.knuassignx.site"
+
 COPY . .
 RUN npm run build
 
-# 2단계: Nginx로 정적 파일 서빙
-FROM nginx:alpine
+# 2. 프로덕션 단계 (Nginx를 사용하여 빌드된 앱 서빙)
+FROM nginx:stable-alpine
 
-# 빌드된 정적 파일을 Nginx의 기본 경로로 복사
+# Nginx 기본 설정 제거 (선택 사항이지만 깔끔하게 시작하기 위해)
+RUN rm /etc/nginx/conf.d/default.conf
+
+# 사용자 정의 Nginx 설정 파일 복사
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+# 빌드 단계에서 생성된 React 앱을 Nginx의 웹 루트로 복사
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Nginx 기본 설정 덮어쓰기(선택, 없으면 생략)
-# COPY nginx.conf /etc/nginx/nginx.conf
-
+# Nginx 포트 노출
 EXPOSE 80
 
+# Nginx 시작
 CMD ["nginx", "-g", "daemon off;"]
