@@ -101,7 +101,6 @@ const TextButton = styled(ButtonBase)`
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-
 export default function UserPage () {
   const navigate = useNavigate()
   //const { githubId } = useParams() // 여기서 param으로 받아오기
@@ -114,12 +113,11 @@ export default function UserPage () {
   const [selectedRepos, setSelectedRepos] = useState([])
   const accessToken = useAccessTokenStore((state) => state.accessToken)
 
+
  const user = useUserStore((state) => state.user)
 
  useEffect(() => {
   if (!user || !accessToken) return
-
-  console.log("accessToken before fetch:", accessToken) // 🔍 이게 undefined면 문제
 
   // fetchRepos 실행
   }, [user, accessToken])
@@ -189,9 +187,10 @@ export default function UserPage () {
       category: field,
     }
 
+
     useUserStore.getState().setUser(updatedUser)
  
-      toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
+    toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
     }catch (error) {
       console.error('❌ 저장 실패:', error)
       toastMsg('저장 중 오류가 발생했습니다.', 'error')
@@ -216,8 +215,7 @@ export default function UserPage () {
 
 const handleEvaluationRequest = async () => {
   try {
-    const response = await api.post(`/agent/assess_stat`,{})
-    console.log('✅ 평가 결과:', response)
+    await api.post(`/agent/assess_stat`,{})
     toastMsg('평가 요청이 완료되었습니다!', 'success')
   } catch (error) {
     console.error('❌ 평가 요청 실패:', error)
@@ -250,7 +248,7 @@ const handleEvaluationRequest = async () => {
             <FormInput
               placeholder='깃허브 계정'
               value={githubName}
-              readOnly
+              disabled
             />
           </FieldWrapper>
 
