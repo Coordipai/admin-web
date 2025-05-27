@@ -101,7 +101,6 @@ const TextButton = styled(ButtonBase)`
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-
 export default function UserPage () {
   const navigate = useNavigate()
   //const { githubId } = useParams() // 여기서 param으로 받아오기
@@ -114,12 +113,11 @@ export default function UserPage () {
   const [selectedRepos, setSelectedRepos] = useState([])
   const accessToken = useAccessTokenStore((state) => state.accessToken)
 
+
  const user = useUserStore((state) => state.user)
 
  useEffect(() => {
   if (!user || !accessToken) return
-
-  console.log("accessToken before fetch:", accessToken) // 🔍 이게 undefined면 문제
 
   // fetchRepos 실행
   }, [user, accessToken])
@@ -176,8 +174,6 @@ export default function UserPage () {
       category: field || '',
       repositories: selectedRepos
     }
-
-    console.log('보낼 데이터:', payload)
 
     try {
       const response = await api.put(`/auth/update`,payload)

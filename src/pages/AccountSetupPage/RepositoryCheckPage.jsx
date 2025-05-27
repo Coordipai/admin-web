@@ -103,9 +103,8 @@ export default function AccountSetupPage () {
     try{
       
       const repoPayload = selectedRepos.map(repo => ({ repo_fullname: repo }))
-      const res = await api.post(`/user-repo`, repoPayload)
+      await api.post(`/user-repo`, repoPayload)
 
-      console.log('레포 등록 성공: ', res)
       const combinedData = {
         name: '', // 필요 시 localStorage 등에서 복구
         githubId, // ← param으로 받은 githubId 사용
