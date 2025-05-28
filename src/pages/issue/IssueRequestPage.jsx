@@ -4,7 +4,7 @@ import arrowright from '@assets/icons/arrow-right.svg'
 import styled from 'styled-components'
 import FormInput from '@components/FormInput'
 import FormTextarea from '@components/FormTextarea'
-import FormDropdown from '@components/FormDropdown'
+import DropDown from '@components/Edit/DropDown'
 import Header from '@components/Header'
 import { EditContentHeader } from '@components/Edit/EditContentHeader'
 import { ButtonBase, MainBox } from '@styles/globalStyle'
@@ -12,6 +12,7 @@ import IssueDetailModal from './IssueDetailModal'
 import { useProjectStore } from '@store/useProjectStore'
 import api from '@hooks/useAxios'
 import toastMsg from '@utils/toastMsg'
+import { set } from 'date-fns'
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
 
@@ -258,11 +259,11 @@ useEffect(() => {
               <img src={arrowright} alt='arrow' width='12' height='12' />
             </div>
             <div style={{ width: '244px' }}>
-              <FormDropdown
-                placeholder="스프린트를 선택하세요"
-                menus={iterationOptions}
-                selectedMenu={selectedSprint}
-                handleChange={setSelectedSprint}
+              <DropDown
+                label="스프린트를 선택하세요"
+                options={iterationOptions}
+                value={selectedSprint}
+                onChange={setSelectedSprint}
               />
             </div>
           </RowGroup>
@@ -279,13 +280,12 @@ useEffect(() => {
               <img src={arrowright} alt='arrow' width='12' height='12' />
             </div>
             <div style={{ width: '244px' }}>
-              <FormDropdown
-                placeholder="변경할 사용자를 선택하세요"
-                menus={assigneeOptions}
-                selectedMenu={selectedAssignee}
-                handleChange={setSelectedAssignee}
+              <DropDown
+                label = "변경할 사용자를 선택하세요"
+                options = {assigneeOptions}
+                value = {selectedAssignee}
+                onChange = {setSelectedAssignee}
               />
-
             </div>
           </RowGroup>
         </LabeledRow>
