@@ -458,17 +458,6 @@ const IssueDetailPage = () => {
                 iteration: parseInt(iteration.title.replace(/\D/g, '')),
                 labels: selectedLabels,
               }
-
-              console.log({
-                project_id: parseInt(projectId),
-                title: issueTitle,
-                body: issueContent,
-                assignees: assignees,
-                priority: priority,
-                iteration: parseInt(iteration.title.replace(/\D/g, '')),
-                labels: selectedLabels,
-              })
-
               createIssue(issueData)
               navigate(`/project/${projectId}`)
             } else {
@@ -483,7 +472,6 @@ const IssueDetailPage = () => {
                   iteration: parseInt(iteration.title.replace(/\D/g, '')),
                   labels: selectedLabels,
                 }
-                console.log(issueData)
                 updateIssue(issueData)
                 navigate(`/project/${projectId}`)
               } else {

@@ -854,7 +854,7 @@ const IssueSuggestPage = () => {
                 <IssueBox
                   key={`${issue.name}-${idx}`}
                   $checked={selectedIssue === issue}
-                  onClick={() => {handleIssueSelect(issue); console.log(issue)}}  // TODO: CONSOLE LOG 제거
+                  onClick={() => {handleIssueSelect(issue)}}
                 >
                   <Typography value={issue.title} variant='textSM' weight='medium' color='gray900' />
                   {issue.isCompleted && <CheckIcon>✓</CheckIcon>}

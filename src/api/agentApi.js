@@ -24,8 +24,6 @@ export const getGeneratedIssues = async (projectId, onChunk) => {
       },
     });
 
-    console.log('response', response);
-
     if (!response.ok || !response.body) {
       throw new Error(`Streaming response failed: ${response.status}`);
     }
@@ -38,7 +36,6 @@ export const getGeneratedIssues = async (projectId, onChunk) => {
       const { done, value } = await reader.read();
       if (done) break;
 
-      console.log('value', value);
       const chunk = decoder.decode(value, { stream: true });
       result += chunk;
     
@@ -131,14 +128,11 @@ export const postAssignIssues = async (projectId, data) => {
             body: issue.body,
         }))
 
-        console.log('issues', issues)
-
         const requestBody = {
             issues: {
                 issues,
             }
         }
-        console.log('requestBody', requestBody)
 
         const response = await api.post(`/agent/recommend_assignees/${projectId}`,
             requestBody,
@@ -148,7 +142,6 @@ export const postAssignIssues = async (projectId, data) => {
                 }
             }
         )
-        console.log('response', response)
         toastMsg('이슈 할당 완료','success')
         return response;
     } catch (error) {

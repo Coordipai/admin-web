@@ -182,7 +182,6 @@ export const Project = () => {
       }
     }
     fetchData()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId])
 
 
