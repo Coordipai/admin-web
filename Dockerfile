@@ -1,24 +1,39 @@
-# 1단계: 빌드 환경
-FROM node:23.11-alpine AS build
+# 빌드 스테이지
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# package.json, package-lock.json 복사 후 의존성 설치
+# 패키지 파일 복사 및 설치
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --frozen-lockfile
 
-# 소스 전체 복사 후 빌드
+# 소스 코드 복사 및 빌드
 COPY . .
 RUN npm run build
 
-# 2단계: Nginx로 정적 파일 서빙
-FROM nginx:alpine
+# 50x.html을 빌드 결과물에 복사
+COPY 50x.html ./dist/50x.html
 
-# 빌드된 정적 파일을 Nginx의 기본 경로로 복사
-COPY --from=build /app/dist /usr/share/nginx/html
+# 프로덕션 스테이지
+FROM nginx:stable-alpine
 
-# Nginx 기본 설정 덮어쓰기(선택, 없으면 생략)
-# COPY nginx.conf /etc/nginx/nginx.conf
+# nginx 설정 파일 복사
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+# 빌드된 파일 복사
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# 보안을 위한 추가 설정
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid
+
+# nginx 사용자로 실행
+USER nginx
 
 EXPOSE 80
 
