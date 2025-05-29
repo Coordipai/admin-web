@@ -35,7 +35,7 @@ import { toast, Bounce } from 'react-toastify'
 export default function toastMsg(message, variant = 'success') {
   const options = {
     position: 'top-right',
-    autoClose: 1000,
+    autoClose: 1500,
     hideProgressBar: true,
     closeOnClick: true,
     pauseOnHover: true,
