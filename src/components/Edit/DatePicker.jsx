@@ -199,7 +199,6 @@ const DatePicker = ({ paramYear, paramMonth, paramDate, setPickedDate, label, re
   }, [setOriginalDate])
 
   useEffect(() => {
-    console.log(paramYear, paramMonth, paramDate)
     if (paramYear && paramMonth && paramDate) {
       setYear(paramYear)
       setMonth(paramMonth)

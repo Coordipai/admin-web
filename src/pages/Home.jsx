@@ -107,7 +107,6 @@ export const Home = () => {
     const login = async () => {
       try {
         const loginRes = await api.post('/auth/login')
-        console.log('login response:', loginRes)
         
         if (!loginRes) {
           throw new Error('Login failed')
@@ -117,7 +116,7 @@ export const Home = () => {
         setAccessToken(loginRes.access_token)
         setRefreshToken(loginRes.refresh_token)
       } catch (error) {
-        console.error('Error:', error)
+        
         toastMsg('로그인 실패', 'error')
       }
     }
@@ -135,11 +134,11 @@ export const Home = () => {
 
       try {
         const data = await api.get('/project')
-        console.log(data)
+        
         setProjects(data || [])
         
       } catch (error) {
-        console.error('Error fetching projects:', error)
+        
         toastMsg('프로젝트 조회 실패', 'error')
       }
     }

@@ -201,7 +201,7 @@ useEffect(() => {
       const res = await api.delete(`/issue-reschedule/${requestId}`, {
         params: { type },
       })
-      console.log(`${type} 완료:`, res)
+      
       toastMsg(`${isApproved ? '승인' : '반려'} 처리되었습니다.`, 'success')
     } catch (error) {
       console.error(`${type} 실패:`, error);
