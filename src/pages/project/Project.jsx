@@ -8,6 +8,8 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useProjectStore } from '@store/useProjectStore'
 import Button from '@components/Common/Button'
 import  api  from '@hooks/useAxios'
+import toastMsg from '@utils/toastMsg'
+
 const HeaderSection = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -138,7 +140,7 @@ export const Project = () => {
   })
 
   const { project } = useProjectStore()
-  console.log('project', project)
+  
 
 
   // URL 해시에 따라 탭 상태 설정
@@ -170,15 +172,19 @@ export const Project = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const issueResponse = await api.get(`/issue`,{
+        const issueResponse = await api.get(`/issue`, {
           params: { project_id: projectId }
         })
         setIssueRows(issueResponse.filter(issue => issue.closed === false))
+      } catch (error) {
+        toastMsg('이슈 목록을 불러오는 데 실패했습니다.', 'error')
+      }
 
+      try {
         const requestResponse = await api.get(`/issue-reschedule/${projectId}`)
         setRequestRows(requestResponse)
       } catch (error) {
-        console.error('Error fetching issues:', error)
+        toastMsg('변경 요청 목록을 불러오는 데 실패했습니다.', 'error')
       }
     }
     fetchData()

@@ -91,7 +91,7 @@ const BuildProject = () => {
 					label: user.name
 				})))
 			} catch (error) {
-				console.error('검색 중 오류 발생:', error)
+				
 				setSearchOptions([])
 				setSearchResults([])
 			}
@@ -219,7 +219,7 @@ const BuildProject = () => {
 					<FileTable
 						files={form.files}
 						setFiles={newFiles => {
-							console.log('FileTable에서 form에 저장되는 파일:', newFiles)
+							
 							setForm(f => ({
 								...f,
 								files: Array.from(newFiles, file => file instanceof File ? file : file.file)

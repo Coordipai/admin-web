@@ -111,7 +111,7 @@ export const SettingProject = () => {
       try {
         const res = await api.get(`/project/${projectId}`)
         
-        console.log(res)
+        
         setForm({
           projectName: res.name || '',
           github: res.repo_fullname || '',
@@ -156,7 +156,7 @@ export const SettingProject = () => {
           label: user.name
         })))
       } catch (error) {
-        console.error('검색 중 오류 발생:', error)
+        
         setSearchOptions([])
         setSearchResults([])
       }
@@ -176,7 +176,7 @@ export const SettingProject = () => {
       role: row.field || 'member'
     }))
 
-    console.log(form.members)
+    
 
     const projectReq = {
       name: form.projectName,
@@ -190,8 +190,7 @@ export const SettingProject = () => {
     }
 
     try {
-      console.log(form.files)
-      console.log(projectReq)
+
 
         const formData = new FormData()
         formData.append('project_req', JSON.stringify(projectReq))
