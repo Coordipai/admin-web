@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 import  api  from '@hooks/useAxios'
+import toastMsg from '@utils/toastMsg'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -117,7 +118,7 @@ export const Home = () => {
         setRefreshToken(loginRes.refresh_token)
       } catch (error) {
         console.error('Error:', error)
-        navigate('/login')
+        toastMsg('로그인 실패', 'error')
       }
     }
     if(!refreshToken){
@@ -136,9 +137,10 @@ export const Home = () => {
         const data = await api.get('/project')
         console.log(data)
         setProjects(data || [])
+        
       } catch (error) {
         console.error('Error fetching projects:', error)
-        navigate('/login')
+        toastMsg('프로젝트 조회 실패', 'error')
       }
     }
     fetchProjects()
