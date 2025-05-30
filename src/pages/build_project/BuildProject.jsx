@@ -164,10 +164,16 @@ const BuildProject = () => {
 					<InputField
 						label='Github Repo 주소 입력'
 						placeholder='입력하세요'
-						value={form.github}
+						value={form.githubInput ?? form.github}
 						onChange={e => {
-							setForm(f => ({ ...f, github: e.target.value }))
-							if (error.github && e.target.value) setError(prev => ({ ...prev, github: false }))
+							const input = e.target.value
+							// 입력값은 그대로 저장
+							setForm(f => ({ ...f, githubInput: input }))
+							// 내부적으로만 "Coordipai/admin-web" 형태로 저장
+							const match = input.match(/github\.com\/([^/]+\/[^/.]+)(?:\.git)?$/)
+							const repo = match ? match[1] : input
+							setForm(f => ({ ...f, github: repo }))
+							if (error.github && input) setError(prev => ({ ...prev, github: false }))
 						}}
 						require
 						error={error.github}
@@ -298,9 +304,7 @@ const BuildProject = () => {
 							
 							navigate('/')
 						} catch (error) {
-							toastMsg('프로젝트 생성 실패', 'error')
-							
-
+							toastMsg(`${error.response?.data?.title}`, 'error')
 						}
 					}} >완료</Button>
 				</ButtonGroup>
