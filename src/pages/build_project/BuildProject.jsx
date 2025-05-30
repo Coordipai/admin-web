@@ -304,9 +304,7 @@ const BuildProject = () => {
 							
 							navigate('/')
 						} catch (error) {
-							toastMsg('프로젝트 생성 실패', 'error')
-							console.log('프로젝트 생성 실패:', error)
-
+							toastMsg(`${error.response?.data?.title}`, 'error')
 						}
 					}} >완료</Button>
 				</ButtonGroup>
