@@ -46,6 +46,7 @@ const Th = styled.th`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
 `
 
 const Td = styled.td`
@@ -104,7 +105,7 @@ const PaginationWrapper = styled.div`
   height: 66px;
 `
 
-const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) => {
+const RequestTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) => {
   const wrapperRef = useRef(null)
   const [pageSize, setPageSize] = useState(99)
   const HEADER_HEIGHT = 53 // px
@@ -150,9 +151,9 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
           <Thead>
             <TrHeader>
               <Th style={{ width: '12%' }}># 이슈번호</Th>
-              <Th style={{ width: '48%' }}>제목</Th>
-              <Th style={{ width: '17%' }}>담당자</Th>
-              <Th style={{ width: '10%' }}>우선순위</Th>
+              <Th style={{ width: '41%' }}>변경 사유</Th>
+              <Th style={{ width: '17%' }}>현재 담당자</Th>
+              <Th style={{ width: '17%' }}>추천 담당자</Th>
               <Th style={{ width: '13%' }}>개발주기</Th>
             </TrHeader>
           </Thead>
@@ -169,14 +170,18 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
                   pagedRows.map((row, idx) => (
                     <Tr key={row.issue_number + row.title + idx} onClick={() => handleNext(row.issue_number)}>
                       <Td># {row.issue_number}</Td>
-                      <Td>{row.title}</Td>
+                      <Td>{row.reason}</Td>
                       <Td>
-                        {Array.isArray(row.assignees) && row.assignees.length > 0
-                          ? row.assignees.map(a => a.github_name).join(', ')
+                        {Array.isArray(row.old_assignees) && row.old_assignees.length > 0
+                          ? row.old_assignees.map(a => a).join(', ')
                           : ''}
                       </Td>
-                      <Td><Badge priority={row.priority} /></Td>
-                      <Td>{row.iteration === -1 ? 'Unassigned' : `Iteration ${row.iteration}`}</Td>
+					  <Td>
+                        {Array.isArray(row.new_assignees) && row.new_assignees.length > 0
+                          ? row.new_assignees.map(a => a).join(', ')
+                          : ''}
+                      </Td>
+                      <Td>{row.old_iteration === -1 ? 'Unassigned' : `Iteration ${row.old_iteration}`}</Td>
                     </Tr>
                   ))
                 )}
@@ -206,4 +211,4 @@ const IssueTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) =>
   )
 }
 
-export default IssueTable
+export default RequestTable
