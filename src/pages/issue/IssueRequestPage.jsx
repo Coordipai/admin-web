@@ -260,7 +260,6 @@ useEffect(() => {
             </div>
             <div style={{ width: '244px' }}>
               <DropDown
-                label="스프린트를 선택하세요"
                 options={iterationOptions}
                 value={selectedSprint}
                 onChange={setSelectedSprint}
@@ -281,7 +280,6 @@ useEffect(() => {
             </div>
             <div style={{ width: '244px' }}>
               <DropDown
-                label = "변경할 사용자를 선택하세요"
                 options = {assigneeOptions}
                 value = {selectedAssignee}
                 onChange = {setSelectedAssignee}
