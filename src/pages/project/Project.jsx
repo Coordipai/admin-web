@@ -2,10 +2,10 @@ import styled from 'styled-components'
 import Typography from '@components/Edit/Typography'
 import React, { useState, useEffect } from 'react'
 import IssueTable from '@components/Edit/IssueTable'
+import RequestTable from '@components/Edit/RequestTable'
 import SearchInputField from '@components/Edit/SearchInputField'
 import { MainBox, ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
-import { useProjectStore } from '@store/useProjectStore'
 import Button from '@components/Common/Button'
 import  api  from '@hooks/useAxios'
 import toastMsg from '@utils/toastMsg'
@@ -139,10 +139,6 @@ export const Project = () => {
     return hash === 'request' ? 'request' : 'issue'
   })
 
-  const { project } = useProjectStore()
-  
-
-
   // URL 해시에 따라 탭 상태 설정
   useEffect(() => {
     const hash = location.hash.replace('#', '')
@@ -176,14 +172,14 @@ export const Project = () => {
           params: { project_id: projectId }
         })
         setIssueRows(issueResponse.filter(issue => issue.closed === false))
-      } catch (error) {
+      } catch {
         toastMsg('이슈 목록을 불러오는 데 실패했습니다.', 'error')
       }
 
       try {
         const requestResponse = await api.get(`/issue-reschedule/${projectId}`)
         setRequestRows(requestResponse)
-      } catch (error) {
+      } catch {
         toastMsg('변경 요청 목록을 불러오는 데 실패했습니다.', 'error')
       }
     }
@@ -275,7 +271,7 @@ export const Project = () => {
                 />
               </div>
             </div>
-            <IssueTable
+            <RequestTable
               rows={filteredRequestRows.length > 0 ? filteredRequestRows : []}
               page={page}
               onPageChange={setPage}
