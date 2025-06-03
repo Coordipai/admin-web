@@ -9,6 +9,7 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import Button from '@components/Common/Button'
 import  api  from '@hooks/useAxios'
 import toastMsg from '@utils/toastMsg'
+import useLoadingStore from '@store/useLoadingStore'
 
 const HeaderSection = styled.div`
 	display: flex;
@@ -128,8 +129,6 @@ const EmptyIssueWrapper = styled.div`
 	gap: ${({ theme }) => theme.gap.md};
 `
 
-
-
 export const Project = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -168,19 +167,25 @@ export const Project = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        useLoadingStore.getState().setLoading(true)
         const issueResponse = await api.get(`/issue`, {
           params: { project_id: projectId }
         })
         setIssueRows(issueResponse.filter(issue => issue.closed === false))
       } catch {
         toastMsg('이슈 목록을 불러오는 데 실패했습니다.', 'error')
+      } finally {
+        useLoadingStore.getState().setLoading(false)
       }
 
       try {
+        useLoadingStore.getState().setLoading(true)
         const requestResponse = await api.get(`/issue-reschedule/${projectId}`)
         setRequestRows(requestResponse)
       } catch {
         toastMsg('변경 요청 목록을 불러오는 데 실패했습니다.', 'error')
+      } finally {
+        useLoadingStore.getState().setLoading(false)
       }
     }
     fetchData()

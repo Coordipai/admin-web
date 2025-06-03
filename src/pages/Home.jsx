@@ -10,8 +10,9 @@ import { extractDate } from '@utils/dateUtils'
 import { useNavigate } from 'react-router-dom'
 import Header from '@components/Header'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
-import  api  from '@hooks/useAxios'
+import api from '@hooks/useAxios'
 import toastMsg from '@utils/toastMsg'
+import useLoadingStore from '@store/useLoadingStore'
 
 const Fieldset = styled.div`
 	flex: 1;
@@ -115,8 +116,7 @@ export const Home = () => {
         setUser(loginRes.user)
         setAccessToken(loginRes.access_token)
         setRefreshToken(loginRes.refresh_token)
-      } catch (error) {
-        
+      } catch {
         toastMsg('로그인 실패', 'error')
       }
     }
@@ -133,13 +133,13 @@ export const Home = () => {
       if (!refreshToken) return
 
       try {
+        useLoadingStore.getState().setLoading(true)
         const data = await api.get('/project')
-        
         setProjects(data || [])
-        
-      } catch (error) {
-        
+      } catch {
         toastMsg('프로젝트 조회 실패', 'error')
+      } finally {
+        useLoadingStore.getState().setLoading(false)
       }
     }
     fetchProjects()
