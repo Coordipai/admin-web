@@ -96,13 +96,13 @@ export const Home = () => {
         setUser(loginRes.user)
         setAccessToken(loginRes.access_token)
         setRefreshToken(loginRes.refresh_token)
+        setIsLoggedIn(true) // ✅ 로그인 성공 후에만 true로 변경
       } catch {
         toastMsg('로그인 실패', 'error')
       }
     }
     if (!refreshToken) {
       login()
-      setIsLoggedIn(true)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 

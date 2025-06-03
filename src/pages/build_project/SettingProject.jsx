@@ -189,9 +189,11 @@ export const SettingProject = () => {
         formData.append('files', file)
       })
       await api.put(`/project/${projectId}`, formData)
-      navigate('/')
-    } catch {
-      toastMsg('프로젝트 수정 실패', 'error')
+      toastMsg('프로젝트 수정 완료', 'success')
+      navigate(-1)
+    } catch(error) {
+      toastMsg(`${error.response.data.title}`, 'error')
+      navigate(-1)
     }
   }
   const handleDelete = async () => {

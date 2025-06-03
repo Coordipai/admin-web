@@ -54,7 +54,7 @@ api.interceptors.response.use(
     }
 
     // 그 외 요청에서 401 발생 시
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (error.response && error.response.status === 401 && !originalRequest._retry && error.response.data?.title.includes('토큰')) {
       originalRequest._retry = true
       try {
         // refresh 요청
