@@ -26,13 +26,6 @@ const Fieldset = styled.div`
 	overflow-y: auto;
 `
 
-const ButtonGroup = styled.div`
-	display: flex;
-	justify-content: flex-end;
-	gap: ${({ theme }) => theme.gap.md};
-	width: 100%;
-`
-
 const Section = styled.section`
 	width: 100%;
 	display: flex;
@@ -64,28 +57,15 @@ const Card = styled.div`
 	}
 `
 
-const CardTitle = styled.div`
-	font-size: 1.5rem;
-	font-weight: 500;
-	color: #000;
-	width: fit-content;
-`
-
-const CardDesc = styled.div`
-	font-size: 1rem;
-	color: #717680;
-	width: fit-content;
-`
-
 function ProjectCard ({ name, start_date, end_date, onClick, selected }) {
   return (
     <Card onClick={onClick} selected={selected}>
       <Typography variant='displayXS' weight='semiBold' value={name} />
-      <Typography 
-        variant='textMD' 
-        weight='medium' 
-        color='gray500' 
-        value={`${extractDate(start_date)} ~ ${extractDate(end_date)}`} 
+      <Typography
+        variant='textMD'
+        weight='medium'
+        color='gray500'
+        value={`${extractDate(start_date)} ~ ${extractDate(end_date)}`}
       />
     </Card>
   )
@@ -94,21 +74,21 @@ function ProjectCard ({ name, start_date, end_date, onClick, selected }) {
 export const Home = () => {
   const theme = useTheme()
   const navigate = useNavigate()
-  const { setProject, clearProject } = useProjectStore();
+  const { setProject, clearProject } = useProjectStore()
   const setUser = useUserStore(state => state.setUser)
   const setAccessToken = useAccessTokenStore(state => state.setAccessToken)
   const setRefreshToken = useRefreshTokenStore(state => state.setRefreshToken)
   const refreshToken = useRefreshTokenStore(state => state.refreshToken)
-  const [isLoggedIn,setIsLoggedIn] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-  const [projects, setProjects] = useState([])  // 프로젝트 목록 
+  const [projects, setProjects] = useState([]) // 프로젝트 목록
 
   // 로그인 처리
   useEffect(() => {
     const login = async () => {
       try {
         const loginRes = await api.post('/auth/login')
-        
+
         if (!loginRes) {
           throw new Error('Login failed')
         }
@@ -120,12 +100,11 @@ export const Home = () => {
         toastMsg('로그인 실패', 'error')
       }
     }
-    if(!refreshToken){
+    if (!refreshToken) {
       login()
       setIsLoggedIn(true)
     }
-      
-  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 로그인 성공 후 프로젝트 목록 요청
   useEffect(() => {
@@ -143,7 +122,7 @@ export const Home = () => {
       }
     }
     fetchProjects()
-  }, [isLoggedIn])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoggedIn]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState(null)
@@ -155,8 +134,8 @@ export const Home = () => {
     : projects
 
   useEffect(() => {
-    clearProject()  
-  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+    clearProject()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <MainBox>
@@ -170,7 +149,7 @@ export const Home = () => {
               placeholder='프로젝트를 검색하세요'
             />
           </div>
-          <Button variant='contained'onClick={()=>{navigate('/buildproject')}} >프로젝트 생성</Button>
+          <Button variant='contained' onClick={() => { navigate('/buildproject') }}>프로젝트 생성</Button>
         </div>
 
         <Fieldset>

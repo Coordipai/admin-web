@@ -6,11 +6,11 @@ export const useUserStore = create(
     (set) => ({
       user: null,
       setUser: (user) => set({ user }),
-      clearUser: () => set({ user: null }),
+      clearUser: () => set({ user: null })
     }),
     {
       name: 'user-storage',
-      getStorage: () => localStorage,
+      getStorage: () => localStorage
     }
   )
 )
@@ -20,11 +20,11 @@ export const useAccessTokenStore = create(
     (set) => ({
       accessToken: null,
       setAccessToken: (token) => set({ accessToken: token }),
-      clearAccessToken: () => set({ accessToken: null }),
+      clearAccessToken: () => set({ accessToken: null })
     }),
     {
       name: 'access-token-storage',
-      getStorage: () => localStorage,
+      getStorage: () => localStorage
     }
   )
 )
@@ -34,11 +34,11 @@ export const useRefreshTokenStore = create(
     (set) => ({
       refreshToken: null,
       setRefreshToken: (token) => set({ refreshToken: token }),
-      clearRefreshToken: () => set({ refreshToken: null }),
+      clearRefreshToken: () => set({ refreshToken: null })
     }),
     {
       name: 'refresh-token-storage',
-      getStorage: () => localStorage,
+      getStorage: () => localStorage
     }
   )
 )

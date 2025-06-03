@@ -8,7 +8,7 @@ import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
 import useLoadingStore from '@store/useLoadingStore'
 import { useNavigate } from 'react-router-dom'
-import  api  from '@hooks/useAxios'
+import api from '@hooks/useAxios'
 import { categoryOptions } from '@constant/options'
 import toastMsg from '@utils/toastMsg'
 import ConfirmModal from '@components/ConfirmModal'
@@ -100,8 +100,6 @@ const TextButton = styled(ButtonBase)`
   }
 `
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
 export default function UserPage () {
   const navigate = useNavigate()
   const [githubName, setGithubName] = useState('')
@@ -111,7 +109,6 @@ export default function UserPage () {
   const [career, setCareer] = useState('')
   const [selectedRepos, setSelectedRepos] = useState([])
   const accessToken = useAccessTokenStore((state) => state.accessToken)
-
 
   const user = useUserStore((state) => state.user)
 
@@ -128,7 +125,7 @@ export default function UserPage () {
       return
     }
 
-    setGithubName(user.github_name|| '')
+    setGithubName(user.github_name || '')
     setUsername(user.name || '')
     setDiscordId(user.discord_id || '')
     setCareer(user.career || '')
@@ -138,11 +135,11 @@ export default function UserPage () {
       try {
         useLoadingStore.getState().setLoading(true)
         // 🔹 선택된 레포 불러오기
-        const selectedRes = await api.get(`/user-repo`)
+        const selectedRes = await api.get('/user-repo')
         const selected = selectedRes.map((r) => r.repo_fullname)
 
         // 🔹 GitHub의 전체 레포 불러오기
-        const allRes = await api.get(`/user-repo/github`)
+        const allRes = await api.get('/user-repo/github')
         const all = allRes.map((r) => r.repo_fullname)
 
         // 상태에 반영
@@ -160,7 +157,7 @@ export default function UserPage () {
 
   const [field, setField] = useState('')
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
-  
+
   const handleSave = async () => {
     try {
       useLoadingStore.getState().setLoading(true)
@@ -168,13 +165,13 @@ export default function UserPage () {
         name: username,
         discord_id: discordId,
         career,
-        category: field || '',
+        category: field || ''
       }
       // 기본 정보 저장
-      await api.put(`/auth/update`, payload)
+      await api.put('/auth/update', payload)
 
       const repoPayload = selectedRepos.map((repo) => ({ repo_fullname: repo }))
-      await api.post(`/user-repo`, repoPayload)
+      await api.post('/user-repo', repoPayload)
 
       // 저장 후 상태 갱신
       const updatedUser = {
@@ -182,7 +179,7 @@ export default function UserPage () {
         name: username,
         discord_id: discordId,
         career,
-        category: field,
+        category: field
       }
       useUserStore.getState().setUser(updatedUser)
       toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
@@ -195,24 +192,24 @@ export default function UserPage () {
 
   const handleWithdraw = async () => {
     try {
-        useLoadingStore.getState().setLoading(true)
-        await api.delete(`/auth/unregister`)
-        toastMsg('탈퇴가 완료되었습니다.', 'success')
-        useUserStore.getState().clearUser()
-        useAccessTokenStore.getState().clearAccessToken()
-        navigate('/login')
-      } catch {
-        toastMsg('탈퇴 중 오류가 발생했습니다.', 'error')
-      } finally {
-        useLoadingStore.getState().setLoading(false)
-      }
+      useLoadingStore.getState().setLoading(true)
+      await api.delete('/auth/unregister')
+      toastMsg('탈퇴가 완료되었습니다.', 'success')
+      useUserStore.getState().clearUser()
+      useAccessTokenStore.getState().clearAccessToken()
+      navigate('/login')
+    } catch {
+      toastMsg('탈퇴 중 오류가 발생했습니다.', 'error')
+    } finally {
+      useLoadingStore.getState().setLoading(false)
+    }
   }
 
   const handleEvaluationRequest = async () => {
     try {
       useLoadingStore.getState().setLoading(true)
       toastMsg('평가 요청을 시작합니다.', 'success')
-      await api.post(`/agent/assess_stat`,{})
+      await api.post('/agent/assess_stat', {})
       toastMsg('평가 요청이 완료되었습니다!', 'success')
     } catch {
       toastMsg('평가 요청 중 오류가 발생했습니다.', 'error')
@@ -236,9 +233,11 @@ export default function UserPage () {
           <Header text='계정 정보' />
           <FieldWrapper>
             <LabelText>사용자 이름</LabelText>
-            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
-              setUsername(v)
-            }} />
+            <FormInput
+              placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
+                setUsername(v)
+              }}
+            />
           </FieldWrapper>
 
           <FieldWrapper>
@@ -252,10 +251,12 @@ export default function UserPage () {
 
           <FieldWrapper>
             <LabelText>Discord ID</LabelText>
-            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
-              setDiscordId(v)
-            }} />
-           </FieldWrapper>
+            <FormInput
+              placeholder='디스코드 ID' value={discordId} handleChange={(v) => {
+                setDiscordId(v)
+              }}
+            />
+          </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>분야 선택</LabelText>
@@ -265,7 +266,7 @@ export default function UserPage () {
               value={field}
               onChange={(v) => {
                 setField(v)
-            }}
+              }}
             />
           </FieldWrapper>
 

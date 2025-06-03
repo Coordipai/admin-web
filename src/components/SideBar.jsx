@@ -10,7 +10,6 @@ import {
 } from '@styles/globalStyle'
 import { useUserStore } from '@store/useUserStore'
 
-
 const LogOutIcon = styledIcon({ icon: LogOut01, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' } })
 const CalendarIcon = styledIcon({ icon: Calendar, strokeColor: '#717680', style: { width: '1.5rem', height: '1.5rem' } })
 const ListIcon = styledIcon({ icon: List, style: { cursor: 'pointer' } })
@@ -290,15 +289,15 @@ const SideBar = ({
 
         <NavFooterSection>
           <HorizontalDivider />
-        {userInfo && (
-          <FormAccount
-            image={userInfo.profile_img}
-            text={userInfo.name}
-            supportingText={userInfo.github_name}
-            logout={logout}
-            onClick={userOnClick}
-          />
-        )}
+          {userInfo && (
+            <FormAccount
+              image={userInfo.profile_img}
+              text={userInfo.name}
+              supportingText={userInfo.github_name}
+              logout={logout}
+              onClick={userOnClick}
+            />
+          )}
         </NavFooterSection>
       </ContentWrapper>
       <VerticalDivider />

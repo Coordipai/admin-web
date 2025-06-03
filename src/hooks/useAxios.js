@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL
   // timeout: 10000
 })
 

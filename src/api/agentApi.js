@@ -1,4 +1,4 @@
-import  api  from '@hooks/useAxios'
+import api from '@hooks/useAxios'
 import { useAccessTokenStore } from '@store/useUserStore'
 import useLoadingStore from '@store/useLoadingStore'
 import toastMsg from '@utils/toastMsg'
@@ -12,143 +12,140 @@ import toastMsg from '@utils/toastMsg'
  */
 export const getGeneratedIssues = async (projectId, onChunk) => {
   try {
-    const token = useAccessTokenStore.getState().accessToken;
+    const token = useAccessTokenStore.getState().accessToken
     if (!token) {
-      throw new Error('Access token is not available');
+      throw new Error('Access token is not available')
     }
 
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/agent/generate_issues/${projectId}`, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+        Authorization: `Bearer ${token}`
+      }
+    })
 
     if (!response.ok || !response.body) {
-      throw new Error(`Streaming response failed: ${response.status}`);
+      throw new Error(`Streaming response failed: ${response.status}`)
     }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder('utf-8');
-    let result = '';
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder('utf-8')
+    let result = ''
 
     while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+      const { done, value } = await reader.read()
+      if (done) break
 
-      const chunk = decoder.decode(value, { stream: true });
-      result += chunk;
-    
-      onChunk(chunk);
+      const chunk = decoder.decode(value, { stream: true })
+      result += chunk
+
+      onChunk(chunk)
     }
-    toastMsg('자동 이슈 생성 완료', 'success');
-    return result;
+    toastMsg('자동 이슈 생성 완료', 'success')
+    return result
   } catch (error) {
-    toastMsg(error,'error')
-    //showErrortoastMsgMsg(error);
-    throw error;
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
+    throw error
   }
-};
-
+}
 
 /**
  * 2. 역량 평가 요청하기 (Post)
- * 
+ *
  * @param {object} data
  * @returns {object} assessData
- * 
+ *
  */
 export const postAssessStat = async (data) => {
-    try {
-        const token = useAccessTokenStore.getState().accessToken
-        if (!token) {
-            throw new Error('Access token is not available')
-        }
-        const response = await api.post('/agent/assess_stat', {
-            body: data
-        })
-        return response;
-    } catch (error) {
-        toastMsg(error,'error')
-        //showErrortoastMsgMsg(error);
-        throw error;
+  try {
+    const token = useAccessTokenStore.getState().accessToken
+    if (!token) {
+      throw new Error('Access token is not available')
     }
+    const response = await api.post('/agent/assess_stat', {
+      body: data
+    })
+    return response
+  } catch (error) {
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
+    throw error
+  }
 }
-
 
 /**
  * 3. 평가된 역량 정보 가져오기 (Get)
- * 
- * @param {string} userId 
+ *
+ * @param {string} userId
  * @returns {object}
- * 
+ *
  */
 export const getReadStat = async (userId) => {
-    try {
-        const token = useAccessTokenStore.getState().accessToken
-        if (!token) {
-            throw new Error('Access token is not available')
-        }
-        const response = await api.get('/agent/read_stat', {
-            params: { user_id: userId }
-        })
-        return response;
-    } catch (error) {
-        toastMsg(error,'error')
-        //showErrortoastMsgMsg(error);
-        throw error;
+  try {
+    const token = useAccessTokenStore.getState().accessToken
+    if (!token) {
+      throw new Error('Access token is not available')
     }
+    const response = await api.get('/agent/read_stat', {
+      params: { user_id: userId }
+    })
+    return response
+  } catch (error) {
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
+    throw error
+  }
 }
-
 
 /**
  * 4. 사용자 이슈 할당하기 (Post)
- * 
+ *
  *  @param {string} projectId
- *  @param {object} data 
- *  @returns {object} 
+ *  @param {object} data
+ *  @returns {object}
  *
  */
 export const postAssignIssues = async (projectId, data) => {
-    try {
-        useLoadingStore.getState().setLoading(true)
-        const token = useAccessTokenStore.getState().accessToken
-        if (!token) {
-            throw new Error('Access token is not available')
-        }
-
-        const issues = data.map(issue => ({
-            type: issue.type,
-            name: issue.name,
-            description: issue.description,
-            title: issue.title,
-            labels: issue.labels,
-            sprint: issue.sprint,
-            priority: issue.priority,
-            body: issue.body,
-        }))
-
-        const requestBody = {
-            issues: {
-                issues,
-            }
-        }
-
-        const response = await api.post(`/agent/recommend_assignees/${projectId}`,
-            requestBody,
-            {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
-        )
-        toastMsg('이슈 할당 완료','success')
-        return response;
-    } catch (error) {
-        toastMsg(error,'error')
-        //showErrortoastMsgMsg(error);
-        throw error;
-    } finally {
-        useLoadingStore.getState().setLoading(false)
+  try {
+    useLoadingStore.getState().setLoading(true)
+    const token = useAccessTokenStore.getState().accessToken
+    if (!token) {
+      throw new Error('Access token is not available')
     }
+
+    const issues = data.map(issue => ({
+      type: issue.type,
+      name: issue.name,
+      description: issue.description,
+      title: issue.title,
+      labels: issue.labels,
+      sprint: issue.sprint,
+      priority: issue.priority,
+      body: issue.body
+    }))
+
+    const requestBody = {
+      issues: {
+        issues
+      }
+    }
+
+    const response = await api.post(`/agent/recommend_assignees/${projectId}`,
+      requestBody,
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    toastMsg('이슈 할당 완료', 'success')
+    return response
+  } catch (error) {
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
+    throw error
+  } finally {
+    useLoadingStore.getState().setLoading(false)
+  }
 }

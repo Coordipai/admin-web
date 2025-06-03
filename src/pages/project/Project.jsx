@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react'
 import IssueTable from '@components/Edit/IssueTable'
 import RequestTable from '@components/Edit/RequestTable'
 import SearchInputField from '@components/Edit/SearchInputField'
-import { MainBox, ButtonBase } from '@styles/globalStyle'
+import { MainBox } from '@styles/globalStyle'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import Button from '@components/Common/Button'
-import  api  from '@hooks/useAxios'
+import api from '@hooks/useAxios'
 import toastMsg from '@utils/toastMsg'
 import useLoadingStore from '@store/useLoadingStore'
 
@@ -23,12 +23,6 @@ const HeaderRow = styled.div`
 	align-items: center;
 	justify-content: space-between;
 	width: 100%;
-`
-
-const TitleBox = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
 `
 
 const TabsWrapper = styled.div`
@@ -93,12 +87,6 @@ const Fieldset = styled.div`
 	overflow-x: hidden;
 `
 
-const DropDownWrapper = styled.div`
-	display: flex;
-	gap: ${({ theme }) => theme.gap.xl};
-	width: 100%;
-`
-
 const ButtonGroup = styled.div`
 	display: flex;
 	justify-content: flex-end;
@@ -117,16 +105,6 @@ const Section = styled.section`
 	overflow-x: hidden;
 	flex: 1;
 	min-height: 0;
-`
-
-const EmptyIssueWrapper = styled.div`
-	width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: ${({ theme }) => theme.gap.md};
 `
 
 export const Project = () => {
@@ -162,13 +140,12 @@ export const Project = () => {
   const [search, setSearch] = useState('')
   const [requestSearch, setRequestSearch] = useState('')
   const [requestRows, setRequestRows] = useState([])
-  
-   
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         useLoadingStore.getState().setLoading(true)
-        const issueResponse = await api.get(`/issue`, {
+        const issueResponse = await api.get('/issue', {
           params: { project_id: projectId }
         })
         setIssueRows(issueResponse.filter(issue => issue.closed === false))
@@ -190,7 +167,6 @@ export const Project = () => {
     }
     fetchData()
   }, [projectId])
-
 
   const filteredRows = search
     ? issueRows.filter(row =>
@@ -215,7 +191,7 @@ export const Project = () => {
       <HeaderSection>
         <HeaderRow>
           <Typography variant='displayXS' weight='semiBold' color='gray700' value='대시보드' />
-          <Button variant='contained' onClick={() => navigate(`${location.pathname}/edit`)} >프로젝트 설정</Button>
+          <Button variant='contained' onClick={() => navigate(`${location.pathname}/edit`)}>프로젝트 설정</Button>
         </HeaderRow>
         <TabsWrapper>
           <TabsRow>
@@ -249,10 +225,10 @@ export const Project = () => {
               </div>
 
               <ButtonGroup>
-                <Button variant='outlined' color='gray700' onClick={() => navigate(`${location.pathname}/issue/new`)} >
+                <Button variant='outlined' color='gray700' onClick={() => navigate(`${location.pathname}/issue/new`)}>
                   이슈 추가
                 </Button>
-                <Button variant='contained' color='brand500' onClick={() => navigate(`/project/${projectId}/issuesuggest#confirm`)} >
+                <Button variant='contained' color='brand500' onClick={() => navigate(`/project/${projectId}/issuesuggest#confirm`)}>
                   이슈 자동 생성
                 </Button>
               </ButtonGroup>

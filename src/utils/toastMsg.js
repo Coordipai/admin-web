@@ -32,7 +32,7 @@ import { toast, Bounce } from 'react-toastify'
  * // 경고 메시지
  * toastMsg('경고!', 'warning')
  */
-export default function toastMsg(message, variant = 'success') {
+export default function toastMsg (message, variant = 'success') {
   const options = {
     position: 'top-right',
     autoClose: 1500,
@@ -42,7 +42,7 @@ export default function toastMsg(message, variant = 'success') {
     draggable: true,
     progress: undefined,
     theme: 'colored',
-    transition: Bounce,
+    transition: Bounce
   }
   if (variant === 'success') toast.success(message, options)
   else if (variant === 'error') {
@@ -51,6 +51,5 @@ export default function toastMsg(message, variant = 'success') {
     } else {
       toast.error(message, options)
     }
-  }
-  else if (variant === 'warning') toast.warn(message, options)
-} 
+  } else if (variant === 'warning') toast.warn(message, options)
+}

@@ -283,8 +283,8 @@ const FileModal = ({ open, onClose, onAttach }) => {
           )}
         </FileQueueContainer>
         <ModalActions>
-          <Button variant='outlined' color='brand500' onClick={onClose} >Cancel</Button>
-          <Button variant='contained' color='brand500' onClick={handleAttach} >Attach files</Button>
+          <Button variant='outlined' color='brand500' onClick={onClose}>Cancel</Button>
+          <Button variant='contained' color='brand500' onClick={handleAttach}>Attach files</Button>
         </ModalActions>
       </ModalBox>
     </Overlay>

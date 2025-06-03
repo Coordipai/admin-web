@@ -1,4 +1,4 @@
-import  api  from '@hooks/useAxios'
+import api from '@hooks/useAxios'
 import { useAccessTokenStore } from '@store/useUserStore'
 import toastMsg from '@utils/toastMsg'
 /**
@@ -12,17 +12,17 @@ export const fetchAllIssues = async (projectId) => {
       throw new Error('Access token is not available')
     }
 
-    const response = await api.get('/issue', { 
+    const response = await api.get('/issue', {
 
-      params: { 
-        project_id: projectId 
-      } 
-    });
-    return response;
+      params: {
+        project_id: projectId
+      }
+    })
+    return response
   } catch (error) {
-    toastMsg(error,'error')
-    //showErrortoastMsgMsg(error);
-    throw error;
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
+    throw error
   }
 }
 
@@ -38,17 +38,17 @@ export const fetchIssueDetail = async (projectId, issueNumber) => {
       throw new Error('Access token is not available')
     }
     const response = await api.get('/issue/detail', {
-    
+
       params: {
         project_id: projectId,
         issue_number: issueNumber
       }
     })
-    return response;
+    return response
   } catch (error) {
-    toastMsg(error,'error')
-    //showErrortoastMsgMsg(error);
-    throw error;
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
+    throw error
   }
 }
 /**
@@ -63,11 +63,11 @@ export const createIssue = async (issueData) => {
     }
 
     const response = await api.post('/issue', issueData)
-    toastMsg('성공적으로 이슈가 생성되었습니다.','success')
+    toastMsg('성공적으로 이슈가 생성되었습니다.', 'success')
     return response.data
   } catch (error) {
-    toastMsg(error,'error')
-    //showErrortoastMsgMsg(error);
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
     throw error
   }
 }
@@ -84,11 +84,11 @@ export const updateIssue = async (issueData) => {
     }
 
     const response = await api.put('/issue', issueData)
-    toastMsg('성공적으로 이슈가 수정되었습니다.','success')
+    toastMsg('성공적으로 이슈가 수정되었습니다.', 'success')
     return response.data
   } catch (error) {
-    toastMsg(error,'error')
-    //showErrortoastMsgMsg(error);
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
     throw error
   }
 }
@@ -105,11 +105,11 @@ export const deleteIssue = async (issueData) => {
     }
 
     const response = await api.patch('/issue', issueData)
-    toastMsg('성공적으로 이슈가 닫혔습니다.','success')
+    toastMsg('성공적으로 이슈가 닫혔습니다.', 'success')
     return response.data
   } catch (error) {
-    toastMsg(error,'error')
-    //showErrortoastMsgMsg(error);
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
     throw error
   }
 }
@@ -117,7 +117,7 @@ export const deleteIssue = async (issueData) => {
 /**
  * 6. 이슈 현황(갯수) 받아오기
  * @param {number} projectId
- * 
+ *
  */
 export const fetchIssueSummary = async (projectId) => {
   try {
@@ -127,15 +127,15 @@ export const fetchIssueSummary = async (projectId) => {
     }
 
     const response = await api.get('/issue/summary', {
-    
+
       params: {
         project_id: projectId
       }
     })
-    return response;
+    return response
   } catch (error) {
-    toastMsg(error,'error')
-    //showErrortoastMsgMsg(error);
-    throw error;
+    toastMsg(error, 'error')
+    // showErrortoastMsgMsg(error);
+    throw error
   }
 }

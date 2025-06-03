@@ -1,18 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
 import InputField from '@components/Edit/InputField'
 import styled from 'styled-components'
-import Typography from '@components/Edit/Typography'
 import DropDown from '@components/Edit/DropDown'
 import FileTable from '@components/Edit/FileTable'
 import Button from '@components/Common/Button'
-import { HorizontalDivider, MainBox } from '@styles/globalStyle'
+import { MainBox } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import SearchInputField from '@components/Edit/SearchInputField'
 import UserTable from '@components/Edit/UserTable'
 import { DatePicker } from '@components/Edit/DatePicker'
 import Header from '@components/Header'
 import dayjs from 'dayjs'
-import  api  from '@hooks/useAxios'
+import api from '@hooks/useAxios'
 import toastMsg from '@utils/toastMsg'
 import ConfirmModal from '@components/ConfirmModal'
 
@@ -75,7 +74,6 @@ export const SettingProject = () => {
   const navigate = useNavigate()
   const inputRef = useRef(null)
 
-
   // form 상태로 통합 관리
   const [form, setForm] = useState({
     projectName: '',
@@ -110,8 +108,7 @@ export const SettingProject = () => {
     const fetchProject = async () => {
       try {
         const res = await api.get(`/project/${projectId}`)
-        
-        
+
         setForm({
           projectName: res.name || '',
           github: res.repo_fullname || '',
@@ -121,21 +118,20 @@ export const SettingProject = () => {
           files: [], // 파일 정보는 별도 처리 필요시 추가
           design_docs: res.design_docs || [],
           members: (res.members || []).map(m => ({
-            id: m.id||1,
+            id: m.id || 1,
             name: m.name,
             githubId: m.github_name,
             profileImg: m.profile_img,
-            field: m.role || '',
+            field: m.role || ''
           })),
           startDate: res.start_date || ''
         })
       } catch {
-        toastMsg('프로젝트 정보를 불러오지 못했습니다.','error')
+        toastMsg('프로젝트 정보를 불러오지 못했습니다.', 'error')
       }
     }
     fetchProject()
   }, [projectId])
-
 
   // 검색어가 변경될 때마다 API 호출
   useEffect(() => {
@@ -156,7 +152,6 @@ export const SettingProject = () => {
           label: user.name
         })))
       } catch (error) {
-        
         setSearchOptions([])
         setSearchResults([])
       }
@@ -168,39 +163,35 @@ export const SettingProject = () => {
   // 완료 버튼 클릭 시 PUT
   const handleUpdate = async () => {
     const sprintMap = { '1주': 7, '2주': 14, '1개월': 30 }
-    const sprint_unit = typeof form.sprint === 'number' ? form.sprint : sprintMap[form.sprint] || 7
+    const sprintUnit = typeof form.sprint === 'number' ? form.sprint : sprintMap[form.sprint] || 7
     const endDate = form.deadline ? `${form.deadline}T00:00:00Z` : ''
-    
+
     const members = form.members.map(row => ({
       id: row.id,
       role: row.field || 'member'
     }))
-
-    
 
     const projectReq = {
       name: form.projectName,
       repo_fullname: form.github,
       start_date: form.startDate,
       end_date: endDate,
-      sprint_unit,
+      sprint_unit: sprintUnit,
       discord_channel_id: form.discord,
       members,
       design_docs: form.design_docs
     }
 
     try {
-
-
-        const formData = new FormData()
-        formData.append('project_req', JSON.stringify(projectReq))
-        form.files.forEach(file => {
-          formData.append('files', file)
+      const formData = new FormData()
+      formData.append('project_req', JSON.stringify(projectReq))
+      form.files.forEach(file => {
+        formData.append('files', file)
       })
       await api.put(`/project/${projectId}`, formData)
       navigate('/')
     } catch {
-      toastMsg('프로젝트 수정 실패','error')
+      toastMsg('프로젝트 수정 실패', 'error')
     }
   }
   const handleDelete = async () => {
@@ -208,7 +199,7 @@ export const SettingProject = () => {
       await api.delete(`/project/${projectId}`)
       navigate('/')
     } catch {
-      toastMsg('프로젝트 삭제 실패','error')
+      toastMsg('프로젝트 삭제 실패', 'error')
     }
   }
   return (
@@ -297,7 +288,7 @@ export const SettingProject = () => {
               setSearch('')
               const selectedUser = searchResults.find(user => user.id.toString() === value)
               if (form.members.some(member => member.id.toString() === value)) {
-                toastMsg('이미 추가된 팀원입니다','error')
+                toastMsg('이미 추가된 팀원입니다', 'error')
                 return
               }
               setForm(prev => ({
@@ -320,8 +311,8 @@ export const SettingProject = () => {
           </TableWrapper>
           <ButtonGroup>
             <Button variant='contained' onClick={() => setShowDeleteModal(true)}>삭제</Button>
-            <Button variant='outlined'  onClick={() => navigate(-1)} >취소</Button>
-            <Button variant='contained'  onClick={handleUpdate} >완료</Button>
+            <Button variant='outlined' onClick={() => navigate(-1)}>취소</Button>
+            <Button variant='contained' onClick={handleUpdate}>완료</Button>
           </ButtonGroup>
         </Fieldset>
       </Section>
@@ -335,6 +326,3 @@ export const SettingProject = () => {
     </MainBox>
   )
 }
-
-
-

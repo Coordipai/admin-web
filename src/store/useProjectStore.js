@@ -20,8 +20,8 @@ const calculateIteration = (startDate, sprintUnit) => {
   const format = (d) => `${d.getMonth() + 1}.${d.getDate()}`
 
   return {
-      sprint: sprintIndex.toString(),
-      period: `${format(sprintStart)} ~ ${format(sprintEnd)}`
+    sprint: sprintIndex.toString(),
+    period: `${format(sprintStart)} ~ ${format(sprintEnd)}`
   }
 }
 
@@ -45,7 +45,7 @@ export const useProjectStore = create(
           const end = new Date(rawProject.end_date)
           const sprintUnit = rawProject.sprint_unit
 
-          let sprintStart = new Date(start)
+          const sprintStart = new Date(start)
           let sprintIndex = 1
 
           while (sprintStart <= end) {
@@ -91,7 +91,7 @@ export const useProjectStore = create(
               iterationOptions,
               assigneeOptions,
 
-              // sidebar 
+              // sidebar
               nowIteration,
               categories,
               issueSummary
