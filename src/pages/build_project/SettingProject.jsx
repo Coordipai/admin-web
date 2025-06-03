@@ -151,7 +151,7 @@ export const SettingProject = () => {
           value: user.id.toString(),
           label: user.name
         })))
-      } catch (error) {
+      } catch {
         setSearchOptions([])
         setSearchResults([])
       }

@@ -13,6 +13,7 @@ import { MainBox } from '@styles/globalStyle'
 import api from '@hooks/useAxios'
 import { useNavigate } from 'react-router-dom'
 import toastMsg from '@utils/toastMsg'
+import useLoadingStore from '@store/useLoadingStore'
 
 const Fieldset = styled.div`
 	display: flex;
@@ -88,7 +89,7 @@ const BuildProject = () => {
           value: user.id.toString(),
           label: user.name
         })))
-      } catch (error) {
+      } catch {
         setSearchOptions([])
         setSearchResults([])
       }
@@ -300,12 +301,16 @@ const BuildProject = () => {
 					    formData.append('files', file)
 					  })
 					  try {
+              useLoadingStore.getState().setLoading(true)
+              toastMsg('프로젝트 생성을 시작합니다!', 'success')
 					    await api.post('/project', formData)
-
 					    navigate('/')
 					  } catch (error) {
 					    toastMsg(`${error.response?.data?.title}`, 'error')
-					  }
+					  } finally {
+              toastMsg('프로젝트 생성이 완료되었습니다!', 'success')
+              useLoadingStore.getState().setLoading(false)
+            }
             }}
           >완료
           </Button>
