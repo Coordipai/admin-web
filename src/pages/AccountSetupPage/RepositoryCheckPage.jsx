@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Header from '@components/Header'
-import FormInput from '@components/FormInput'
-import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
-import  api  from '@hooks/useAxios'
+import api from '@hooks/useAxios'
 import toastMsg from '@utils/toastMsg'
 
 const FormWrapper = styled.div`
@@ -64,7 +62,6 @@ const Button = styled(ButtonBase)`
   justify-content: center;      // 가로 중앙 정렬
   ${({ theme }) => theme.texts.textSM};
 `
-const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function AccountSetupPage () {
   // 추가
@@ -77,7 +74,7 @@ export default function AccountSetupPage () {
     const fetchRepos = async () => {
       try {
         // zustand에서 access_token 꺼내기
-        const res = await api.get(`/user-repo/github`)
+        const res = await api.get('/user-repo/github')
         const repos = res.map((item) => item.repo_fullname).filter(Boolean)
         setRepoList(repos)
       } catch (error) {
@@ -98,11 +95,9 @@ export default function AccountSetupPage () {
   }
 
   const handleCreateAccount = async () => {
-
-    try{
-      
+    try {
       const repoPayload = selectedRepos.map(repo => ({ repo_fullname: repo }))
-      await api.post(`/user-repo`, repoPayload)
+      await api.post('/user-repo', repoPayload)
 
       const combinedData = {
         name: '', // 필요 시 localStorage 등에서 복구
@@ -111,11 +106,10 @@ export default function AccountSetupPage () {
       }
       navigate(`/userform/${githubId}`, { state: combinedData })
     } catch (error) {
-        console.error('레포 등록 실패: ', error.response || error.message)
-        toastMsg('레포 등록 중 오류가 발생했습니다.', 'error')
-        }
+      console.error('레포 등록 실패: ', error.response || error.message)
+      toastMsg('레포 등록 중 오류가 발생했습니다.', 'error')
     }
-
+  }
 
   return (
     <>

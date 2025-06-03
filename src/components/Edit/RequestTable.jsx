@@ -147,46 +147,46 @@ const RequestTable = ({ rows = [], page = 1, onPageChange, variant = 'issue' }) 
 
   return (
     <TableWrapper ref={wrapperRef}>
-        <Table>
-          <Thead>
-            <TrHeader>
-              <Th style={{ width: '12%' }}># 이슈번호</Th>
-              <Th style={{ width: '41%' }}>변경 사유</Th>
-              <Th style={{ width: '17%' }}>현재 담당자</Th>
-              <Th style={{ width: '17%' }}>추천 담당자</Th>
-              <Th style={{ width: '13%' }}>개발주기</Th>
-            </TrHeader>
-          </Thead>
-          <tbody>
-            {pagedRows.length === 0
-              ? (
-                <tr>
-                  <Td colSpan={7} rowSpan={8} align="center">
-                    <Typography variant='textMD' color='gray500' value={variant === 'request' ? '변경요청서가 없습니다.' : '이슈가 없습니다.'} />
-                  </Td>
-                </tr>
-                )
-              : (
-                  pagedRows.map((row, idx) => (
-                    <Tr key={row.issue_number + row.title + idx} onClick={() => handleNext(row.issue_number)}>
-                      <Td># {row.issue_number}</Td>
-                      <Td>{row.reason}</Td>
-                      <Td>
-                        {Array.isArray(row.old_assignees) && row.old_assignees.length > 0
-                          ? row.old_assignees.map(a => a).join(', ')
-                          : ''}
-                      </Td>
-					  <Td>
-                        {Array.isArray(row.new_assignees) && row.new_assignees.length > 0
-                          ? row.new_assignees.map(a => a).join(', ')
-                          : ''}
-                      </Td>
-                      <Td>{row.old_iteration === -1 ? 'Unassigned' : `Iteration ${row.old_iteration}`}</Td>
-                    </Tr>
-                  ))
-                )}
-          </tbody>
-        </Table>
+      <Table>
+        <Thead>
+          <TrHeader>
+            <Th style={{ width: '12%' }}># 이슈번호</Th>
+            <Th style={{ width: '41%' }}>변경 사유</Th>
+            <Th style={{ width: '17%' }}>현재 담당자</Th>
+            <Th style={{ width: '17%' }}>추천 담당자</Th>
+            <Th style={{ width: '13%' }}>개발주기</Th>
+          </TrHeader>
+        </Thead>
+        <tbody>
+          {pagedRows.length === 0
+            ? (
+              <tr>
+                <Td colSpan={7} rowSpan={8} align='center'>
+                  <Typography variant='textMD' color='gray500' value={variant === 'request' ? '변경요청서가 없습니다.' : '이슈가 없습니다.'} />
+                </Td>
+              </tr>
+              )
+            : (
+                pagedRows.map((row, idx) => (
+                  <Tr key={row.issue_number + row.title + idx} onClick={() => handleNext(row.issue_number)}>
+                    <Td># {row.issue_number}</Td>
+                    <Td>{row.reason}</Td>
+                    <Td>
+                      {Array.isArray(row.old_assignees) && row.old_assignees.length > 0
+                        ? row.old_assignees.map(a => a).join(', ')
+                        : ''}
+                    </Td>
+                    <Td>
+                      {Array.isArray(row.new_assignees) && row.new_assignees.length > 0
+                        ? row.new_assignees.map(a => a).join(', ')
+                        : ''}
+                    </Td>
+                    <Td>{row.old_iteration === -1 ? 'Unassigned' : `Iteration ${row.old_iteration}`}</Td>
+                  </Tr>
+                ))
+              )}
+        </tbody>
+      </Table>
 
       <PaginationWrapper>
         <Button

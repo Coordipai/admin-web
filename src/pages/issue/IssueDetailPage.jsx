@@ -72,10 +72,10 @@ const IssueDetailPage = () => {
     { value: 'C', label: '[C] Could Have' },
     { value: 'W', label: '[W] Won\'t Have' }
   ])
-  const [iterationOptions, setIterationOptions] = useState([ { title: 'iteration 선택', period: ''}])
+  const [iterationOptions, setIterationOptions] = useState([{ title: 'iteration 선택', period: '' }])
   const [labelOptions] = useState(['기능', '설정', '테스트', '배포', '버그 수정', '문서', '리팩토링', '질문', '정리'])
   const [assigneeOptions, setAssigneeOptions] = useState([])
-  
+
   // issue 정보
   const [issueTitle, setIssueTitle] = useState('')
   const [issueContent, setIssueContent] = useState('')
@@ -83,7 +83,6 @@ const IssueDetailPage = () => {
   const [iteration, setIteration] = useState(iterationOptions[0])
   const [selectedLabels, setSelectedLabels] = useState([])
   const [assignees, setAssignees] = useState([])
-
 
   const fetchProject = useCallback(async () => {
     try {
@@ -128,7 +127,7 @@ const IssueDetailPage = () => {
         const matchedIteration = project.iterationOptions.find(opt => {
           const num = parseInt(opt.title.replace(/\D/g, ''))
           return num === meta.iteration
-        })        
+        })
         setIteration(matchedIteration || iterationOptions[0])
         setSelectedLabels(res?.labels || [])
         setAssignees(res?.assignees.map(a => a.github_name) || [])
@@ -158,7 +157,7 @@ const IssueDetailPage = () => {
       }
     }
     init()
-  }, [issueNumber, projectId, iterationOptions])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [issueNumber, projectId, iterationOptions]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 모달 관련
   const [showModal, setShowModal] = useState(false)
@@ -271,40 +270,40 @@ const IssueDetailPage = () => {
         buttonsData={
             issueNumber === 'new'
               ? [
-                  { 
+                  {
                     value: '저장',
-                    onClick: () => {  // issue 추가
+                    onClick: () => { // issue 추가
                       setModalText('저장하시겠습니까?')
                       setShowModal(true)
-                    }, 
-                    isHighlighted: true 
+                    },
+                    isHighlighted: true
                   },
                   { value: '취소', onClick: () => window.history.back() }
                 ]
               : [
-                  { 
-                    value: '저장', 
+                  {
+                    value: '저장',
                     onClick: () => { // issue 수정
                       setModalText('저장하시겠습니까?')
                       setShowModal(true)
                       setIsEdit(true)
-                    }, 
-                    isHighlighted: true 
+                    },
+                    isHighlighted: true
                   },
-                  { 
-                    value: '삭제', 
-                    onClick: () => {  // issue 삭제
+                  {
+                    value: '삭제',
+                    onClick: () => { // issue 삭제
                       setModalText('삭제하시겠습니까?')
                       setShowModal(true)
                       setIsEdit(false)
-                    }, 
-                    isHighlighted: true 
+                    },
+                    isHighlighted: true
                   },
                   { value: '취소', onClick: () => window.history.back() }
                 ]
           }
       />
-      { 
+      {
       !isLoading && (
         <ContainerBox>
           <InputField label='이슈 타이틀' placeholder='이슈 제목을 입력해주세요.' value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)} />
@@ -404,7 +403,7 @@ const IssueDetailPage = () => {
               )}
             </LabelContainer>
           </Row>
-          
+
           <Row>
             <Typography value='Assignee' variant='textSM' weight='medium' color='gray900' />
             <div ref={assigneeRef} onClick={() => setAssigneeDropdownOpen(prev => !prev)} style={{ cursor: 'pointer' }}>
@@ -441,7 +440,8 @@ const IssueDetailPage = () => {
             )}
           </Row>
         </ContainerBox>
-      )}
+      )
+}
 
       {showModal && createPortal(
         <Modal
@@ -453,10 +453,10 @@ const IssueDetailPage = () => {
                 project_id: parseInt(projectId),
                 title: issueTitle,
                 body: issueContent,
-                assignees: assignees,
-                priority: priority,
+                assignees,
+                priority,
                 iteration: parseInt(iteration.title.replace(/\D/g, '')),
-                labels: selectedLabels,
+                labels: selectedLabels
               }
               createIssue(issueData)
               navigate(`/project/${projectId}`)
@@ -467,10 +467,10 @@ const IssueDetailPage = () => {
                   issue_number: parseInt(issueNumber),
                   title: issueTitle,
                   body: issueContent,
-                  assignees: assignees,
-                  priority: priority,
+                  assignees,
+                  priority,
                   iteration: parseInt(iteration.title.replace(/\D/g, '')),
-                  labels: selectedLabels,
+                  labels: selectedLabels
                 }
                 updateIssue(issueData)
                 navigate(`/project/${projectId}`)

@@ -84,13 +84,11 @@ const SearchInputField = ({
         onFocus={() => setOpen(!!value)}
         icon={searchIcon}
         onKeyDown={e => {
-
           if (e.key === 'Enter') {
-            e.preventDefault();
-            e.stopPropagation();
+            e.preventDefault()
+            e.stopPropagation()
             if (props.onKeyDown) props.onKeyDown(e)
           }
-
         }}
         {...Object.fromEntries(Object.entries(props).filter(([k]) => k !== 'onKeyDown'))}
       />
@@ -103,7 +101,7 @@ const SearchInputField = ({
           overflowY: options.length > 5 ? 'auto' : undefined,
           display: 'block'
         }}
-      >
+                                              >
         {options.map(opt => (
           <DropDownItem
             key={opt.value}

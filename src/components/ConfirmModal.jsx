@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import PropTypes from "prop-types";
-import Header from "./Header";
+import styled from 'styled-components'
+import PropTypes from 'prop-types'
+import Header from './Header'
 
 const ModalBackdrop = styled.div`
   position: fixed;
@@ -12,7 +12,7 @@ const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
+`
 
 const ModalLayout = styled.div`
   min-width: 18.75rem;
@@ -23,25 +23,25 @@ const ModalLayout = styled.div`
   padding: 1.25rem 1rem 1rem 1rem;
   border-radius: 0.75rem;
   background-color: white;
-`;
+`
 
 const ModalContentBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-`;
+`
 
 const ModalHeader = styled.h2`
   ${({ theme }) => theme.texts.textLG}
   font-weight: ${({ theme }) => theme.weights.semiBold};
   color: ${({ theme }) => theme.colors.gray900};
-`;
+`
 
 const ModalActionsBox = styled.div`
   display: flex;
   flex-direction: row;
   gap: 0.75rem;
-`;
+`
 
 const ModalActionsButton = styled.div`
   flex: 1;
@@ -62,16 +62,15 @@ const ModalActionsButton = styled.div`
   white-space: nowrap;
 `
 
-
 const ConfirmModal = ({ text, setShowModal, handleConfirm }) => {
-    const _handleConfirm = () => {
-        handleConfirm();
-        setShowModal(false);
-    };
+  const _handleConfirm = () => {
+    handleConfirm()
+    setShowModal(false)
+  }
 
   const _handleCancel = () => {
-    setShowModal(false);
-  };
+    setShowModal(false)
+  }
 
   return (
     <ModalBackdrop onClick={_handleCancel}>
@@ -82,7 +81,7 @@ const ConfirmModal = ({ text, setShowModal, handleConfirm }) => {
           </ModalHeader>
         </ModalContentBox>
         <ModalActionsBox>
-          <ModalActionsButton $isConfirmBtn={true} onClick={_handleConfirm}>
+          <ModalActionsButton $isConfirmBtn onClick={_handleConfirm}>
             확인
           </ModalActionsButton>
           <ModalActionsButton $isConfirmBtn={false} onClick={_handleCancel}>
@@ -91,13 +90,13 @@ const ConfirmModal = ({ text, setShowModal, handleConfirm }) => {
         </ModalActionsBox>
       </ModalLayout>
     </ModalBackdrop>
-  );
-};
+  )
+}
 
 ConfirmModal.propTypes = {
   text: PropTypes.string.isRequired,
   setShowModal: PropTypes.func.isRequired,
-  handleConfirm: PropTypes.func.isRequired,
-};
+  handleConfirm: PropTypes.func.isRequired
+}
 
-export default ConfirmModal;
+export default ConfirmModal

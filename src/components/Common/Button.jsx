@@ -19,7 +19,7 @@ const StyledButton = styled.button`
   border-style: solid;
 
   ${({ theme, $variant = 'text', $color = 'brand500', disabled }) => {
-    const colorValue = theme.colors[$color] || theme.colors.brand500;
+    const colorValue = theme.colors[$color] || theme.colors.brand500
     if (disabled) {
       return css`
         background: ${theme.colors.gray200};
@@ -114,8 +114,8 @@ const Button = ({
             disabled
               ? 'gray400'
               : variant === 'contained'
-              ? 'white'
-              : color
+                ? 'white'
+                : color
           }
           value={children}
         />

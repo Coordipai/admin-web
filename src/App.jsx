@@ -11,7 +11,7 @@ import LoginPage from '@pages/login/LoginPage'
 import FirstAccountPage from '@pages/AccountSetupPage/AccountSetupPage'
 import RepositoryCheckPage from '@pages/AccountSetupPage/RepositoryCheckPage'
 import UserForm from '@pages/UserPage/UserPage'
-import  BuildProject  from '@pages/build_project/BuildProject'
+import BuildProject from '@pages/build_project/BuildProject'
 import { Project } from '@pages/project/Project'
 import IssueDetailPage from '@pages/issue/IssueDetailPage'
 import { SettingProject } from '@pages/build_project/SettingProject'
@@ -47,9 +47,9 @@ function App () {
           <Route path='/' element={<PrivateRoute element={<Home />} />} />
 
           <Route path='/login' element={<LoginPage />} />
-          <Route path="/register/:githubId" element={<FirstAccountPage />} />
-          <Route path="/repositorycheckpage/:githubId" element={<RepositoryCheckPage />} />
-          <Route path="/userform/:githubId" element={<PrivateRoute element={<UserForm />} />} />
+          <Route path='/register/:githubId' element={<FirstAccountPage />} />
+          <Route path='/repositorycheckpage/:githubId' element={<RepositoryCheckPage />} />
+          <Route path='/userform/:githubId' element={<PrivateRoute element={<UserForm />} />} />
 
           <Route path='/repositorycheckpage' element={<RepositoryCheckPage />} />
 
@@ -94,10 +94,10 @@ const PrivateRoute = ({ element, hasSideBar = true }) => {
     navigate('/login')
   }
 
-  return hasSideBar ? (
-    <PageBox>
-      {
-        // authData &&
+  return hasSideBar
+    ? (
+      <PageBox>
+        {
         hasSideBar && (
           <SideBar
             brandIcon={brandIcon}
@@ -108,11 +108,12 @@ const PrivateRoute = ({ element, hasSideBar = true }) => {
           />
         )
       }
-      {element}
-    </PageBox>
-  ) : (
-    {element}
-  )
+        {element}
+      </PageBox>
+      )
+    : (
+        { element }
+      )
 }
 
 PrivateRoute.propTypes = {
@@ -121,8 +122,8 @@ PrivateRoute.propTypes = {
 }
 
 const GlobalLoading = () => {
-  const { isLoading } = useLoadingStore();
-  return <Loading isLoading={isLoading} />;
-};
+  const { isLoading } = useLoadingStore()
+  return <Loading isLoading={isLoading} />
+}
 
 export default App
