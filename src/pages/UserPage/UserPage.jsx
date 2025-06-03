@@ -6,8 +6,9 @@ import DropDown from '@components/Edit/DropDown'
 import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useAccessTokenStore, useUserStore } from '@store/useUserStore'
+import useLoadingStore from '@store/useLoadingStore'
 import { useNavigate } from 'react-router-dom'
-import  api  from '@hooks/useAxios'
+import api from '@hooks/useAxios'
 import { categoryOptions } from '@constant/options'
 import toastMsg from '@utils/toastMsg'
 import ConfirmModal from '@components/ConfirmModal'
@@ -99,12 +100,8 @@ const TextButton = styled(ButtonBase)`
   }
 `
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
 export default function UserPage () {
   const navigate = useNavigate()
-  //const { githubId } = useParams() // 여기서 param으로 받아오기
-  const [githubId, setGithubId] = useState('') // 초기값으로 사용
   const [githubName, setGithubName] = useState('')
   const [repoList, setRepoList] = useState([])
   const [username, setUsername] = useState('')
@@ -113,11 +110,10 @@ export default function UserPage () {
   const [selectedRepos, setSelectedRepos] = useState([])
   const accessToken = useAccessTokenStore((state) => state.accessToken)
 
+  const user = useUserStore((state) => state.user)
 
- const user = useUserStore((state) => state.user)
-
- useEffect(() => {
-  if (!user || !accessToken) return
+  useEffect(() => {
+    if (!user || !accessToken) return
 
   // fetchRepos 실행
   }, [user, accessToken])
@@ -129,98 +125,98 @@ export default function UserPage () {
       return
     }
 
-  setGithubName(user.github_name|| '')
-  setGithubId(user.github_id || '')
-  setUsername(user.name || '')
-  setDiscordId(user.discord_id || '')
-  setCareer(user.career || '')
-  setField(user.category || '')
+    setGithubName(user.github_name || '')
+    setUsername(user.name || '')
+    setDiscordId(user.discord_id || '')
+    setCareer(user.career || '')
+    setField(user.category || '')
 
-  const fetchRepos = async () => {
-    try {
-      // 🔹 선택된 레포 불러오기
-      const selectedRes = await api.get(`/user-repo`)
-      const selected = selectedRes.map((r) => r.repo_fullname)
+    const fetchRepos = async () => {
+      try {
+        useLoadingStore.getState().setLoading(true)
+        // 🔹 선택된 레포 불러오기
+        const selectedRes = await api.get('/user-repo')
+        const selected = selectedRes.map((r) => r.repo_fullname)
 
-      // 🔹 GitHub의 전체 레포 불러오기
-      const allRes = await api.get(`/user-repo/github`)
-      const all = allRes.map((r) => r.repo_fullname)
+        // 🔹 GitHub의 전체 레포 불러오기
+        const allRes = await api.get('/user-repo/github')
+        const all = allRes.map((r) => r.repo_fullname)
 
-      // 상태에 반영
-      setRepoList(all)
-      setSelectedRepos(selected)
-    } catch (error) {
-      console.error('레포지토리 불러오기 실패:', error)
+        // 상태에 반영
+        setRepoList(all)
+        setSelectedRepos(selected)
+      } catch (error) {
+        console.error('레포지토리 불러오기 실패:', error)
+      } finally {
+        useLoadingStore.getState().setLoading(false)
+      }
     }
-  }
 
-  fetchRepos()
-}, [user, accessToken, navigate])
-
+    fetchRepos()
+  }, [user, accessToken, navigate])
 
   const [field, setField] = useState('')
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
 
-  
-
-  
   const handleSave = async () => {
     try {
+      useLoadingStore.getState().setLoading(true)
       const payload = {
         name: username,
         discord_id: discordId,
         career,
-        category: field || '',
+        category: field || ''
       }
       // 기본 정보 저장
-      await api.put(`/auth/update`, payload)
+      await api.put('/auth/update', payload)
 
-    const repoPayload = selectedRepos.map((repo) => ({ repo_fullname: repo }))
-    await api.post(`/user-repo`, repoPayload)
+      const repoPayload = selectedRepos.map((repo) => ({ repo_fullname: repo }))
+      await api.post('/user-repo', repoPayload)
 
-    // 저장 후 상태 갱신
-    const updatedUser = {
-      ...user,
-      name: username,
-      discord_id: discordId,
-      career,
-      category: field,
-    }
-
-
-    useUserStore.getState().setUser(updatedUser)
- 
-    toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
-    }catch (error) {
-      console.error('❌ 저장 실패:', error)
+      // 저장 후 상태 갱신
+      const updatedUser = {
+        ...user,
+        name: username,
+        discord_id: discordId,
+        career,
+        category: field
+      }
+      useUserStore.getState().setUser(updatedUser)
+      toastMsg('정보가 성공적으로 저장되었습니다!', 'success')
+    } catch {
       toastMsg('저장 중 오류가 발생했습니다.', 'error')
+    } finally {
+      useLoadingStore.getState().setLoading(false)
     }
   }
 
- const handleWithdraw = async () => {
-   try {
-     await api.delete(`/auth/unregister`)
-     toastMsg('탈퇴가 완료되었습니다.', 'success')
-     useUserStore.getState().clearUser()
-     useAccessTokenStore.getState().clearAccessToken()
-     navigate('/login')
-   } catch (error) {
-     console.error('❌ 탈퇴 실패:', error)
-     toastMsg('탈퇴 중 오류가 발생했습니다.', 'error')
-   }
- }
-
-
-
-const handleEvaluationRequest = async () => {
-  try {
-    await api.post(`/agent/assess_stat`,{})
-    toastMsg('평가 요청이 완료되었습니다!', 'success')
-  } catch (error) {
-    console.error('❌ 평가 요청 실패:', error)
-    toastMsg('평가 요청 중 오류가 발생했습니다.', 'error')
+  const handleWithdraw = async () => {
+    try {
+      useLoadingStore.getState().setLoading(true)
+      await api.delete('/auth/unregister')
+      toastMsg('탈퇴가 완료되었습니다.', 'success')
+      useUserStore.getState().clearUser()
+      useAccessTokenStore.getState().clearAccessToken()
+      navigate('/login')
+    } catch {
+      toastMsg('탈퇴 중 오류가 발생했습니다.', 'error')
+    } finally {
+      useLoadingStore.getState().setLoading(false)
+    }
   }
-}
+
+  const handleEvaluationRequest = async () => {
+    try {
+      useLoadingStore.getState().setLoading(true)
+      toastMsg('평가 요청을 시작합니다.', 'success')
+      await api.post('/agent/assess_stat', {})
+      toastMsg('평가 요청이 완료되었습니다!', 'success')
+    } catch {
+      toastMsg('평가 요청 중 오류가 발생했습니다.', 'error')
+    } finally {
+      useLoadingStore.getState().setLoading(false)
+    }
+  }
 
   const toggleRepo = (repo) => {
     setSelectedRepos((prev) =>
@@ -237,10 +233,12 @@ const handleEvaluationRequest = async () => {
           <Header text='계정 정보' />
           <FieldWrapper>
             <LabelText>사용자 이름</LabelText>
-            <FormInput placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
-              setUsername(v)
-            }} />
-            </FieldWrapper>
+            <FormInput
+              placeholder='이름을 입력해주세요' value={username} handleChange={(v) => {
+                setUsername(v)
+              }}
+            />
+          </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>GitHub 계정이름</LabelText>
@@ -253,10 +251,12 @@ const handleEvaluationRequest = async () => {
 
           <FieldWrapper>
             <LabelText>Discord ID</LabelText>
-            <FormInput placeholder='디스코드 ID' value={discordId} handleChange={(v) =>{
-              setDiscordId(v)
-            }} />
-           </FieldWrapper>
+            <FormInput
+              placeholder='디스코드 ID' value={discordId} handleChange={(v) => {
+                setDiscordId(v)
+              }}
+            />
+          </FieldWrapper>
 
           <FieldWrapper>
             <LabelText>분야 선택</LabelText>
@@ -266,7 +266,7 @@ const handleEvaluationRequest = async () => {
               value={field}
               onChange={(v) => {
                 setField(v)
-            }}
+              }}
             />
           </FieldWrapper>
 

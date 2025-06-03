@@ -7,12 +7,9 @@ import FormTextarea from '@components/FormTextarea'
 import { ButtonBase } from '@styles/globalStyle'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useUserStore, useAccessTokenStore, useRefreshTokenStore } from '@store/useUserStore'
-import  api  from '@hooks/useAxios'
+import api from '@hooks/useAxios'
 import { categoryOptions } from '@constant/options'
 import toastMsg from '@utils/toastMsg'
-
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
 
 const FormWrapper = styled.div`
   max-width: 800px;
@@ -76,11 +73,11 @@ export default function AccountSetupPage () {
         name: username,
         discord_id: discordId,
         category: selectedField || '',
-        career: career,
+        career
       }
 
       try {
-        const response = await api.post(`/auth/register`,payload)
+        const response = await api.post('/auth/register', payload)
 
         useUserStore.getState().setUser(response.user)
         useAccessTokenStore.getState().setAccessToken(response.access_token)
@@ -92,7 +89,6 @@ export default function AccountSetupPage () {
       }
     }
   }
-
 
   return (
     <FormWrapper>

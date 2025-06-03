@@ -12,9 +12,7 @@ import IssueDetailModal from './IssueDetailModal'
 import { useProjectStore } from '@store/useProjectStore'
 import api from '@hooks/useAxios'
 import toastMsg from '@utils/toastMsg'
-import { set } from 'date-fns'
 const BASE_URL = import.meta.env.VITE_BASE_URL
-
 
 const FormWrapper = styled.div`
   max-width: 1120px;
@@ -92,43 +90,42 @@ export default function IssueRequestPage () {
   const [assigneeOptions, setAssigneeOptions] = useState([])
   const iterationOptions = useProjectStore((state) => state.project?.iterationOptions || [])
 
-  
-useEffect(() => {
-  const fetchIssueData = async () => {
-    try {
-      const res = await api.get(`/issue-reschedule/${projectId}`);
-      const issues = res || [];
+  useEffect(() => {
+    const fetchIssueData = async () => {
+      try {
+        const res = await api.get(`/issue-reschedule/${projectId}`)
+        const issues = res || []
 
-      const matched = issues.find(issue => issue.issue_number === Number(requestId));
+        const matched = issues.find(issue => issue.issue_number === Number(requestId))
 
-      if (!matched) {
-        toastMsg('해당 요청을 찾을 수 없습니다.', 'error')
-        return;
+        if (!matched) {
+          toastMsg('해당 요청을 찾을 수 없습니다.', 'error')
+          return
+        }
+
+        const oldAssignee = matched.old_assignees?.[0] || ''
+        const newAssignee = matched.new_assignees?.[0] || ''
+
+        const members = useProjectStore.getState().project?.members || []
+        const userPart = members.find((m) => m.github_name === oldAssignee)?.role || ''
+
+        const transformed = {
+          oldAssignee,
+          newAssignee,
+          reason: matched.reason,
+          currentSprint: matched.old_iteration,
+          targetSprint: matched.new_iteration,
+          userPart
+        }
+
+        setIssueData(transformed)
+      } catch (error) {
+        console.error('이슈 데이터 가져오기 실패:', error)
       }
-
-      const oldAssignee = matched.old_assignees?.[0] || ''
-      const newAssignee = matched.new_assignees?.[0] || ''
-
-      const members = useProjectStore.getState().project?.members || []
-      const userPart = members.find((m) => m.github_name === oldAssignee)?.role || ''
-
-      const transformed = {
-        oldAssignee,
-        newAssignee,
-        reason: matched.reason,
-        currentSprint: matched.old_iteration,
-        targetSprint: matched.new_iteration,
-        userPart
-      }
-
-      setIssueData(transformed);
-    } catch (error) {
-      console.error('이슈 데이터 가져오기 실패:', error);
     }
-  };
 
-  fetchIssueData();
-}, [projectId, requestId]);
+    fetchIssueData()
+  }, [projectId, requestId])
 
   useEffect(() => {
     const fetchProjectMembers = async () => {
@@ -180,14 +177,13 @@ useEffect(() => {
   }, [issueData])
 
   useEffect(() => {
-  if (issueData) {
+    if (issueData) {
       const sprintIndex = iterationOptions.findIndex(
         (option) => option.title === issueData.targetSprint
       )
       setSelectedSprint(sprintIndex)
     }
   }, [issueData, iterationOptions])
-
 
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
@@ -199,17 +195,15 @@ useEffect(() => {
 
     try {
       const res = await api.delete(`/issue-reschedule/${requestId}`, {
-        params: { type },
+        params: { type }
       })
-      
+
       toastMsg(`${isApproved ? '승인' : '반려'} 처리되었습니다.`, 'success')
     } catch (error) {
-      console.error(`${type} 실패:`, error);
+      console.error(`${type} 실패:`, error)
       toastMsg(`${isApproved ? '승인' : '반려'} 처리에 실패했습니다.`, 'error')
     }
   }
-
-
 
   const handleRequestFeedbackAgain = () => {
     console.log('AI 피드백 재요청 처리')
@@ -226,7 +220,8 @@ useEffect(() => {
           buttonsData={[
             { value: '변경 반려', onClick: () => handleDecision(false) },
             { value: '변경 승인', onClick: () => handleDecision(true) }
-          ]}/>
+          ]}
+        />
         <LabeledRow>
           <Label>담당자 / 분야 </Label>
           <RowGroup2>
@@ -260,7 +255,7 @@ useEffect(() => {
             </div>
             <div style={{ width: '244px' }}>
               <DropDown
-                label="스프린트를 선택하세요"
+                label='스프린트를 선택하세요'
                 options={iterationOptions}
                 value={selectedSprint}
                 onChange={setSelectedSprint}
@@ -281,10 +276,10 @@ useEffect(() => {
             </div>
             <div style={{ width: '244px' }}>
               <DropDown
-                label = "변경할 사용자를 선택하세요"
-                options = {assigneeOptions}
-                value = {selectedAssignee}
-                onChange = {setSelectedAssignee}
+                label='변경할 사용자를 선택하세요'
+                options={assigneeOptions}
+                value={selectedAssignee}
+                onChange={setSelectedAssignee}
               />
             </div>
           </RowGroup>
