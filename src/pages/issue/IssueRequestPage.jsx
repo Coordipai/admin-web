@@ -88,13 +88,26 @@ export default function IssueRequestPage () {
   const [aiFeedback, setAiFeedback] = useState('')
   const [aiFeedbackReason, setAiFeedbackReason] = useState('')
   const [assigneeOptions, setAssigneeOptions] = useState([])
-  const iterationOptions = useProjectStore((state) => state.project?.iterationOptions || [])
+  const rawIterationOptions = useProjectStore((state) => state.project?.iterationOptions || [])
 
-  useEffect(() => {
-    const fetchIssueData = async () => {
-      try {
-        const res = await api.get(`/issue-reschedule/${projectId}`)
-        const issues = res || []
+  const iterationOptions = rawIterationOptions.map((opt) => {
+    const match = opt.title.match(/\d+/)  // 숫자만 추출
+    const numericValue = match ? match[0] : ''  // 없으면 빈 문자열 fallback
+
+    return {
+      value: numericValue,                    // ex: "1"
+      label: opt.title                        // ex: "Iteration 1"
+    }
+  })
+
+
+
+  
+useEffect(() => {
+  const fetchIssueData = async () => {
+    try {
+      const res = await api.get(`/issue-reschedule/${projectId}`);
+      const issues = res || [];
 
         const matched = issues.find(issue => issue.issue_number === Number(requestId))
 
@@ -109,14 +122,15 @@ export default function IssueRequestPage () {
         const members = useProjectStore.getState().project?.members || []
         const userPart = members.find((m) => m.github_name === oldAssignee)?.role || ''
 
-        const transformed = {
-          oldAssignee,
-          newAssignee,
-          reason: matched.reason,
-          currentSprint: matched.old_iteration,
-          targetSprint: matched.new_iteration,
-          userPart
-        }
+      const transformed = {
+        oldAssignee,
+        newAssignee,
+        reason: matched.reason,
+        currentSprint: matched.old_iteration,
+        targetSprint: String(matched.new_iteration),
+        userPart
+      }
+      
 
         setIssueData(transformed)
       } catch (error) {
@@ -134,8 +148,10 @@ export default function IssueRequestPage () {
         const members = res.members || []
 
         const mappedOptions = members.map((member) => ({
-          title: member.name || member.github_id // 혹은 github_name
+          value: member.github_name,
+          label: member.name || member.github_id,
         }))
+
 
         setAssigneeOptions(mappedOptions)
       } catch (error) {
@@ -147,43 +163,50 @@ export default function IssueRequestPage () {
   }, [projectId])
 
   useEffect(() => {
-    const fetchAiFeedback = async () => {
-      try {
-        // const response = await axios.get(`/api/issue/${requestId}/ai-feedback`)
-        const mockFeedback = {
-          feedback: '이건 개선사항임',
-          reason: '너가 못한거잖아ㅋㅋㅋ'
-        }
+  const fetchAiFeedback = async () => {
+    try {
+      const response = await api.get('/agent/feedback', {
+        data: {
+          project_id: Number(projectId),
+          issue_rescheduling_id: Number(requestId),
+        },
+      });
 
-        setAiFeedback(mockFeedback.feedback)
-        setAiFeedbackReason(mockFeedback.reason)
-      } catch (error) {
-        console.error('AI 피드백 불러오기 실패:', error)
-      }
+      const data = response.content?.data;
+
+      setAiFeedback(data?.reason_for_assignee || '없음');
+      setAiFeedbackReason(data?.reason_for_iteration || '없음');
+    } catch (error) {
+      console.error('AI 피드백 불러오기 실패:', error);
+      toastMsg('AI 피드백 요청 실패', 'error');
     }
+  };
 
-    fetchAiFeedback()
-  }, [requestId]) // Add requestId as a dependency
+  fetchAiFeedback();
+}, [projectId, requestId]);
+
 
   const [selectedSprint, setSelectedSprint] = useState(-1)
 
   const [selectedAssignee, setSelectedAssignee] = useState(-1)
 
   useEffect(() => {
-    if (issueData) {
+    if (issueData && assigneeOptions.length > 0) {
       const index = assigneeOptions.findIndex(opt => opt.title === issueData.newAssignee)
       setSelectedAssignee(index)
     }
-  }, [issueData])
+  }, [issueData, assigneeOptions])
 
   useEffect(() => {
-    if (issueData) {
+    if (issueData && iterationOptions.length > 0) {
       const sprintIndex = iterationOptions.findIndex(
         (option) => option.title === issueData.targetSprint
       )
       setSelectedSprint(sprintIndex)
     }
   }, [issueData, iterationOptions])
+
+
 
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false)
 
@@ -248,17 +271,18 @@ export default function IssueRequestPage () {
           <Label>변경 기한</Label>
           <RowGroup>
             <div style={{ width: '244px' }}>
-              <FormInput value={issueData?.currentSprint || ''} readOnly />
+              <FormInput value={`Iteration ${issueData?.currentSprint || ''}`} readOnly />
             </div>
             <div style={{ padding: '0.275rem', alignContent: 'center' }}>
               <img src={arrowright} alt='arrow' width='12' height='12' />
             </div>
             <div style={{ width: '244px' }}>
               <DropDown
-                label='스프린트를 선택하세요'
                 options={iterationOptions}
-                value={selectedSprint}
-                onChange={setSelectedSprint}
+                value={issueData?.targetSprint || ''}
+                onChange={(val) =>
+                  setIssueData(prev => ({ ...prev, targetSprint: val }))
+                }
               />
             </div>
           </RowGroup>
@@ -276,10 +300,11 @@ export default function IssueRequestPage () {
             </div>
             <div style={{ width: '244px' }}>
               <DropDown
-                label='변경할 사용자를 선택하세요'
                 options={assigneeOptions}
-                value={selectedAssignee}
-                onChange={setSelectedAssignee}
+                value={issueData?.newAssignee || ''}
+                onChange={(val) =>
+                  setIssueData(prev => ({ ...prev, newAssignee: val }))
+                }
               />
             </div>
           </RowGroup>

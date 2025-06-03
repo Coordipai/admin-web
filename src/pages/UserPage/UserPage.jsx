@@ -193,7 +193,7 @@ export default function UserPage () {
   const handleWithdraw = async () => {
     try {
       useLoadingStore.getState().setLoading(true)
-      await api.delete('/auth/unregister')
+      await api.delete('/user/unregister')
       toastMsg('탈퇴가 완료되었습니다.', 'success')
       useUserStore.getState().clearUser()
       useAccessTokenStore.getState().clearAccessToken()
