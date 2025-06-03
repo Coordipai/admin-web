@@ -97,7 +97,6 @@ const PrivateRoute = ({ element, hasSideBar = true }) => {
   return hasSideBar ? (
     <PageBox>
       {
-        // authData &&
         hasSideBar && (
           <SideBar
             brandIcon={brandIcon}
