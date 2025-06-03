@@ -274,7 +274,7 @@ useEffect(() => {
           <Label>변경 기한</Label>
           <RowGroup>
             <div style={{ width: '244px' }}>
-              <FormInput value={issueData?.currentSprint || ''} readOnly />
+              <FormInput value={`Iteration ${issueData?.currentSprint || ''}`} readOnly />
             </div>
             <div style={{ padding: '0.275rem', alignContent: 'center' }}>
               <img src={arrowright} alt='arrow' width='12' height='12' />
