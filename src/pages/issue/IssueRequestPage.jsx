@@ -106,8 +106,8 @@ export default function IssueRequestPage () {
 useEffect(() => {
   const fetchIssueData = async () => {
     try {
-      const res = await api.get(`/issue-reschedule/${projectId}`);
-      const issues = res || [];
+      const res = await api.get(`/issue-reschedule/${projectId}`)
+      const issues = res || []
 
         const matched = issues.find(issue => issue.issue_number === Number(requestId))
 
@@ -151,8 +151,6 @@ useEffect(() => {
           value: member.github_name,
           label: member.name || member.github_id,
         }))
-
-
         setAssigneeOptions(mappedOptions)
       } catch (error) {
         console.error('프로젝트 멤버 불러오기 실패:', error)
@@ -168,20 +166,21 @@ useEffect(() => {
       const response = await api.post('/agent/feedback', {
           project_id: Number(projectId),
           issue_rescheduling_id: Number(requestId),
-      });
+      })
 
-      const data = response.data?.content?.data;
+      const data = response.data?.content?.data
 
-      setAiFeedback(data?.reason_for_assignee || '없음');
-      setAiFeedbackReason(data?.reason_for_iteration || '없음');
+      setAiFeedback(data?.reason_for_assignee || '없음')
+      setAiFeedbackReason(data?.reason_for_iteration || '없음')
     } catch (error) {
-      console.error('AI 피드백 불러오기 실패:', error);
-      toastMsg('AI 피드백 요청 실패', 'error');
+      console.error('AI 피드백 불러오기 실패:', error)
+      toastMsg('AI 피드백 요청 실패', 'error')
     }
-  };
+  }
 
-  fetchAiFeedback();
-}, [projectId, requestId]);
+  fetchAiFeedback()
+}, [projectId, requestId])
+
 
 
   const [selectedSprint, setSelectedSprint] = useState(-1)
@@ -203,6 +202,8 @@ useEffect(() => {
       setSelectedSprint(sprintIndex)
     }
   }, [issueData, iterationOptions])
+
+
 
 
 
@@ -232,9 +233,9 @@ const handleRequestFeedbackAgain = async () => {
     const response = await api.post('/agent/feedback', {
       project_id: Number(projectId),
       issue_rescheduling_id: Number(requestId),
-    });
+    })
 
-    const data = response.data?.data;
+    const data = response.data?.content?.data;
     setAiFeedback(data?.reason_for_assignee || '없음')
     setAiFeedbackReason(data?.reason_for_iteration || '없음')
 
