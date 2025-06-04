@@ -165,14 +165,12 @@ useEffect(() => {
   useEffect(() => {
   const fetchAiFeedback = async () => {
     try {
-      const response = await api.get('/agent/feedback', {
-        data: {
+      const response = await api.post('/agent/feedback', {
           project_id: Number(projectId),
           issue_rescheduling_id: Number(requestId),
-        },
       });
 
-      const data = response.content?.data;
+      const data = response.data?.content?.data;
 
       setAiFeedback(data?.reason_for_assignee || '없음');
       setAiFeedbackReason(data?.reason_for_iteration || '없음');
@@ -228,10 +226,25 @@ useEffect(() => {
     }
   }
 
-  const handleRequestFeedbackAgain = () => {
-    console.log('AI 피드백 재요청 처리')
-    // TODO: axios.post('/api/issue/feedback-request', { issueId })
+
+const handleRequestFeedbackAgain = async () => {
+  try {
+    const response = await api.post('/agent/feedback', {
+      project_id: Number(projectId),
+      issue_rescheduling_id: Number(requestId),
+    });
+
+    const data = response.data?.data;
+    setAiFeedback(data?.reason_for_assignee || '없음')
+    setAiFeedbackReason(data?.reason_for_iteration || '없음')
+
+    toastMsg('AI 피드백이 갱신되었습니다.', 'success')
+  } catch (error) {
+    console.error('AI 피드백 재요청 실패:', error)
+    toastMsg('AI 피드백 재요청 실패', 'error')
   }
+}
+
 
   return (
     <MainBox>
