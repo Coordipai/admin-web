@@ -170,8 +170,8 @@ useEffect(() => {
 
       const data = response.data?.content?.data
 
-      setAiFeedback(data?.reason_for_assignee || '없음')
-      setAiFeedbackReason(data?.reason_for_iteration || '없음')
+      setAiFeedback(data?.reason_for_assignees || '없음')
+      setAiFeedbackReason(data?.reason_for_iterations || '없음')
     } catch (error) {
       console.error('AI 피드백 불러오기 실패:', error)
       toastMsg('AI 피드백 요청 실패', 'error')
@@ -189,7 +189,7 @@ useEffect(() => {
 
   useEffect(() => {
     if (issueData && assigneeOptions.length > 0) {
-      const index = assigneeOptions.findIndex(opt => opt.title === issueData.newAssignee)
+      const index = assigneeOptions.findIndex(opt => opt.value === issueData.newAssignee)
       setSelectedAssignee(index)
     }
   }, [issueData, assigneeOptions])
@@ -197,7 +197,7 @@ useEffect(() => {
   useEffect(() => {
     if (issueData && iterationOptions.length > 0) {
       const sprintIndex = iterationOptions.findIndex(
-        (option) => option.title === issueData.targetSprint
+        (option) => option.value === issueData.targetSprint
       )
       setSelectedSprint(sprintIndex)
     }
@@ -236,8 +236,8 @@ const handleRequestFeedbackAgain = async () => {
     })
 
     const data = response.data?.content?.data;
-    setAiFeedback(data?.reason_for_assignee || '없음')
-    setAiFeedbackReason(data?.reason_for_iteration || '없음')
+    setAiFeedback(data?.reason_for_assignees || '없음')
+    setAiFeedbackReason(data?.reason_for_iterations || '없음')
 
     toastMsg('AI 피드백이 갱신되었습니다.', 'success')
   } catch (error) {
