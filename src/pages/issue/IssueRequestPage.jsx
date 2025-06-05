@@ -107,12 +107,10 @@ useEffect(() => {
   const fetchIssueData = async () => {
     try {
       const res = await api.get(`/issue-reschedule/${projectId}`)
-      console.log('✅ API 전체 응답:', res)
       const issues = res || []
 
         const matched = issues.find(issue => issue.issue_number === Number(requestId))
-        console.log('Matched issue:', matched)
-
+        
         if (!matched) {
           toastMsg('해당 요청을 찾을 수 없습니다.', 'error')
           return
@@ -168,9 +166,6 @@ useEffect(() => {
       const res = await api.get(`/issue-reschedule/${projectId}`)
       const issues = res
       const matched = issues.find(issue => issue.issue_number === Number(requestId))
-      console.log('number(requstId)', Number(requestId))
-      console.log('issue: ',issues)
-      console.log('matched: ', matched)
       if (!matched) {
         toastMsg('해당 요청을 찾을 수 없습니다.', 'error')
         return
@@ -181,8 +176,6 @@ useEffect(() => {
         issue_rescheduling_id: matched.id, // ✅ 정확한 id 사용
       })
 
-      console.log('여기까지는 오는거냐?')
-      console.log('AI 피드백 전체 응답:', response)
       // 👇 aiFeedback: 담당자 + 스프린트
       const suggested = response?.suggested_assignees
       const suggestedIter = response?.suggested_iteration
