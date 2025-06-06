@@ -148,7 +148,7 @@ const BuildProject = () => {
             </div>
             <DropDown
               label='스프린트 단위'
-              placeholder='Select team member'
+              placeholder='스프린트 단위를 선택해주세요.'
               value={form.sprint}
               onChange={v => {
 							  setForm(f => ({ ...f, sprint: v }))
@@ -161,7 +161,7 @@ const BuildProject = () => {
           </DropDownWrapper>
           <InputField
             label='Github Repo 주소 입력'
-            placeholder='입력하세요'
+            placeholder='Github Repo 주소를 입력해주세요'
             value={form.githubInput ?? form.github}
             onChange={e => {
 						  const input = e.target.value
@@ -178,7 +178,7 @@ const BuildProject = () => {
           />
           <InputField
             label='Discord 서버 ID 입력'
-            placeholder='입력하세요'
+            placeholder='Discord 서버 ID를 입력해주세요'
             value={form.discord}
             onChange={e => {
 						  setForm(f => ({ ...f, discord: e.target.value }))
