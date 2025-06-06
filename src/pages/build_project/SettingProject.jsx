@@ -211,7 +211,7 @@ export const SettingProject = () => {
         <Fieldset>
           <InputField
             label='프로젝트 명 입력'
-            placeholder='입력하세요'
+            placeholder='프로젝트 명을 입력해주세요'
             value={form.projectName}
             onChange={e => {
               setForm(f => ({ ...f, projectName: e.target.value }))
@@ -237,7 +237,7 @@ export const SettingProject = () => {
             </div>
             <DropDown
               label='스프린트 단위'
-              placeholder='Select team member'
+              placeholder='스프린트 단위를 선택해주세요.'
               value={form.sprint}
               onChange={v => {
                 setForm(f => ({ ...f, sprint: v }))
@@ -250,7 +250,7 @@ export const SettingProject = () => {
           </DropDownWrapper>
           <InputField
             label='Github Repo 주소 입력'
-            placeholder='입력하세요'
+            placeholder='Github Repo 주소를 입력해주세요'
             value={form.github}
             onChange={e => {
               setForm(f => ({ ...f, github: e.target.value }))
@@ -261,7 +261,7 @@ export const SettingProject = () => {
           />
           <InputField
             label='Discord 서버 ID 입력'
-            placeholder='입력하세요'
+            placeholder='Discord 서버 ID를 입력해주세요'
             value={form.discord}
             onChange={e => {
               setForm(f => ({ ...f, discord: e.target.value }))
