@@ -292,7 +292,6 @@ const IssueSuggestPage = () => {
     }
 
     function appendContentInline (issue) {
-      issue.priority = 'M' // TODO: 수정 필요
       if (!issue.body || !Array.isArray(issue.body)) {
         return { ...issue, content: '' }
       }
@@ -428,7 +427,7 @@ const IssueSuggestPage = () => {
     setIssueTitle(issue.title)
     setIssueContent(issue.content)
     setPriority(issue.priority || 'M')
-    setSprintIndex(issue.sprint)
+    setSprintIndex(issue.sprint ? Number(issue.sprint) - 1 : null)
     setSelectedLabels(issue.labels || [])
     setAssignees(issue.assignees || [])
     setIsCompleted(issue.isCompleted || false)
@@ -436,7 +435,7 @@ const IssueSuggestPage = () => {
 
   const handleStateToggle = () => {
     if (step === 'assign') {
-      if (assignees.length === 0) {
+      if (!assignees || assignees.length === 0) {
         toastMsg('담당자를 먼저 선택해주세요.', 'warning')
         return
       }
@@ -624,7 +623,7 @@ const IssueSuggestPage = () => {
 
             <Row>
               <Typography value='Iteration' variant='textSM' weight='medium' color='gray900' />
-              {sprintIndex && (
+              {sprintIndex !== null && (
                 <>
                   <div
                     ref={iterationRef}
@@ -641,17 +640,17 @@ const IssueSuggestPage = () => {
                       <IterationBox>
                         <Typography
                           value={
-                              sprintIndex !== null && iterationOptions[sprintIndex]
+                              iterationOptions[sprintIndex]
                                 ? iterationOptions[sprintIndex].title
                                 : 'Iteration을 선택해주세요'
                             }
                           variant='textSM'
                           weight='regular'
-                          color={sprintIndex !== null && iterationOptions[sprintIndex] ? 'gray900' : 'gray400'}
+                          color={iterationOptions[sprintIndex] ? 'gray900' : 'gray400'}
                         />
                         <Typography
                           value={
-                              sprintIndex !== null && iterationOptions[sprintIndex]
+                              iterationOptions[sprintIndex]
                                 ? iterationOptions[sprintIndex].period
                                 : ''
                             }
@@ -660,7 +659,6 @@ const IssueSuggestPage = () => {
                           color='gray500'
                         />
                       </IterationBox>
-
                     </IterationBox>
                   </div>
                   {iterationDropdownOpen && isIssueSelected && createPortal(
