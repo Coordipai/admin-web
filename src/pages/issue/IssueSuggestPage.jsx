@@ -207,6 +207,8 @@ const IssueSuggestPage = () => {
   const [issueList, setIssueList] = useState([])
   const isAllCompleted = issueList.every(issue => issue.isCompleted)
 
+  const abortControllerRef = useRef(null)
+
   const fetchProject = useCallback(async () => {
     try {
       setIterationOptions(project.iterationOptions)
@@ -229,12 +231,16 @@ const IssueSuggestPage = () => {
       return
     }
 
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
     try {
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/agent/generate_issues/${projectId}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`
-        }
+        },
+        signal: controller.signal
       })
 
       const reader = response.body.getReader()
@@ -243,41 +249,43 @@ const IssueSuggestPage = () => {
 
       while (true) {
         const { done, value } = await reader.read()
-        if (done) {
-          if (buffer.trim() !== '') {
+        if (done) break
+        
+        const chunk = decoder.decode(value, { stream: true })
+        buffer += chunk
+
+        try {
+          // Try to parse complete JSON objects from the buffer
+          const jsonObjects = buffer.split('}{').map((obj, index, array) => {
+            if (index === 0) return obj + '}'
+            if (index === array.length - 1) return '{' + obj
+            return '{' + obj + '}'
+          })
+
+          for (const jsonStr of jsonObjects) {
             try {
-              const lastIssue = JSON.parse(buffer)
-              const processed = appendContentInline(lastIssue)
+              const parsed = JSON.parse(jsonStr)
+              const processed = appendContentInline(parsed)
               setIssueList(prev => [...prev, processed])
-            } catch (err) {
-              console.error('마지막 이슈 파싱 실패:', err, buffer)
+            } catch {
+              continue
             }
           }
-          break
-        }
-
-        buffer += decoder.decode(value, { stream: true })
-
-        let boundary = buffer.indexOf('}{')
-        while (boundary !== -1) {
-          const jsonString = buffer.substring(0, boundary + 1)
-          try {
-            const parsed = JSON.parse(jsonString)
-            const processed = appendContentInline(parsed)
-            setIssueList(prev => [...prev, processed])
-          } catch (err) {
-            console.error('JSON 파싱 실패:', err, jsonString)
-          }
-          buffer = buffer.substring(boundary + 1)
-          boundary = buffer.indexOf('}{')
+          buffer = '' // Clear buffer after successful parsing
+        } catch {
+          continue
         }
         toastMsg('자동 이슈 생성중...', 'success')
       }
       toastMsg('자동 이슈 생성 완료', 'success')
     } catch (error) {
-      toastMsg(error, 'error')
-      // showErrortoastMsgMsg(error)
-      console.error('Failed to fetch issue list:', error)
+      if (error.name === 'AbortError') {
+        toastMsg('자동 이슈 생성이 취소되었습니다.', 'success')
+        navigate(-1)
+        return
+      }
+      console.error('Error fetching issues:', error)
+      toastMsg('이슈 생성 중 오류가 발생했습니다.', 'error')
       setIssueList([])
     } finally {
       setIsFetching(false)
@@ -538,7 +546,16 @@ const IssueSuggestPage = () => {
                 isHighlighted: true
               },
           step === 'confirm'
-            ? { value: '취소', onClick: () => window.history.back() }
+            ? { 
+              value: '취소', 
+              onClick: () => {
+                if (abortControllerRef.current) {
+                  abortControllerRef.current.abort()
+                  abortControllerRef.current = null
+                }
+                setIsFetching(false)
+                setIssueList([])
+              }}
             : { value: '뒤로', onClick: () => window.history.back() }
         ]}
       />
