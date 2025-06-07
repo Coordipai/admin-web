@@ -106,11 +106,11 @@ export default function IssueRequestPage () {
 useEffect(() => {
   const fetchIssueData = async () => {
     try {
-      const res = await api.get(`/issue-reschedule/${projectId}`);
-      const issues = res || [];
+      const res = await api.get(`/issue-reschedule/${projectId}`)
+      const issues = res || []
 
         const matched = issues.find(issue => issue.issue_number === Number(requestId))
-
+        
         if (!matched) {
           toastMsg('해당 요청을 찾을 수 없습니다.', 'error')
           return
@@ -151,8 +151,6 @@ useEffect(() => {
           value: member.github_name,
           label: member.name || member.github_id,
         }))
-
-
         setAssigneeOptions(mappedOptions)
       } catch (error) {
         console.error('프로젝트 멤버 불러오기 실패:', error)
@@ -165,25 +163,38 @@ useEffect(() => {
   useEffect(() => {
   const fetchAiFeedback = async () => {
     try {
-      const response = await api.get('/agent/feedback', {
-        data: {
-          project_id: Number(projectId),
-          issue_rescheduling_id: Number(requestId),
-        },
-      });
+      const res = await api.get(`/issue-reschedule/${projectId}`)
+      const issues = res
+      const matched = issues.find(issue => issue.issue_number === Number(requestId))
+      if (!matched) {
+        toastMsg('해당 요청을 찾을 수 없습니다.', 'error')
+        return
+      }
 
-      const data = response.content?.data;
+      const response = await api.post('/agent/feedback', {
+        project_id: Number(projectId),
+        issue_rescheduling_id: matched.id, // ✅ 정확한 id 사용
+      })
 
-      setAiFeedback(data?.reason_for_assignee || '없음');
-      setAiFeedbackReason(data?.reason_for_iteration || '없음');
+      // 👇 aiFeedback: 담당자 + 스프린트
+      const suggested = response?.suggested_assignees
+      const suggestedIter = response?.suggested_iteration
+      setAiFeedback(`Suggested assignee: ${suggested ?? '담당자 없음'} \nSuggested Iteration: Iteration ${suggestedIter ?? '?'}`)
+
+      // 👇 aiFeedbackReason: 이유 설명 두 줄 합치기
+      const reason1 = response?.reason_for_assignees ?? ''
+      const reason2 = response?.reason_for_iteration ?? ''
+      setAiFeedbackReason(`${reason1}\n${reason2}`)
     } catch (error) {
-      console.error('AI 피드백 불러오기 실패:', error);
-      toastMsg('AI 피드백 요청 실패', 'error');
+      console.error('AI 피드백 요청 실패:', error.response?.data || error.message)
+      toastMsg('AI 피드백 요청 실패', 'error')
     }
-  };
+  }
 
-  fetchAiFeedback();
-}, [projectId, requestId]);
+  fetchAiFeedback()
+}, [projectId, requestId])
+
+
 
 
   const [selectedSprint, setSelectedSprint] = useState(-1)
@@ -192,7 +203,7 @@ useEffect(() => {
 
   useEffect(() => {
     if (issueData && assigneeOptions.length > 0) {
-      const index = assigneeOptions.findIndex(opt => opt.title === issueData.newAssignee)
+      const index = assigneeOptions.findIndex(opt => opt.value === issueData.newAssignee)
       setSelectedAssignee(index)
     }
   }, [issueData, assigneeOptions])
@@ -200,11 +211,13 @@ useEffect(() => {
   useEffect(() => {
     if (issueData && iterationOptions.length > 0) {
       const sprintIndex = iterationOptions.findIndex(
-        (option) => option.title === issueData.targetSprint
+        (option) => option.value === issueData.targetSprint
       )
       setSelectedSprint(sprintIndex)
     }
   }, [issueData, iterationOptions])
+
+
 
 
 
@@ -228,10 +241,31 @@ useEffect(() => {
     }
   }
 
-  const handleRequestFeedbackAgain = () => {
-    console.log('AI 피드백 재요청 처리')
-    // TODO: axios.post('/api/issue/feedback-request', { issueId })
+
+const handleRequestFeedbackAgain = async () => {
+  try {
+    const response = await api.post('/agent/feedback', {
+      project_id: Number(projectId),
+      issue_rescheduling_id: Number(requestId),
+    })
+
+    // 👇 aiFeedback: 담당자 + 스프린트
+    const suggested = response?.suggested_assignees
+    const suggestedIter = response?.suggested_iteration
+    setAiFeedback(`Suggested assignee: ${suggested ?? '담당자 없음'} \nSuggested Iteration: Iteration ${suggestedIter ?? '?'}`)
+
+    // 👇 aiFeedbackReason: 이유 설명 두 줄 합치기
+    const reason1 = response?.reason_for_assignees ?? ''
+    const reason2 = response?.reason_for_iteration ?? ''
+    setAiFeedbackReason(`${reason1}\n${reason2}`)
+
+    toastMsg('AI 피드백이 갱신되었습니다.', 'success')
+  } catch (error) {
+    console.error('AI 피드백 재요청 실패:', error)
+    toastMsg('AI 피드백 재요청 실패', 'error')
   }
+}
+
 
   return (
     <MainBox>
