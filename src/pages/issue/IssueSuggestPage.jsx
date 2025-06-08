@@ -175,11 +175,36 @@ const IssueSuggestPage = () => {
     const hash = location.hash.replace('#', '')
     return hash === 'confirm' ? 'confirm' : 'assign'
   })
+  const abortControllerRef = useRef(null)
+
+  // issue 목록
+  const [selectedIssue, setSelectedIssue] = useState(null)
+  const isIssueSelected = !!selectedIssue
+  const [issueList, setIssueList] = useState([])
+  const isAllCompleted = issueList.every(issue => issue.isCompleted)
 
   useEffect(() => {
+    // 페이지를 나가는 중이면 실행하지 않음
+    if (!location.pathname.includes('issuesuggest')) return
+
     const hash = location.hash.replace('#', '')
     setStep(hash === 'confirm' ? 'confirm' : 'assign')
-  }, [location.hash])
+
+    // If in assign step and no issues, go back to confirm step
+    if (hash === 'assign' && issueList.length === 0) {
+      navigate(`${location.pathname}#confirm`)
+    }
+  }, [location.hash, issueList.length, navigate, location.pathname])
+
+  // 컴포넌트 언마운트 시 abortControllerRef 정리
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+        abortControllerRef.current = null
+      }
+    }
+  }, [])
 
   // project 정보
   const [priorityOptions] = useState([
@@ -200,12 +225,6 @@ const IssueSuggestPage = () => {
   const [selectedLabels, setSelectedLabels] = useState([])
   const [assignees, setAssignees] = useState([])
   const [isCompleted, setIsCompleted] = useState(false)
-
-  // issue 목록
-  const [selectedIssue, setSelectedIssue] = useState(null)
-  const isIssueSelected = !!selectedIssue
-  const [issueList, setIssueList] = useState([])
-  const isAllCompleted = issueList.every(issue => issue.isCompleted)
 
   const fetchProject = useCallback(async () => {
     try {
@@ -229,12 +248,16 @@ const IssueSuggestPage = () => {
       return
     }
 
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
     try {
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/agent/generate_issues/${projectId}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`
-        }
+        },
+        signal: controller.signal
       })
 
       const reader = response.body.getReader()
@@ -243,48 +266,49 @@ const IssueSuggestPage = () => {
 
       while (true) {
         const { done, value } = await reader.read()
-        if (done) {
-          if (buffer.trim() !== '') {
+        if (done) break
+        
+        const chunk = decoder.decode(value, { stream: true })
+        buffer += chunk
+
+        try {
+          // Try to parse complete JSON objects from the buffer
+          const jsonObjects = buffer.split('}{').map((obj, index, array) => {
+            if (index === 0) return obj + '}'
+            if (index === array.length - 1) return '{' + obj
+            return '{' + obj + '}'
+          })
+
+          for (const jsonStr of jsonObjects) {
             try {
-              const lastIssue = JSON.parse(buffer)
-              const processed = appendContentInline(lastIssue)
+              const parsed = JSON.parse(jsonStr)
+              const processed = appendContentInline(parsed)
               setIssueList(prev => [...prev, processed])
-            } catch (err) {
-              console.error('마지막 이슈 파싱 실패:', err, buffer)
+            } catch {
+              continue
             }
           }
-          break
-        }
-
-        buffer += decoder.decode(value, { stream: true })
-
-        let boundary = buffer.indexOf('}{')
-        while (boundary !== -1) {
-          const jsonString = buffer.substring(0, boundary + 1)
-          try {
-            const parsed = JSON.parse(jsonString)
-            const processed = appendContentInline(parsed)
-            setIssueList(prev => [...prev, processed])
-          } catch (err) {
-            console.error('JSON 파싱 실패:', err, jsonString)
-          }
-          buffer = buffer.substring(boundary + 1)
-          boundary = buffer.indexOf('}{')
+          buffer = '' // Clear buffer after successful parsing
+        } catch {
+          continue
         }
         toastMsg('자동 이슈 생성중...', 'success')
       }
       toastMsg('자동 이슈 생성 완료', 'success')
     } catch (error) {
-      toastMsg(error, 'error')
-      // showErrortoastMsgMsg(error)
-      console.error('Failed to fetch issue list:', error)
+      if (error.name === 'AbortError') {
+        toastMsg('자동 이슈 생성이 취소되었습니다.', 'success')
+        navigate(-1)
+        return
+      }
+      console.error('Error fetching issues:', error)
+      toastMsg('이슈 생성 중 오류가 발생했습니다.', 'error')
       setIssueList([])
     } finally {
       setIsFetching(false)
     }
 
     function appendContentInline (issue) {
-      issue.priority = 'M' // TODO: 수정 필요
       if (!issue.body || !Array.isArray(issue.body)) {
         return { ...issue, content: '' }
       }
@@ -301,7 +325,7 @@ const IssueSuggestPage = () => {
       const content = `📌 기능 설명\n${description}\n\n✅ 구현 단계 (TODO)\n${todos}\n\n👤 희망 담당자 정보\n${assigneeInfo}`
       return { ...issue, content }
     }
-  }, [projectId])
+  }, [projectId, navigate])
 
   useEffect(() => {
     if (issueList.length > 0) return
@@ -420,7 +444,7 @@ const IssueSuggestPage = () => {
     setIssueTitle(issue.title)
     setIssueContent(issue.content)
     setPriority(issue.priority || 'M')
-    setSprintIndex(issue.sprint)
+    setSprintIndex(issue.sprint ? Number(issue.sprint) - 1 : null)
     setSelectedLabels(issue.labels || [])
     setAssignees(issue.assignees || [])
     setIsCompleted(issue.isCompleted || false)
@@ -428,7 +452,7 @@ const IssueSuggestPage = () => {
 
   const handleStateToggle = () => {
     if (step === 'assign') {
-      if (assignees.length === 0) {
+      if (!assignees || assignees.length === 0) {
         toastMsg('담당자를 먼저 선택해주세요.', 'warning')
         return
       }
@@ -538,7 +562,13 @@ const IssueSuggestPage = () => {
                 isHighlighted: true
               },
           step === 'confirm'
-            ? { value: '취소', onClick: () => window.history.back() }
+            ? { 
+              value: '취소', 
+              onClick: () => {
+                setIsFetching(false)
+                setIssueList([])
+                window.location.href = `/project/${projectId}#issue`
+              }}
             : { value: '뒤로', onClick: () => window.history.back() }
         ]}
       />
@@ -607,7 +637,7 @@ const IssueSuggestPage = () => {
 
             <Row>
               <Typography value='Iteration' variant='textSM' weight='medium' color='gray900' />
-              {sprintIndex && (
+              {sprintIndex !== null && (
                 <>
                   <div
                     ref={iterationRef}
@@ -624,17 +654,17 @@ const IssueSuggestPage = () => {
                       <IterationBox>
                         <Typography
                           value={
-                              sprintIndex !== null && iterationOptions[sprintIndex]
+                              iterationOptions[sprintIndex]
                                 ? iterationOptions[sprintIndex].title
                                 : 'Iteration을 선택해주세요'
                             }
                           variant='textSM'
                           weight='regular'
-                          color={sprintIndex !== null && iterationOptions[sprintIndex] ? 'gray900' : 'gray400'}
+                          color={iterationOptions[sprintIndex] ? 'gray900' : 'gray400'}
                         />
                         <Typography
                           value={
-                              sprintIndex !== null && iterationOptions[sprintIndex]
+                              iterationOptions[sprintIndex]
                                 ? iterationOptions[sprintIndex].period
                                 : ''
                             }
@@ -643,7 +673,6 @@ const IssueSuggestPage = () => {
                           color='gray500'
                         />
                       </IterationBox>
-
                     </IterationBox>
                   </div>
                   {iterationDropdownOpen && isIssueSelected && createPortal(
@@ -807,20 +836,12 @@ const IssueSuggestPage = () => {
                 setIssueList(updated)
                 setIsCompleted(true)
               }}
-              style={{
-                cursor: step === 'assign' || isAllCompleted ? 'not-allowed' : 'pointer',
-                opacity: step === 'assign' || isAllCompleted ? 0.5 : 1
-              }}
             >
               전체 이슈 확정
             </ButtonBase>
             <ButtonBase
               $isHighlighted
               disabled={isFetching}
-              style={{
-                cursor: step === 'assign' || isAllCompleted ? 'not-allowed' : 'pointer',
-                opacity: step === 'assign' || isAllCompleted ? 0.5 : 1
-              }}
               onClick={() => {
                 if (isFetching) return
                 navigate(`${location.pathname}#confirm`)
