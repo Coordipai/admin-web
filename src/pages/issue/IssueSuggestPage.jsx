@@ -175,11 +175,36 @@ const IssueSuggestPage = () => {
     const hash = location.hash.replace('#', '')
     return hash === 'confirm' ? 'confirm' : 'assign'
   })
+  const abortControllerRef = useRef(null)
+
+  // issue 목록
+  const [selectedIssue, setSelectedIssue] = useState(null)
+  const isIssueSelected = !!selectedIssue
+  const [issueList, setIssueList] = useState([])
+  const isAllCompleted = issueList.every(issue => issue.isCompleted)
 
   useEffect(() => {
+    // 페이지를 나가는 중이면 실행하지 않음
+    if (!location.pathname.includes('issuesuggest')) return
+
     const hash = location.hash.replace('#', '')
     setStep(hash === 'confirm' ? 'confirm' : 'assign')
-  }, [location.hash])
+
+    // If in assign step and no issues, go back to confirm step
+    if (hash === 'assign' && issueList.length === 0) {
+      navigate(`${location.pathname}#confirm`)
+    }
+  }, [location.hash, issueList.length, navigate, location.pathname])
+
+  // 컴포넌트 언마운트 시 abortControllerRef 정리
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+        abortControllerRef.current = null
+      }
+    }
+  }, [])
 
   // project 정보
   const [priorityOptions] = useState([
@@ -200,14 +225,6 @@ const IssueSuggestPage = () => {
   const [selectedLabels, setSelectedLabels] = useState([])
   const [assignees, setAssignees] = useState([])
   const [isCompleted, setIsCompleted] = useState(false)
-
-  // issue 목록
-  const [selectedIssue, setSelectedIssue] = useState(null)
-  const isIssueSelected = !!selectedIssue
-  const [issueList, setIssueList] = useState([])
-  const isAllCompleted = issueList.every(issue => issue.isCompleted)
-
-  const abortControllerRef = useRef(null)
 
   const fetchProject = useCallback(async () => {
     try {
@@ -308,7 +325,7 @@ const IssueSuggestPage = () => {
       const content = `📌 기능 설명\n${description}\n\n✅ 구현 단계 (TODO)\n${todos}\n\n👤 희망 담당자 정보\n${assigneeInfo}`
       return { ...issue, content }
     }
-  }, [projectId])
+  }, [projectId, navigate])
 
   useEffect(() => {
     if (issueList.length > 0) return
@@ -548,12 +565,9 @@ const IssueSuggestPage = () => {
             ? { 
               value: '취소', 
               onClick: () => {
-                if (abortControllerRef.current) {
-                  abortControllerRef.current.abort()
-                  abortControllerRef.current = null
-                }
                 setIsFetching(false)
                 setIssueList([])
+                window.location.href = `/project/${projectId}#issue`
               }}
             : { value: '뒤로', onClick: () => window.history.back() }
         ]}
@@ -822,20 +836,12 @@ const IssueSuggestPage = () => {
                 setIssueList(updated)
                 setIsCompleted(true)
               }}
-              style={{
-                cursor: step === 'assign' || isAllCompleted ? 'not-allowed' : 'pointer',
-                opacity: step === 'assign' || isAllCompleted ? 0.5 : 1
-              }}
             >
               전체 이슈 확정
             </ButtonBase>
             <ButtonBase
               $isHighlighted
               disabled={isFetching}
-              style={{
-                cursor: step === 'assign' || isAllCompleted ? 'not-allowed' : 'pointer',
-                opacity: step === 'assign' || isAllCompleted ? 0.5 : 1
-              }}
               onClick={() => {
                 if (isFetching) return
                 navigate(`${location.pathname}#confirm`)

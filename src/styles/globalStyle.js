@@ -23,7 +23,7 @@ export const ContainerBox = styled.div`
   gap: 1rem;
 `
 
-export const ButtonBase = styled.div`
+export const ButtonBase = styled.button`
   display: flex;
   gap: 0.5rem;
   margin: auto 0;
@@ -40,6 +40,10 @@ export const ButtonBase = styled.div`
       $isHighlighted ? theme.colors.brand600 : theme.colors.gray300};
   cursor: pointer;
   white-space: nowrap;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `
 
 export const InputFieldBase = styled.div`
